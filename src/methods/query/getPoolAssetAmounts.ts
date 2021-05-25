@@ -26,7 +26,7 @@ export const getPoolAssetsAmounts = async (
 
   if (!api) return null;
 
-  const poolsList = await api.query.amm.poolAssets.entries();
+  const poolsList = await api.query.xyk.poolAssets.entries();
 
   //TODO should be create type for poolsList (api.createType())
   const parsedPoolsList = poolsList.map(item => {

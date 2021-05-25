@@ -8,7 +8,7 @@ export function addLiquidity(asset1Id: string, asset2Id: string, amount: BigNumb
   return new Promise((resolve, reject) => {
     try {
       const api = Api.getApi();
-      const tx = api.tx.amm.addLiquidity(
+      const tx = api.tx.xyk.addLiquidity(
                               asset1Id,
                               asset2Id,
                               bnToBn(amount.toString()),

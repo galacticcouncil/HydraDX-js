@@ -8,7 +8,7 @@ export function removeLiquidity(asset1Id: string, asset2Id: string, liquidityToR
   return new Promise((resolve, reject) => {
     try {
       const api = Api.getApi();
-      const tx = api.tx.amm.removeLiquidity(
+      const tx = api.tx.xyk.removeLiquidity(
                               asset1Id,
                               asset2Id,
                               bnToBn(liquidityToRemove.toString())

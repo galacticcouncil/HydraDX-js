@@ -19,7 +19,7 @@ export async function getMarketcap(assetId1: string, assetId2: string) {
         });
       }
 
-      const poolsList = await api.query.amm.poolAssets.entries();
+      const poolsList = await api.query.xyk.poolAssets.entries();
       let parsedPoolsList = poolsList.map(item => {
         return [item[0].toHuman(), item[1].toHuman()];
       });

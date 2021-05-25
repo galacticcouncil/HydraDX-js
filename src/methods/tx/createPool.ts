@@ -8,7 +8,7 @@ export function createPool(asset1Id: string, asset2Id: string, amount: BigNumber
   return new Promise((resolve, reject) => {
     try {
       const api = Api.getApi();
-      const tx = api.tx.amm.createPool(
+      const tx = api.tx.xyk.createPool(
                               asset1Id,
                               asset2Id,
                               bnToBn(amount.toString()),
