@@ -38,5 +38,5 @@ export default {
   },
   "LookupSource": "AccountId",
   "OrderedSet": "Vec<AssetId>",
-  "Price": "U64F64"
+  "Price": "Balance"
 }
