@@ -1,5 +1,5 @@
 node_modules
 /lib
 jest.env.js
-.ideayarn-error.log
 .idea
+yarn-error.log

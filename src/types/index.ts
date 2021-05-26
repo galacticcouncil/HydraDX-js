@@ -69,8 +69,8 @@ export type ExchangeTransactionDetails = {
   asset1?: string;
   asset2?: string;
   amount?: BigNumber;
-  amountAmmTrade?: BigNumber;
-  amountOutAmmTrade?: BigNumber;
+  amountXykTrade?: BigNumber;
+  amountOutXykTrade?: BigNumber;
   amountSoldBought?: BigNumber;
   totalAmountFinal?: BigNumber,
   directTrades?: {

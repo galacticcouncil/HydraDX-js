@@ -74,9 +74,9 @@ const mergeEventToScope = (receivedEventData: any) => {
    * this specific exchange action + fees.
    */
 
-  const totalAmmTradeAmount: BigNumber =
-    pairedEventData.data && pairedEventData.data.amountOutAmmTrade !== undefined
-      ? pairedEventData.data.amountOutAmmTrade
+  const totalXykTradeAmount: BigNumber =
+    pairedEventData.data && pairedEventData.data.amountOutXykTrade !== undefined
+      ? pairedEventData.data.amountOutXykTrade
       : new BigNumber(0);
 
   const totalDirectTradeAmount: BigNumber =
@@ -91,7 +91,7 @@ const mergeEventToScope = (receivedEventData: any) => {
 
   if (!pairedEventData.data) pairedEventData.data = { id: null };
 
-  pairedEventData.data.totalAmountFinal = totalAmmTradeAmount
+  pairedEventData.data.totalAmountFinal = totalXykTradeAmount
     .plus(totalDirectTradeAmount)
     .plus(totalFeesAmount);
 
@@ -174,8 +174,8 @@ export const processChainEvent = (
               id: parsedData[2]?.toString(),
               intentionType: parsedData[1]?.toString(),
               account: parsedData[0]?.toString(),
-              amountAmmTrade: new BigNumber(parsedData[3]?.toString() || 0),
-              amountOutAmmTrade: new BigNumber(parsedData[4]?.toString() || 0),
+              amountXykTrade: new BigNumber(parsedData[3]?.toString() || 0),
+              amountOutXykTrade: new BigNumber(parsedData[4]?.toString() || 0),
             },
           });
         }
@@ -257,7 +257,7 @@ export const processChainEvent = (
               account: parsedData[0]?.toString(),
               intentionType: parsedData[2]?.toString(),
               assetsPair: parsedData[1]?.toString(),
-              errorDetails: parsedData[1]?.toString(),
+              errorDetails: parsedData[4]?.toString(),
             },
           });
         }
