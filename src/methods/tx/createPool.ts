@@ -25,7 +25,7 @@ export function createPool(asset1Id: string, asset2Id: string, amount: BigNumber
       result.catch(txCatch(reject));
     } catch(e) {
       reject({
-        section: 'amm.createPool',
+        section: 'xyk.createPool',
         data: [ e.message ],
       });
     }

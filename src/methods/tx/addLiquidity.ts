@@ -25,7 +25,7 @@ export function addLiquidity(asset1Id: string, asset2Id: string, amount: BigNumb
       result.catch(txCatch(reject));
     } catch (e) {
       reject({
-        section: 'amm.addLiquidity',
+        section: 'xyk.addLiquidity',
         data: [ e.message ],
       });
     }
