@@ -8,7 +8,7 @@ export function addLiquidity(asset1Id: string, asset2Id: string, amount: BigNumb
   return new Promise((resolve, reject) => {
     try {
       const api = Api.getApi();
-      const tx = api.tx.amm.addLiquidity(
+      const tx = api.tx.xyk.addLiquidity(
                               asset1Id,
                               asset2Id,
                               bnToBn(amount.toString()),
@@ -25,7 +25,7 @@ export function addLiquidity(asset1Id: string, asset2Id: string, amount: BigNumb
       result.catch(txCatch(reject));
     } catch (e) {
       reject({
-        section: 'amm.addLiquidity',
+        section: 'xyk.addLiquidity',
         data: [ e.message ],
       });
     }

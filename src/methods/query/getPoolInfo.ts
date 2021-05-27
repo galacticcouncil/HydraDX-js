@@ -6,8 +6,8 @@ export async function getPoolInfo() {
     try {
       const api = Api.getApi();
       if (!api) return reject();
-      const allPools = await api.query.amm.poolAssets.entries();
-      const allTokens = await api.query.amm.shareToken.entries();
+      const allPools = await api.query.xyk.poolAssets.entries();
+      const allTokens = await api.query.xyk.shareToken.entries();
   
       const poolInfo: PoolInfo = {};
   
