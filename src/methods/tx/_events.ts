@@ -257,7 +257,7 @@ export const processChainEvent = (
               account: parsedData[0]?.toString(),
               intentionType: parsedData[2]?.toString(),
               assetsPair: parsedData[1]?.toString(),
-              errorDetails: parsedData[4]?.toString(),
+              errorDetails: parsedData[4],
             },
           });
         }
