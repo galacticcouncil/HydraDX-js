@@ -5,6 +5,8 @@ import {
 } from '../../types';
 import { getHdxEventEmitter } from '../../utils/eventEmitter';
 import BigNumber from 'bignumber.js';
+import BN from 'bn.js';
+import Api from '../../api';
 
 let mergedPairedEvents: MergedPairedEvents = {};
 
@@ -104,6 +106,8 @@ export const processChainEvent = (
 ) => {
   if (!records) return;
   const hdxEventEmitter = getHdxEventEmitter();
+  const api = Api.getApi();
+
   mergedPairedEvents = {}; // set/clear tmp storage with tx-s merged by intentionID
 
   const newEvents = records.filter(({ event }: { event: any }) =>
@@ -241,6 +245,21 @@ export const processChainEvent = (
          *                     [who, assets, sell or buy, intention id, error detail]
          */
         if (Array.isArray(parsedData)) {
+          const dispatchError = parsedData[4]
+          let errorDetails = dispatchError.toString();
+
+          if (parsedData[4].module !== undefined) {
+            const { documentation, section, name } = api.registry.findMetaError({
+              error: new BN(dispatchError.module.error),
+              index: new BN(dispatchError.module.index),
+            });
+            errorDetails = {
+              section,
+              name,
+              documentation: documentation.join(' '),
+            }
+          }
+
           mergeEventToScope({
             ...exchangeTxEventData,
             status: {
@@ -257,7 +276,7 @@ export const processChainEvent = (
               account: parsedData[0]?.toString(),
               intentionType: parsedData[2]?.toString(),
               assetsPair: parsedData[1]?.toString(),
-              errorDetails: parsedData[4],
+              errorDetails,
             },
           });
         }
