@@ -245,19 +245,21 @@ export const processChainEvent = (
          *                     [who, assets, sell or buy, intention id, error detail]
          */
         if (Array.isArray(parsedData)) {
-          const dispatchError = parsedData[4]
+          const dispatchError = parsedData[4];
           let errorDetails = dispatchError.toString();
 
           if (parsedData[4].module !== undefined) {
-            const { documentation, section, name } = api.registry.findMetaError({
-              error: new BN(dispatchError.module.error),
-              index: new BN(dispatchError.module.index),
-            });
+            const { documentation, section, name } = api.registry.findMetaError(
+              {
+                error: new BN(dispatchError.module.error),
+                index: new BN(dispatchError.module.index),
+              }
+            );
             errorDetails = {
               section,
               name,
               documentation: documentation.join(' '),
-            }
+            };
           }
 
           mergeEventToScope({
@@ -334,7 +336,9 @@ export const processExchangeTransactionEvent = (events: any) => {
 
     //TODO wait for data from system.events
     if (!currentTxIntentionId || currentTxIntentionId.length === 0) {
-      reject(new Error('Intention ID has not been found in exchange even data.'));
+      reject(
+        new Error('Intention ID has not been found in exchange even data.')
+      );
       return; // Terminate execution "processExchangeTransactionEvent" function here.
     }
 
