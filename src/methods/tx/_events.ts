@@ -46,6 +46,10 @@ const mergeEventToScope = (receivedEventData: any) => {
           ...(pairedEventData.data.directTrades || []),
           ...(receivedEventData.data.directTrades || []),
         ],
+        fees: [
+          ...(pairedEventData.data.fees || []),
+          ...(receivedEventData.data.fees || []),
+        ],
       },
     };
   }
@@ -69,7 +73,21 @@ const mergeEventToScope = (receivedEventData: any) => {
     pairedEventData.data.match = totalDirectTradeMatch;
   }
 
-  // TODO return final trade price and final trade fee
+  /**
+   * Calculate "totalFeeFinal" - total amount of direct trade fees.
+   */
+  if (
+    receivedEventData.method[0] === 'IntentionResolvedDirectTradeFees' &&
+    pairedEventData.data !== undefined &&
+    pairedEventData.data.fees !== undefined
+  ) {
+    let totalFeesAmount = new BigNumber(0);
+    pairedEventData.data.fees.forEach(feeItem => {
+      totalFeesAmount = totalFeesAmount.plus(feeItem.amount);
+    });
+    pairedEventData.data.totalFeeFinal = totalFeesAmount;
+  }
+
 
   /**
    * Calculate "totalAmountFinal" - total amount from all types of trading for
@@ -86,16 +104,16 @@ const mergeEventToScope = (receivedEventData: any) => {
       ? pairedEventData.data.match
       : new BigNumber(0);
 
-  const totalFeesAmount: BigNumber =
-    pairedEventData.data && pairedEventData.data.fees !== undefined
-      ? pairedEventData.data.fees
+  const totalFeeAmount: BigNumber =
+    pairedEventData.data && pairedEventData.data.totalFeeFinal !== undefined
+      ? pairedEventData.data.totalFeeFinal
       : new BigNumber(0);
 
   if (!pairedEventData.data) pairedEventData.data = { id: null };
 
   pairedEventData.data.totalAmountFinal = totalXykTradeAmount
     .plus(totalDirectTradeAmount)
-    .plus(totalFeesAmount);
+    .plus(totalFeeAmount);
 
   mergedPairedEvents[intentionId] = pairedEventData;
 };
@@ -235,9 +253,25 @@ export const processChainEvent = (
         break;
       case 'IntentionResolvedDirectTradeFees':
         /**
-         * parsedData: <Array> [AccountId, AccountId, AssetId, Balance]
-         *                     [who, account paid to, asset, fee amount]
+         * parsedData: <Array> [AccountId, IntentionID, AccountId, AssetId, Balance]
+         *                     [who, IntentionID, account paid to, asset, fee amount]
          */
+        if (Array.isArray(parsedData)) {
+          mergeEventToScope({
+            ...exchangeTxEventData,
+            data: {
+              id: parsedData[1]?.toString(),
+              fees: [
+                {
+                  account1: parsedData[0]?.toString(),
+                  account2: parsedData[2]?.toString(),
+                  asset: parsedData[3]?.toString(),
+                  amount: new BigNumber(parsedData[4]?.toString()),
+                },
+              ],
+            },
+          });
+        }
         break;
       case 'IntentionResolveErrorEvent':
         /**
