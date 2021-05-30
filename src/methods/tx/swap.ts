@@ -10,7 +10,7 @@ export function swap({
   amount,
   expectedOut,
   actionType,
-  slippage = new BigNumber('100000000000000000'),
+  slippage,
   account,
   signer,
 }: {
