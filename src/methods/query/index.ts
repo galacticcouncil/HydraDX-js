@@ -37,3 +37,5 @@ export { getReservedTokenAmount } from './getReservedTokenAmount';
 export { getFrozenFeeTokenAmount } from './getFrozenFeeTokenAmount';
 export { getMiscFrozenTokenAmount } from './getMiscFrozenTokenAmount';
 export { getMarketcap } from './getMarketcap';
+export { getMaxReceivedTradeAmount } from './getMaxReceivedTradeAmount';
+export { getMinReceivedTradeAmount } from './getMinReceivedTradeAmount';
