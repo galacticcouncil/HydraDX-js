@@ -39,6 +39,9 @@ export function swap({
     if (status.isInBlock) txCallback(resolve, reject, 'exchange')(callbackData);
   };
 
+  console.log('SDK --- amount.toString() - ', amount.toString())
+  console.log('SDK --- bnToBn(amount.toString() - ', bnToBn(amount.toString()).toString())
+
   if (actionType === 'buy') {
     tx = api.tx.exchange
       //TODO: CALCULATE LIMITS FROM SPOT PRICE
