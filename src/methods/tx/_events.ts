@@ -88,7 +88,6 @@ const mergeEventToScope = (receivedEventData: any) => {
     pairedEventData.data.totalFeeFinal = totalFeesAmount;
   }
 
-
   /**
    * Calculate "totalAmountFinal" - total amount from all types of trading for
    * this specific exchange action + fees.
@@ -112,8 +111,12 @@ const mergeEventToScope = (receivedEventData: any) => {
   if (!pairedEventData.data) pairedEventData.data = { id: null };
 
   pairedEventData.data.totalAmountFinal = totalXykTradeAmount
-    .plus(totalDirectTradeAmount)
-    .plus(totalFeeAmount);
+    .plus(totalDirectTradeAmount);
+
+  pairedEventData.data.totalAmountFinal =
+    pairedEventData.data.intentionType === 'BUY'
+      ? pairedEventData.data.totalAmountFinal.plus(totalFeeAmount)
+      : pairedEventData.data.totalAmountFinal.minus(totalFeeAmount);
 
   mergedPairedEvents[intentionId] = pairedEventData;
 };
