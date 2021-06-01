@@ -248,7 +248,11 @@ export const processChainEvent = (
           const dispatchError = parsedData[4];
           let errorDetails = dispatchError.toString();
 
-          if (parsedData[4].module !== undefined) {
+          if (
+            parsedData[4].module !== undefined &&
+            new BigNumber(dispatchError.module.error).isInteger() &&
+            new BigNumber(dispatchError.module.index).isInteger()
+          ) {
             const { documentation, section, name } = api.registry.findMetaError(
               {
                 error: new BN(dispatchError.module.error),
