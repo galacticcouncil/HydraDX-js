@@ -59,7 +59,7 @@ const mergeEventToScope = (receivedEventData: any) => {
    */
 
   /**
-   * Calculate "match" value - total amount, which has been traded by Direct trade
+   * Calculate "match" value - total amount, which has been matched by Direct trade
    */
   if (
     receivedEventData.method[0] === 'IntentionResolvedDirectTrade' &&
@@ -67,10 +67,13 @@ const mergeEventToScope = (receivedEventData: any) => {
     pairedEventData.data.directTrades !== undefined
   ) {
     let totalDirectTradeMatch = new BigNumber(0);
+    let totalDirectTradeSent = new BigNumber(0);
     pairedEventData.data.directTrades.forEach(item => {
       totalDirectTradeMatch = totalDirectTradeMatch.plus(item.amountReceived);
+      totalDirectTradeSent = totalDirectTradeMatch.plus(item.amountSent);
     });
     pairedEventData.data.match = totalDirectTradeMatch;
+    pairedEventData.data.totalDirectTradeSent = totalDirectTradeSent;
   }
 
   /**
@@ -98,9 +101,13 @@ const mergeEventToScope = (receivedEventData: any) => {
       ? pairedEventData.data.amountOutXykTrade
       : new BigNumber(0);
 
+  // const totalDirectTradeAmount: BigNumber =
+  //   pairedEventData.data && pairedEventData.data.match !== undefined
+  //     ? pairedEventData.data.match
+  //     : new BigNumber(0);
   const totalDirectTradeAmount: BigNumber =
-    pairedEventData.data && pairedEventData.data.match !== undefined
-      ? pairedEventData.data.match
+    pairedEventData.data && pairedEventData.data.totalDirectTradeSent !== undefined
+      ? pairedEventData.data.totalDirectTradeSent
       : new BigNumber(0);
 
   const totalFeeAmount: BigNumber =

@@ -71,6 +71,7 @@ export type ExchangeTransactionDetails = {
   fees?: DirectTradeFee[];
   totalFeeFinal?: BigNumber;
   match?: BigNumber;
+  totalDirectTradeSent?: BigNumber;
   saved?: BigNumber;
   intentionType?: string;
   account?: string;
