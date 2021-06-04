@@ -58,11 +58,20 @@ export type TradeTransaction = {
   progress: number;
 };
 
+export type DirectTradeFee = {
+  account1: string;
+  account2: string;
+  asset: string;
+  amount: BigNumber;
+}
+
 export type ExchangeTransactionDetails = {
   id: string | null;
   slippage?: BigNumber;
-  fees?: BigNumber;
+  fees?: DirectTradeFee[];
+  totalFeeFinal?: BigNumber;
   match?: BigNumber;
+  totalDirectTradeExchanged?: BigNumber;
   saved?: BigNumber;
   intentionType?: string;
   account?: string;
@@ -72,7 +81,10 @@ export type ExchangeTransactionDetails = {
   amountXykTrade?: BigNumber;
   amountOutXykTrade?: BigNumber;
   amountSoldBought?: BigNumber;
-  totalAmountFinal?: BigNumber,
+  totalAmountFinal?: BigNumber;
+  errorDetails?:
+    string | { section: string; name: string; documentation: string };
+  assetsPair?: string;
   directTrades?: {
     amountSent: BigNumber;
     amountReceived: BigNumber;
