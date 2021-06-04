@@ -58,11 +58,20 @@ export type TradeTransaction = {
   progress: number;
 };
 
+export type DirectTradeFee = {
+  account1: string;
+  account2: string;
+  asset: string;
+  amount: BigNumber;
+}
+
 export type ExchangeTransactionDetails = {
   id: string | null;
   slippage?: BigNumber;
-  fees?: BigNumber;
+  fees?: DirectTradeFee[];
+  totalFeeFinal?: BigNumber;
   match?: BigNumber;
+  totalDirectTradeExchanged?: BigNumber;
   saved?: BigNumber;
   intentionType?: string;
   account?: string;
