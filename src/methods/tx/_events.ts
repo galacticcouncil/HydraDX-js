@@ -65,13 +65,19 @@ const mergeEventToScope = (receivedEventData: any) => {
     pairedEventData.data.directTrades !== undefined
   ) {
     let totalDirectTradeMatch = new BigNumber(0);
-    let totalDirectTradeSent = new BigNumber(0);
+    let totalDirectTradeExchanged = new BigNumber(0);
+
     pairedEventData.data.directTrades.forEach(item => {
-      totalDirectTradeMatch = totalDirectTradeMatch.plus(item.amountReceived);
-      totalDirectTradeSent = totalDirectTradeMatch.plus(item.amountSent);
+      if (pairedEventData.data.intentionType === 'BUY') {
+        totalDirectTradeMatch = totalDirectTradeMatch.plus(item.amountReceived);
+        totalDirectTradeExchanged = totalDirectTradeExchanged.plus(item.amountSent);
+      } else {
+        totalDirectTradeMatch = totalDirectTradeMatch.plus(item.amountSent);
+        totalDirectTradeExchanged = totalDirectTradeExchanged.plus(item.amountReceived);
+      }
     });
     pairedEventData.data.match = totalDirectTradeMatch;
-    pairedEventData.data.totalDirectTradeSent = totalDirectTradeSent;
+    pairedEventData.data.totalDirectTradeExchanged = totalDirectTradeExchanged;
   }
 
   /**
@@ -91,7 +97,7 @@ const mergeEventToScope = (receivedEventData: any) => {
 
   /**
    * Calculate "totalAmountFinal" - total amount from all types of trading for
-   * this specific exchange action + fees.
+   * this specific exchange action +/- fees.
    */
 
   const totalXykTradeAmount: BigNumber =
@@ -100,8 +106,8 @@ const mergeEventToScope = (receivedEventData: any) => {
       : new BigNumber(0);
 
   const totalDirectTradeAmount: BigNumber =
-    pairedEventData.data && pairedEventData.data.totalDirectTradeSent !== undefined
-      ? pairedEventData.data.totalDirectTradeSent
+    pairedEventData.data && pairedEventData.data.totalDirectTradeExchanged !== undefined
+      ? pairedEventData.data.totalDirectTradeExchanged
       : new BigNumber(0);
 
   const totalFeeAmount: BigNumber =
