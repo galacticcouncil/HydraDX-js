@@ -3,8 +3,8 @@ import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { wasm } from './index';
 
-export async function calculateSpotAmount(asset1Id: string, asset2Id: string, amount: string) {
-  return new Promise(async (resolve, reject) => {
+export async function calculateSpotAmount(asset1Id: string, asset2Id: string, amount: BigNumber) {
+  return new Promise<BigNumber>(async (resolve, reject) => {
     try {
       const api = Api.getApi();
     
@@ -18,7 +18,7 @@ export async function calculateSpotAmount(asset1Id: string, asset2Id: string, am
         )
           return;
 
-        const price = new BigNumber(await wasm.get_spot_price(assetsAmounts.asset1, assetsAmounts.asset2, amount));
+        const price = new BigNumber(await wasm.get_spot_price(assetsAmounts.asset1, assetsAmounts.asset2, amount.toString()));
         resolve(price);
       }
     } catch(e) {

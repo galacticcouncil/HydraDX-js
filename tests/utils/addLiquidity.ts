@@ -1,11 +1,12 @@
+import BigNumber from 'bignumber.js';
 import { HydraApiPromise } from '../../src/types';
 import { KeyringPair } from '@polkadot/keyring/types';
 
-export const addLiquidity = (api: HydraApiPromise, keyring: KeyringPair, assetId1: string, assetId2: string, amount: string, maxSellPrice: string) => {
+export const addLiquidity = (api: HydraApiPromise, keyring: KeyringPair, assetId1: string, assetId2: string, amount: BigNumber, maxSellPrice: BigNumber) => {
   let account = '';
 
   return new Promise<string>(async (resolve, reject) => {
-    const unsub = await api.tx.amm.addLiquidity(assetId1, assetId2, amount, maxSellPrice)
+    const unsub = await api.tx.xyk.addLiquidity(assetId1, assetId2, amount.toString(), maxSellPrice.toString())
       .signAndSend(keyring, ({ events = [], status }) => {
         if (status.isFinalized) {
           unsub();

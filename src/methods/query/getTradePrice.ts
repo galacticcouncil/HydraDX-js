@@ -4,8 +4,8 @@ import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { wasm } from './index';
 
-export async function getTradePrice(asset1Id: string, asset2Id: string, tradeAmount: string, actionType: string) {
-  return new Promise(async (resolve, reject) => {
+export async function getTradePrice(asset1Id: string, asset2Id: string, tradeAmount: BigNumber, actionType: string) {
+  return new Promise<BigNumber>(async (resolve, reject) => {
     try {
       const api = Api.getApi();
     
@@ -24,9 +24,9 @@ export async function getTradePrice(asset1Id: string, asset2Id: string, tradeAmo
                 return;
 
               if (actionType === 'sell') {
-                  amount = new BigNumber(await wasm.get_sell_price(assetsAmounts.asset1, assetsAmounts.asset2, tradeAmount));
+                  amount = new BigNumber(await wasm.get_sell_price(assetsAmounts.asset1, assetsAmounts.asset2, tradeAmount.toString()));
               } else if (actionType === 'buy') {
-                  amount = new BigNumber(await wasm.get_buy_price(assetsAmounts.asset1, assetsAmounts.asset2, tradeAmount));
+                  amount = new BigNumber(await wasm.get_buy_price(assetsAmounts.asset1, assetsAmounts.asset2, tradeAmount.toString()));
               }
           }
           resolve(amount);

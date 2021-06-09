@@ -1,5 +1,8 @@
 import type { Codec } from '@polkadot/types/types';
 import type { Balance } from '@polkadot/types/interfaces/runtime';
+import BigNumber from "bignumber.js";
+
+import { toInternalBN, toExternalBN } from '../../utils';
 
 export interface AccountAmount extends Codec {
   free?: Balance;
@@ -24,18 +27,52 @@ async function initialize() {
 
 initialize();
 
-export { getAccountBalances } from './getAccountBalances';
-export { getAssetList } from './getAssetList';
-export { getPoolInfo } from './getPoolInfo';
-export { getSpotPrice } from './getSpotPrice';
-export { getTokenAmount } from './getTokenAmount';
-export { getPoolAssetsAmounts } from './getPoolAssetAmounts';
-export { calculateSpotAmount } from './calculateSpotAmount';
-export { getTradePrice } from './getTradePrice';
-export { getFreeTokenAmount } from './getFreeTokenAmount';
-export { getReservedTokenAmount } from './getReservedTokenAmount';
-export { getFrozenFeeTokenAmount } from './getFrozenFeeTokenAmount';
-export { getMiscFrozenTokenAmount } from './getMiscFrozenTokenAmount';
-export { getMarketcap } from './getMarketcap';
-export { getMaxReceivedTradeAmount } from './getMaxReceivedTradeAmount';
-export { getMinReceivedTradeAmount } from './getMinReceivedTradeAmount';
+import { getAccountBalances } from './getAccountBalances';
+import { getAssetList } from './getAssetList';
+import { getPoolInfo } from './getPoolInfo';
+import { getSpotPrice } from './getSpotPrice';
+import { getTokenAmount } from './getTokenAmount';
+import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
+import { calculateSpotAmount as _calculateSpotAmount } from './calculateSpotAmount';
+import { getTradePrice as _getTradePrice } from './getTradePrice';
+import { getFreeTokenAmount } from './getFreeTokenAmount';
+import { getReservedTokenAmount } from './getReservedTokenAmount';
+import { getFrozenFeeTokenAmount } from './getFrozenFeeTokenAmount';
+import { getMiscFrozenTokenAmount } from './getMiscFrozenTokenAmount';
+import { getMarketcap } from './getMarketcap';
+import { getMaxReceivedTradeAmount as _getMaxReceivedTradeAmount } from './getMaxReceivedTradeAmount';
+import { getMinReceivedTradeAmount as _getMinReceivedTradeAmount } from './getMinReceivedTradeAmount';
+
+const calculateSpotAmount = async (asset1Id: string, asset2Id: string, amount: BigNumber) => {
+  return Promise.resolve(toExternalBN(await _calculateSpotAmount(asset1Id, asset2Id, toInternalBN(amount))));
+}
+
+const getTradePrice = async (asset1Id: string, asset2Id: string, tradeAmount: BigNumber, actionType: string) => {
+  return Promise.resolve(toExternalBN(await _getTradePrice(asset1Id, asset2Id, toInternalBN(tradeAmount), actionType)));
+}
+
+const getMaxReceivedTradeAmount = (tradeAmount: BigNumber, slippage: BigNumber) => {
+  return toExternalBN(_getMaxReceivedTradeAmount(toInternalBN(tradeAmount), toInternalBN(slippage)));
+}
+
+const getMinReceivedTradeAmount = (tradeAmount: BigNumber, slippage: BigNumber) => {
+  return toExternalBN(_getMaxReceivedTradeAmount(toInternalBN(tradeAmount), toInternalBN(slippage)));
+}
+
+export {
+  getAccountBalances,
+  getAssetList,
+  getPoolInfo,
+  getSpotPrice,
+  getTokenAmount,
+  getPoolAssetsAmounts,
+  calculateSpotAmount,
+  getTradePrice,
+  getFreeTokenAmount,
+  getReservedTokenAmount,
+  getFrozenFeeTokenAmount,
+  getMiscFrozenTokenAmount,
+  getMarketcap,
+  getMaxReceivedTradeAmount,
+  getMinReceivedTradeAmount,
+}
