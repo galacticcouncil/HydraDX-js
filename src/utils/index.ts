@@ -65,7 +65,7 @@ export const decorateExchangeTxDataScopeToExternalBN = (
 
   Object.keys(txDataScope).forEach(txId => {
     decoratedScope[txId] = decorateExchangeTxDataToExternalBN(
-      decoratedScope[txId]
+      txDataScope[txId]
     );
   });
 
