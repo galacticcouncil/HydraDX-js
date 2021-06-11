@@ -5,6 +5,7 @@ import TypeConfig from './config/type';
 import { processChainEvent } from './methods/tx/_events';
 
 import { initHdxEventEmitter } from './utils/eventEmitter';
+import { decorateExchangeTxDataScopeToExternalBN } from './utils';
 
 import * as query from './methods/query';
 import * as tx from './methods/tx';
@@ -57,7 +58,7 @@ const initialize = async (
 
       apiInst.query.system.events((events: any) => {
         processChainEvent(events, pairedEventsData =>
-          onTxEventCallback(pairedEventsData)
+          onTxEventCallback(decorateExchangeTxDataScopeToExternalBN(pairedEventsData))
         );
       });
     };
