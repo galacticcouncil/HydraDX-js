@@ -3,6 +3,7 @@ import BN from 'bn.js';
 import { formatBalance } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import Api from '../api';
+import { ExchangeTxEventData, MergedPairedEvents } from '../types';
 
 import { AssetAmount } from '../types';
 
@@ -26,8 +27,49 @@ const bnToDec = (bn: BN): BigNumber => new BigNumber(bn.toString());
 
 const getStableCoinID = () => 1;
 
-export const toInternalBN = (number: BigNumber, multiply: number = 12) => number.multipliedBy(`1e${multiply}`);
+export const toInternalBN = (number: BigNumber, multiply: number = 12) =>
+  number.multipliedBy(`1e${multiply}`);
 
-export const toExternalBN = (number: BigNumber, divide: number = 12) => number.dividedBy(`1e${divide}`);
+export const toExternalBN = (number: BigNumber, divide: number = 12) =>
+  number.dividedBy(`1e${divide}`);
+
+export const decorateExchangeTxDataToExternalBN = (
+  txDataFull: ExchangeTxEventData
+): ExchangeTxEventData => {
+  let decoratedTxData = txDataFull.data;
+
+  const checkTxProperties = (propsScope: any) => {
+    Object.keys(propsScope).forEach(txPropName => {
+      if (Array.isArray(propsScope[txPropName])) {
+        propsScope[txPropName].forEach((listedPropsScope: any) =>
+          checkTxProperties(listedPropsScope)
+        );
+      } else if (propsScope[txPropName] instanceof BigNumber) {
+        propsScope[txPropName] = toExternalBN(propsScope[txPropName]);
+      }
+    });
+  };
+
+  checkTxProperties(decoratedTxData);
+
+  return {
+    ...txDataFull,
+    data: decoratedTxData,
+  } as ExchangeTxEventData;
+};
+
+export const decorateExchangeTxDataScopeToExternalBN = (
+  txDataScope: MergedPairedEvents
+): MergedPairedEvents => {
+  const decoratedScope: MergedPairedEvents = {};
+
+  Object.keys(txDataScope).forEach(txId => {
+    decoratedScope[txId] = decorateExchangeTxDataToExternalBN(
+      txDataScope[txId]
+    );
+  });
+
+  return decoratedScope;
+};
 
 export { decToBn, bnToDec, formatBalanceAmount, getStableCoinID };

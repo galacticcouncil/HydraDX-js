@@ -94,13 +94,6 @@ export type ExchangeTransactionDetails = {
   }[];
 };
 
-export type SuccessEventData = {
-  section: string;
-  method: string;
-  dispatchInfo?: any;
-  data?: ExchangeTransactionDetails;
-};
-
 export type ExchangeTxEventData = {
   section: string[];
   method: string[];

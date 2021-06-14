@@ -413,6 +413,4 @@ export const processExchangeTransactionEvent = (events: any) => {
 
     hdxEventEmitter.on('onSystemEventProcessed', checkPairedTxData);
   });
-
-  // TODO add reject processing
 };
