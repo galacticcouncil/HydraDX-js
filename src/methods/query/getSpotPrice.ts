@@ -4,7 +4,7 @@ import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { wasm } from './index';
 
 export async function getSpotPrice(asset1Id: string, asset2Id: string) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<BigNumber>(async (resolve, reject) => {
     try {
       const api = Api.getApi();
     

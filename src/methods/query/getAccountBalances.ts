@@ -3,7 +3,7 @@ import { AssetBalance } from '../../types';
 import Api from '../../api';
 
 export async function getAccountBalances(account: any) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<AssetBalance[]>(async (resolve, reject) => {
     try {
       const api = Api.getApi();
       const balances: AssetBalance[] = [];
