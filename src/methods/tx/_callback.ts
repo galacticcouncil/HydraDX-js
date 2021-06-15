@@ -1,6 +1,5 @@
 import Api from '../../api';
 import { processExchangeTransactionEvent } from './_events';
-import { decorateExchangeTxDataToExternalBN } from '../../utils';
 
 export const txCallback = (resolve: any, reject: any, methodName?: string) => ({
   dispatchError,
@@ -12,9 +11,7 @@ export const txCallback = (resolve: any, reject: any, methodName?: string) => ({
 
   if (methodName === 'exchange') {
     processExchangeTransactionEvent(events)
-      .then((transactionData: any): void =>
-        resolve(decorateExchangeTxDataToExternalBN(transactionData))
-      )
+      .then((transactionData: any): void => resolve(transactionData))
       .catch(transactionErrorData => reject(transactionErrorData));
     return;
   } else {

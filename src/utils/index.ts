@@ -36,7 +36,7 @@ export const toExternalBN = (number: BigNumber, divide: number = 12) =>
 export const decorateExchangeTxDataToExternalBN = (
   txDataFull: ExchangeTxEventData
 ): ExchangeTxEventData => {
-  let decoratedTxData = txDataFull.data;
+  let decoratedTxData = { ...txDataFull.data };
 
   const checkTxProperties = (propsScope: any) => {
     Object.keys(propsScope).forEach(txPropName => {
