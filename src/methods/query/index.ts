@@ -105,19 +105,6 @@ const getMinReceivedTradeAmount = (
 };
 
 const getAccountBalances = (account: any) => {
-  // return Promise.resolve ( => {
-  //   const balances: AssetBalance[] = await _getAccountBalances(account);
-  //   return balances.map(({ assetId, balance, balanceFormatted }) => {
-  //     return {
-  //       assetId,
-  //       balance: toExternalBN(balance),
-  //       balanceFormatted: toExternalBN(
-  //         new BigNumber(balanceFormatted)
-  //       ).toString(),
-  //     };
-  //   });
-  // });
-
   return new Promise((resolve, reject) => {
     _getAccountBalances(account)
       .then((balances: AssetBalance[]) => {

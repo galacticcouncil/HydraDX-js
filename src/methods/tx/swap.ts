@@ -3,6 +3,7 @@ import { bnToBn } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { txCallback, txCatch } from './_callback';
+import { ExchangeTxEventData } from '../../types';
 
 export function swap({
   asset1Id,
@@ -10,7 +11,7 @@ export function swap({
   amount,
   expectedOut,
   actionType,
-  slippage = new BigNumber('100000000000000000'),
+  slippage,
   account,
   signer,
 }: {
@@ -61,7 +62,7 @@ export function swap({
       );
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise<ExchangeTxEventData>((resolve, reject) => {
     if (signer) {
       result = tx.signAndSend(
         account,
