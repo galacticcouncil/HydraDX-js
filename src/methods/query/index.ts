@@ -104,7 +104,7 @@ const getMinReceivedTradeAmount = (
   );
 };
 
-const getAccountBalances = (account: any) => {
+const getAccountBalances = async (account: any) => {
   return Promise.resolve(async () => {
     const balances: AssetBalance[] = await _getAccountBalances(account);
     return balances.map(({ assetId, balance, balanceFormatted }) => {
