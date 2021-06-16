@@ -31,7 +31,7 @@ export const toInternalBN = (number: BigNumber, multiply: number = 12) =>
   number.multipliedBy(`1e${multiply}`).integerValue();
 
 export const toExternalBN = (number: BigNumber, divide: number = 12) =>
-  number.dividedBy(`1e${divide}`).integerValue();
+  number.integerValue().dividedBy(`1e${divide}`);
 
 export const decorateExchangeTxDataToExternalBN = (
   txDataFull: ExchangeTxEventData
