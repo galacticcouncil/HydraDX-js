@@ -28,10 +28,10 @@ const bnToDec = (bn: BN): BigNumber => new BigNumber(bn.toString());
 const getStableCoinID = () => 1;
 
 export const toInternalBN = (number: BigNumber, multiply: number = 12) =>
-  number.multipliedBy(`1e${multiply}`).integerValue();
+  number.multipliedBy(`1e+${multiply}`).integerValue();
 
 export const toExternalBN = (number: BigNumber, divide: number = 12) =>
-  number.integerValue().dividedBy(`1e${divide}`);
+  number.integerValue().dividedBy(`1e+${divide}`);
 
 export const decorateExchangeTxDataToExternalBN = (
   txDataFull: ExchangeTxEventData
