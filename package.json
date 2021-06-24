@@ -11,7 +11,7 @@
     "@polkadot/api": "^4.10.1",
     "bignumber.js": "^9.0.1",
     "bn.js": "^5.1.3",
-    "hack-hydra-dx-wasm": "git+https://github.com/galacticcouncil/HydraDX-wasm#build_targets"
+    "hydra-dx-wasm": "git+https://github.com/galacticcouncil/HydraDX-wasm#build_targets"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
@@ -26,11 +26,11 @@
   },
   "main": "lib/index.js",
   "transformIgnorePatterns": [
-    "node_modules/(?!hack-hydra-dx-wasm).+/"
+    "node_modules/(?!hydra-dx-wasm).+/"
   ],
   "jest": {
     "transformIgnorePatterns": [
-      "node_modules/(?!hack-hydra-dx-wasm).+/"
+      "node_modules/(?!hydra-dx-wasm).+/"
     ],
     "plugins": [
       "plugin-transform-modules-commonjs"
