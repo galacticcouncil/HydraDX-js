@@ -24,9 +24,9 @@ export async function getTradePrice(asset1Id: string, asset2Id: string, tradeAmo
                 return;
 
               if (actionType === 'sell') {
-                  amount = new BigNumber(await wasm.get_sell_price(assetsAmounts.asset1, assetsAmounts.asset2, tradeAmount.toString()));
+                  amount = new BigNumber(await wasm.calculate_in_given_out(assetsAmounts.asset1, assetsAmounts.asset2, tradeAmount.toString()));
               } else if (actionType === 'buy') {
-                  amount = new BigNumber(await wasm.get_buy_price(assetsAmounts.asset1, assetsAmounts.asset2, tradeAmount.toString()));
+                  amount = new BigNumber(await wasm.calculate_out_given_in(assetsAmounts.asset1, assetsAmounts.asset2, tradeAmount.toString()));
               }
           }
           resolve(amount);
