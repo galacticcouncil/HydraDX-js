@@ -14,14 +14,14 @@ export let wasm: any;
 async function initialize() {
   if (typeof window !== 'undefined') {
     if (typeof process.env.NODE_ENV === 'undefined') {
-      wasm = await import('hydra-dx-wasm/build/web');
+      wasm = await import('hydra-dx-wasm/build/xyk/web');
       wasm.default();
     } else {
       const { import_wasm } = await import('../../utils/import_wasm');
       wasm = await import_wasm();
     }
   } else {
-    wasm = await import('hydra-dx-wasm/build/nodejs');
+    wasm = await import('hydra-dx-wasm/build/xyk/nodejs');
   }
 }
 
