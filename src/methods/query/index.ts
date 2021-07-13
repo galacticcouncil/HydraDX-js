@@ -113,21 +113,11 @@ const getAccountBalances = (account: any) => {
             return {
               assetId,
               balance: toExternalBN(balance),
-              balanceFormatted: toExternalBN(
-                new BigNumber(balanceFormatted)
-              ).toString(),
-              freeBalance: toExternalBN(
-                new BigNumber(freeBalance)
-              ).toString(),
-              feeFrozenBalance: toExternalBN(
-                new BigNumber(feeFrozenBalance)
-              ).toString(),
-              miscFrozenBalance: toExternalBN(
-                new BigNumber(miscFrozenBalance)
-              ).toString(),
-              reservedBalance: toExternalBN(
-                new BigNumber(reservedBalance)
-              ).toString(),
+              balanceFormatted: toExternalBN(new BigNumber(balanceFormatted)),
+              freeBalance: toExternalBN(new BigNumber(freeBalance)),
+              feeFrozenBalance: toExternalBN(new BigNumber(feeFrozenBalance)),
+              miscFrozenBalance: toExternalBN(new BigNumber(miscFrozenBalance)),
+              reservedBalance: toExternalBN(new BigNumber(reservedBalance)),
             };
           })
         );

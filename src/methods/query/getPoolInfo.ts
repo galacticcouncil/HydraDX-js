@@ -5,6 +5,8 @@ import  { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { getAssetPrices } from '../../utils';
 import { wasm } from './index';
 
+import { toExternalBN } from '../../utils';
+
 export async function getPoolInfo() {
   return new Promise(async (resolve, reject) => {
     try {
@@ -92,8 +94,8 @@ export async function getPoolInfo() {
 
           if (poolInfo[poolId]) {
             poolInfo[poolId].poolAssetsAmount = {
-              asset1: poolAssetsAmount.asset1,
-              asset2: poolAssetsAmount.asset2,
+              asset1: toExternalBN(new BigNumber(poolAssetsAmount.asset1)),
+              asset2: toExternalBN(new BigNumber(poolAssetsAmount.asset2)),
             }
             poolInfo[poolId].marketCap = marketCap;
           }

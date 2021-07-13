@@ -44,8 +44,8 @@ export type PoolInfo = {
     poolAssetNames: string[];
     shareToken: number;
     poolAssetsAmount?: {
-      asset1: string | null;
-      asset2: string | null;
+      asset1: BigNumber | null;
+      asset2: BigNumber | null;
     } | null;
     marketCap?: BigNumber;
   };
