@@ -2,6 +2,7 @@ import Api from '../../../src/api';
 import { HydraApiPromise } from '../../../src/types';
 import { getAliceAccount } from '../../utils/getAliceAccount';
 import { createPool } from '../../utils/createPool';
+import BigNumber from 'bignumber.js';
 
 let api: HydraApiPromise;
 
@@ -13,8 +14,8 @@ test('Test getPoolInfo structure', async () => {
 
   const assetList = await api.hydraDx.query.getAssetList(alice.address);
   const asset1 = assetList[0].assetId.toString();
-  const asset2 = assetList[assetList.length - 1].assetId.toString();
-  const address = await createPool(api, alice, asset1, asset2, '1000000000', '500000000');
+  const asset2 = assetList[1].assetId.toString();
+  const address = await createPool(api, alice, asset1, asset2, new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
 
   let expectedPoolInfo = {...poolInfo};
 

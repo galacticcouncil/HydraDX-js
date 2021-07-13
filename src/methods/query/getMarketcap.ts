@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 
 import Api from '../../api';
-import { getStableCoinID } from '../../utils';
+import { getAssetPrices } from '../../utils';
 
 import  { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { getPoolInfo } from './getPoolInfo';
@@ -61,54 +61,7 @@ export async function getMarketcap(assetId1: string, assetId2: string) {
       });
 
       const priceUnit = (new BigNumber(1)).multipliedBy('1e12');
-      const stableCoinId = getStableCoinID();
-      const assetPrices: any = {
-        [stableCoinId]: priceUnit,
-      };
-      const activeMap = [{
-        [stableCoinId]: poolInfo.tokenTradeMap[stableCoinId]
-      }];
-
-      while (activeMap.length) {
-        const element: any = activeMap.pop();
-
-        if (element) {
-          const key: string = Object.keys(element)[0];
-
-          poolInfo.tokenTradeMap[key] = null;
-          for (let i = 0; i < element[key].length; i++) {
-            const assetId = element[key][i].toString();
-
-            if (poolInfo.tokenTradeMap[assetId]) {
-              activeMap.push({
-                [assetId]: poolInfo.tokenTradeMap[assetId]
-              });
-            }
-
-            const currentPool: any = parsedPoolsList.find(
-              poolInfo =>
-                  poolInfo[1] &&
-                  //@ts-ignore
-                  poolInfo[1].includes(key) &&
-                  //@ts-ignore
-                  poolInfo[1].includes(assetId)
-            );
-
-            const poolHash = currentPool && currentPool[0] && currentPool[0][0];
-            const assetAmount = poolAssetAmounts.find(amount => amount.accountAddress === poolHash);
-            const assetIndex = currentPool && currentPool[1] && (currentPool[1] as any[]).indexOf(assetId);
-            let price;
-
-            if (assetIndex === 0) {
-              price = assetPrices[key].multipliedBy(assetAmount.spotPrice).dividedBy(priceUnit);
-            } else {
-              price = assetPrices[key].dividedBy(assetAmount.spotPrice).multipliedBy(priceUnit);
-            }
-
-            assetPrices[assetId] = price;
-          }
-        }
-      }
+      const assetPrices = getAssetPrices(poolInfo.tokenTradeMap, parsedPoolsList, poolAssetAmounts);
 
       poolAssetAmounts.forEach(assetAmount => {
         const asset1Price = (new BigNumber(assetAmount.asset1)).multipliedBy(assetPrices[assetAmount.assetId1]).dividedBy(priceUnit);

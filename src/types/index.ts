@@ -11,7 +11,7 @@ export type ApiListeners = {
   connected?: (api?: ApiPromise) => void;
   disconnected?: () => void;
   ready?: (api?: ApiPromise) => void;
-  onTxEvent: (eventData: any) => void;
+  onTxEvent?: (eventData: any) => void;
 };
 
 export type AssetAmount = {
@@ -24,6 +24,10 @@ export type AssetBalance = {
   assetId: number;
   balance: BigNumber;
   balanceFormatted: string;
+  freeBalance: BigNumber,
+  feeFrozenBalance: BigNumber,
+  miscFrozenBalance: BigNumber,
+  reservedBalance: BigNumber,
   name?: string;
   shareToken?: boolean;
 };
@@ -39,6 +43,11 @@ export type PoolInfo = {
     poolAssets: number[];
     poolAssetNames: string[];
     shareToken: number;
+    poolAssetsAmount?: {
+      asset1: string | null;
+      asset2: string | null;
+    } | null;
+    marketCap?: BigNumber;
   };
 };
 
