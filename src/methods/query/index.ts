@@ -29,7 +29,7 @@ initialize();
 
 // import { getAccountBalances } from './getAccountBalances';
 import { getAssetList } from './getAssetList';
-import { getPoolInfo } from './getPoolInfo';
+import { getPoolInfo as _getPoolInfo } from './getPoolInfo';
 // import { getSpotPrice } from './getSpotPrice';
 import { getTokenAmount } from './getTokenAmount';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
@@ -121,6 +121,23 @@ const getAccountBalances = (account: any) => {
             };
           })
         );
+      })
+      .catch(e => reject(e));
+  });
+};
+
+const getPoolInfo = () => {
+  return new Promise((resolve, reject) => {
+    _getPoolInfo()
+      .then((res: any) => {
+        Object.keys(res.poolInfo).forEach((key) => {
+          if (res.poolInfo[key].poolAssetsAmount) {
+            res.poolInfo[key].poolAssetsAmount.asset1 = toExternalBN(res.poolInfo[key].poolAssetsAmount.asset1);
+            res.poolInfo[key].poolAssetsAmount.asset2 = toExternalBN(res.poolInfo[key].poolAssetsAmount.asset2);
+          }
+          res.poolInfo[key].marketCap = toExternalBN(res.poolInfo[key].marketCap);
+        });
+        resolve(res);
       })
       .catch(e => reject(e));
   });

@@ -94,8 +94,8 @@ export async function getPoolInfo() {
 
           if (poolInfo[poolId]) {
             poolInfo[poolId].poolAssetsAmount = {
-              asset1: toExternalBN(new BigNumber(poolAssetsAmount.asset1)),
-              asset2: toExternalBN(new BigNumber(poolAssetsAmount.asset2)),
+              asset1: new BigNumber(poolAssetsAmount.asset1),
+              asset2: new BigNumber(poolAssetsAmount.asset2),
             }
             poolInfo[poolId].marketCap = marketCap;
           }
