@@ -23,7 +23,7 @@ export type AssetAmount = {
 export type AssetBalance = {
   assetId: number;
   balance: BigNumber;
-  balanceFormatted: string;
+  totalBalance: BigNumber;
   freeBalance: BigNumber,
   feeFrozenBalance: BigNumber,
   miscFrozenBalance: BigNumber,
