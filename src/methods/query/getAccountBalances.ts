@@ -45,7 +45,7 @@ export async function getAccountBalances(account: any) {
             assetId,
             balance,
             balanceFormatted,
-            freeBalance: baseTokenBalance,
+            freeBalance: balance,
             feeFrozenBalance,
             miscFrozenBalance,
             reservedBalance,
