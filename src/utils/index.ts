@@ -3,7 +3,11 @@ import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 import type { StorageKey } from '@polkadot/types';
 import type { AnyTuple, Codec, AnyJson } from '@polkadot/types/types';
-import { ExchangeTxEventData, MergedPairedEvents, TokenTradeMap } from '../types';
+import {
+  ExchangeTxEventData,
+  MergedPairedEvents,
+  TokenTradeMap,
+} from '../types';
 
 const decToBn = (bignumber: BigNumber): BN => bnToBn(bignumber.toString());
 
@@ -56,17 +60,24 @@ export const decorateExchangeTxDataScopeToExternalBN = (
   return decoratedScope;
 };
 
-export const getAssetPrices = (tokenTradeMap: any, parsedPoolsList: AnyJson[][], poolAssetAmounts: any[]) : {
+export const getAssetPrices = (
+  tokenTradeMap: any,
+  parsedPoolsList: AnyJson[][],
+  poolAssetAmounts: any[]
+): {
   [key: string]: BigNumber;
 } => {
-  const priceUnit = (new BigNumber(1)).multipliedBy('1e12');
+  const priceUnit = new BigNumber(1).multipliedBy('1e12');
   const stableCoinId = getStableCoinID();
+  const tradeMap = { ...tokenTradeMap };
   const assetPrices: any = {
     [stableCoinId]: priceUnit,
   };
-  const activeMap = [{
-    [stableCoinId]: tokenTradeMap[stableCoinId]
-  }];
+  const activeMap = [
+    {
+      [stableCoinId]: tradeMap[stableCoinId],
+    },
+  ];
 
   while (activeMap.length) {
     const element: any = activeMap.pop();
@@ -74,34 +85,43 @@ export const getAssetPrices = (tokenTradeMap: any, parsedPoolsList: AnyJson[][],
     if (element) {
       const key: string = Object.keys(element)[0];
 
-      tokenTradeMap[key] = null;
+      tradeMap[key] = null;
       for (let i = 0; i < element[key].length; i++) {
         const assetId = element[key][i].toString();
 
-        if (tokenTradeMap[assetId]) {
+        if (tradeMap[assetId]) {
           activeMap.push({
-            [assetId]: tokenTradeMap[assetId]
+            [assetId]: tradeMap[assetId],
           });
         }
 
         const currentPool: any = parsedPoolsList.find(
           poolInfo =>
-              poolInfo[1] &&
-              //@ts-ignore
-              poolInfo[1].includes(key) &&
-              //@ts-ignore
-              poolInfo[1].includes(assetId)
+            poolInfo[1] &&
+            //@ts-ignore
+            poolInfo[1].includes(key) &&
+            //@ts-ignore
+            poolInfo[1].includes(assetId)
         );
 
         const poolHash = currentPool && currentPool[0] && currentPool[0][0];
-        const assetAmount = poolAssetAmounts.find(amount => amount.accountAddress === poolHash);
-        const assetIndex = currentPool && currentPool[1] && (currentPool[1] as any[]).indexOf(assetId);
+        const assetAmount = poolAssetAmounts.find(
+          amount => amount.accountAddress === poolHash
+        );
+        const assetIndex =
+          currentPool &&
+          currentPool[1] &&
+          (currentPool[1] as any[]).indexOf(assetId);
         let price;
 
         if (assetIndex === 0) {
-          price = assetPrices[key].multipliedBy(assetAmount.spotPrice).dividedBy(priceUnit);
+          price = assetPrices[key]
+            .multipliedBy(assetAmount.spotPrice)
+            .dividedBy(priceUnit);
         } else {
-          price = assetPrices[key].dividedBy(assetAmount.spotPrice).multipliedBy(priceUnit);
+          price = assetPrices[key]
+            .dividedBy(assetAmount.spotPrice)
+            .multipliedBy(priceUnit);
         }
 
         assetPrices[assetId] = price;
@@ -110,6 +130,6 @@ export const getAssetPrices = (tokenTradeMap: any, parsedPoolsList: AnyJson[][],
   }
 
   return assetPrices;
-}
+};
 
 export { decToBn, bnToDec, getStableCoinID };
