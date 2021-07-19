@@ -109,11 +109,11 @@ const getAccountBalances = (account: any) => {
     _getAccountBalances(account)
       .then((balances: AssetBalance[]) => {
         resolve(
-          balances.map(({ assetId, balance, balanceFormatted, freeBalance, feeFrozenBalance, miscFrozenBalance, reservedBalance }) => {
+          balances.map(({ assetId, balance, totalBalance, freeBalance, feeFrozenBalance, miscFrozenBalance, reservedBalance }) => {
             return {
               assetId,
               balance: toExternalBN(balance),
-              balanceFormatted: toExternalBN(new BigNumber(balanceFormatted)),
+              totalBalance: toExternalBN(new BigNumber(totalBalance)),
               freeBalance: toExternalBN(new BigNumber(freeBalance)),
               feeFrozenBalance: toExternalBN(new BigNumber(feeFrozenBalance)),
               miscFrozenBalance: toExternalBN(new BigNumber(miscFrozenBalance)),
