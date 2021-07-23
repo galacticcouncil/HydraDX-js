@@ -16,13 +16,17 @@ test('Test removeLiquidity', async () => {
   const asset1 = assetList[0].assetId;
   const asset2 = assetList[assetList.length - 1].assetId;
 
-  await createPool(asset1.toString(), asset2.toString(), new BigNumber('1000000000'), new BigNumber('500000000'), alice);
+  try {
+    await createPool(asset1.toString(), asset2.toString(), new BigNumber('1000000000'), new BigNumber('500000000'), alice);
+  } catch(e) {
+    // NO-OP
+  }
   let targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
-  expect(targetBalance[targetBalance.length - 1].balanceFormatted).toBe('1000000000');
+  expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('0.001');
 
   await removeLiquidity(asset1.toString(), asset2.toString(), new BigNumber('500000000'), alice);
   targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
-  expect(targetBalance[targetBalance.length - 1].balanceFormatted).toBe('500000000');
+  expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('0.0005');
 
   try {
     await removeLiquidity(asset1.toString(), asset2.toString(), new BigNumber('0'), alice);

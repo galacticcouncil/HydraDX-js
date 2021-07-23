@@ -21,9 +21,21 @@ test('Test swap', async () => {
   let poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
 
   if (!poolInfo.tokenTradeMap[asset1].includes(parseInt(asset2))) {
-    await createPool(asset1.toString(), asset2.toString(), new BigNumber('0.02').multipliedBy('1e12'), new BigNumber('2').multipliedBy('1e18'), alice);
+    try {
+      await createPool(asset1.toString(), asset2.toString(), new BigNumber('0.02').multipliedBy('1e12'), new BigNumber('2').multipliedBy('1e18'), alice);
+    } catch (e) {
+      // NO-OP
+    }
   }
 
-  let result : any = await swap(asset1.toString(), asset2.toString(), new BigNumber('0.001').multipliedBy('1e12'), 'sell', 1, alice);
+  let result : any = await swap({
+    asset1Id: asset1.toString(), 
+    asset2Id: asset2.toString(), 
+    amount: new BigNumber('0.001').multipliedBy('1e12'), 
+    actionType: 'sell', 
+    expectedOut: '',
+    slippage: new BigNumber(1), 
+    account: alice
+  });
   expect(result.data[0].method).toBe('IntentionRegistered');
 });

@@ -7,6 +7,9 @@ export const transfer = (api: HydraApiPromise, targetAddress: string, sourceKeyr
     const unsub = await api.tx.balances
       .transfer(targetAddress, amount.toString())
       .signAndSend(sourceKeyring, async ({ events = [], status }) => {
+        events.forEach(({ event: { data, method, section }, phase }) => {
+          console.log('\t', phase.toString(), `: ${section}.${method}`, data.toString());
+        });
         if (status.isFinalized) {
           unsub();
           resolve();

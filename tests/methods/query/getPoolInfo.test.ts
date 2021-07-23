@@ -23,6 +23,11 @@ test('Test getPoolInfo structure', async () => {
     poolAssetNames: [],
     poolAssets: [parseInt(asset1), parseInt(asset2)],
     shareToken: assetList.length,
+    marketCap: new BigNumber('2'),
+    poolAssetsAmount: {
+      asset1: new BigNumber('1'),
+      asset2: new BigNumber('1'),
+    }
   };
 
   expectedPoolInfo.shareTokenIds.push(assetList.length);

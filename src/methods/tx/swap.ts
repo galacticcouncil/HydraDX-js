@@ -18,8 +18,8 @@ export function swap({
   asset1Id: string;
   asset2Id: string;
   amount: BigNumber;
-  expectedOut: string;
   actionType: string;
+  expectedOut: string;
   slippage: BigNumber;
   account: AddressOrPair;
   signer?: Signer;

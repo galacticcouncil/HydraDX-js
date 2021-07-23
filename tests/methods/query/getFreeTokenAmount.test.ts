@@ -11,9 +11,9 @@ test('Test getFreeTokenAmount structure', async () => {
   const alice = getAliceAccount();
 
   let freeTokenOrg = await api.hydraDx.query.getFreeTokenAmount(alice.address, '0');
-  let reserveAmount = (new BigNumber('10000')).multipliedBy('1e12');
+  let reserveAmount = (new BigNumber('1000')).multipliedBy('1e12');
 
-  await propose(api, alice, '0x0000000000000000000000000000000000000000000000000000000000000000', reserveAmount.toString());
+  await propose(api, alice, '0x0000000000000000000000000000000000000000000000000000000000000000', new BigNumber(reserveAmount.toString()));
 
   let freeTokenNow = await api.hydraDx.query.getFreeTokenAmount(alice.address, '0');
 
