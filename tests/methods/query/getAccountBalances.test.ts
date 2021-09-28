@@ -17,8 +17,8 @@ test('Test getAccountBalances structure', async () => {
 
   expect(targetBalance[0].balance.toString()).toBe('0');
 
-  await transfer(api, target.address, alice, new BigNumber('1000000000000'));
+  await transfer(api, target.address, alice, new BigNumber('1').multipliedBy('1e12'));
   targetBalance = await api.hydraDx.query.getAccountBalances(target.address);
 
-  expect(targetBalance[0].balance.toString()).toBe('1000000000000');
+  expect(targetBalance[0].balance.toString()).toBe('1');
 });

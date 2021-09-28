@@ -1,8 +1,10 @@
+import BigNumber from 'bignumber.js';
+
 import Api from '../../../src/api';
 import { HydraApiPromise } from '../../../src/types';
 import { getAliceAccount } from '../../utils/getAliceAccount';
 import { createPool } from '../../utils/createPool';
-import BigNumber from 'bignumber.js';
+import { destroyAllPools } from '../../utils';
 
 let api: HydraApiPromise;
 
@@ -10,19 +12,21 @@ test('Test getPoolInfo structure', async () => {
   api = await Api.initialize({}, process.env.WS_URL);
 
   const alice = getAliceAccount();
-  let poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
+  await destroyAllPools(api, alice);
 
-  const assetList = await api.hydraDx.query.getAssetList(alice.address);
+  let poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
+  let assetList = await api.hydraDx.query.getAssetList(alice.address);
   const asset1 = assetList[0].assetId.toString();
   const asset2 = assetList[1].assetId.toString();
   const address = await createPool(api, alice, asset1, asset2, new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
+  assetList = await api.hydraDx.query.getAssetList(alice.address);
 
   let expectedPoolInfo = {...poolInfo};
 
   expectedPoolInfo.poolInfo[address] = {
     poolAssetNames: [],
     poolAssets: [parseInt(asset1), parseInt(asset2)],
-    shareToken: assetList.length,
+    shareToken: 11,
     marketCap: new BigNumber('2'),
     poolAssetsAmount: {
       asset1: new BigNumber('1'),
@@ -30,7 +34,7 @@ test('Test getPoolInfo structure', async () => {
     }
   };
 
-  expectedPoolInfo.shareTokenIds.push(assetList.length);
+  expectedPoolInfo.shareTokenIds.push(11);
   expectedPoolInfo.tokenTradeMap[asset1] = expectedPoolInfo.tokenTradeMap[asset1] || [];
   expectedPoolInfo.tokenTradeMap[asset2] = expectedPoolInfo.tokenTradeMap[asset2] || [];
   expectedPoolInfo.tokenTradeMap[asset1].push(parseInt(asset2));

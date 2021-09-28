@@ -1,10 +1,11 @@
+import BigNumber from 'bignumber.js';
+
 import Api from '../../../src/api';
 import { HydraApiPromise } from '../../../src/types';
-
 import { createPool } from '../../../src/methods/tx/createPool';
 import { addLiquidity } from '../../../src/methods/tx/addLiquidity';
 import { getAliceAccount } from '../../utils/getAliceAccount';
-import BigNumber from 'bignumber.js';
+import { destroyAllPools } from '../../utils';
 
 let api: HydraApiPromise;
 
@@ -16,6 +17,7 @@ test('Test addLiquidity', async () => {
   const asset1 = assetList[0].assetId;
   const asset2 = assetList[1].assetId;
 
+  await destroyAllPools(api, alice);
   try {
     await createPool(asset1.toString(), asset2.toString(), new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'), alice);
   } catch (e) {
@@ -24,7 +26,7 @@ test('Test addLiquidity', async () => {
   let targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
   expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('1');
 
-  await addLiquidity(asset1.toString(), asset2.toString(), new BigNumber('1000000000'), new BigNumber('500000000'), alice);
+  await addLiquidity(asset1.toString(), asset2.toString(), new BigNumber('1000'), new BigNumber('500'), alice);
   targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
   expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('2');
 

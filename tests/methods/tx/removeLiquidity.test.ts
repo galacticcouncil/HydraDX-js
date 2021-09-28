@@ -1,10 +1,11 @@
+import BigNumber from 'bignumber.js';
+
 import Api from '../../../src/api';
 import { HydraApiPromise } from '../../../src/types';
-
 import { createPool } from '../../../src/methods/tx/createPool';
 import { removeLiquidity } from '../../../src/methods/tx/removeLiquidity';
 import { getAliceAccount } from '../../utils/getAliceAccount';
-import BigNumber from 'bignumber.js';
+import { destroyAllPools } from '../../utils';
 
 let api: HydraApiPromise;
 
@@ -16,6 +17,7 @@ test('Test removeLiquidity', async () => {
   const asset1 = assetList[0].assetId;
   const asset2 = assetList[assetList.length - 1].assetId;
 
+  await destroyAllPools(api, alice);
   try {
     await createPool(asset1.toString(), asset2.toString(), new BigNumber('1000000000'), new BigNumber('500000000'), alice);
   } catch(e) {

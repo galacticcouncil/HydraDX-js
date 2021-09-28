@@ -16,6 +16,10 @@ export const createPool = (api: HydraApiPromise, keyring: KeyringPair, assetId1:
             if (section === 'system' && method === 'NewAccount') {
               account = data[0].toString();
             }
+
+            if (section === 'balances' && method === 'Endowed') {
+              account = data[0].toString();
+            }
           });
         }
     });
