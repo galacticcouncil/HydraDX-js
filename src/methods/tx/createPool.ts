@@ -23,7 +23,7 @@ export function createPool(asset1Id: string, asset2Id: string, amount: BigNumber
       }
 
       result.catch(txCatch(reject));
-    } catch(e) {
+    } catch(e: any) {
       reject({
         section: 'xyk.createPool',
         data: [ e.message ],
