@@ -18,7 +18,7 @@ export async function getAssetList() {
       });
     
       resolve(assetList);
-    } catch(e) {
+    } catch(e: any) {
       reject(e);
     }
   });

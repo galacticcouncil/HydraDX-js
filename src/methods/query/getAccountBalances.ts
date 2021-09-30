@@ -73,7 +73,7 @@ export async function getAccountBalances(account: any) {
       }
 
       resolve(balances);
-    } catch (e) {
+    } catch (e: any) {
       reject(e);
     }
   });

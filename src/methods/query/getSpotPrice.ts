@@ -21,7 +21,7 @@ export async function getSpotPrice(asset1Id: string, asset2Id: string) {
         const price = new BigNumber(await wasm.get_spot_price(assetsAmounts.asset1, assetsAmounts.asset2, '1000000000000'));
         resolve(price);
       }
-    } catch(e) {
+    } catch(e: any) {
       reject(e);
     }
   });
