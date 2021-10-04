@@ -76,7 +76,7 @@ export async function getMarketcap(assetId1: string, assetId2: string) {
       }
 
       resolve(poolAssetAmounts);
-    } catch(e) {
+    } catch(e: any) {
       reject(e);
     }
   });

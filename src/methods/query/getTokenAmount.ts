@@ -30,7 +30,7 @@ export const getTokenAmount = async (
 
       // @ts-ignore
       return amount[type] ? bnToDec(amount[type]) : null;
-    } catch(e) {
+    } catch(e: any) {
       console.log(e);
       return null;
     }

@@ -56,7 +56,7 @@ export async function getTradePrice(
         }
         resolve(amount);
       }
-    } catch (e) {
+    } catch (e: any) {
       reject(e);
     }
   });

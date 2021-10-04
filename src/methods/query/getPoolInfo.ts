@@ -143,7 +143,7 @@ export async function getPoolInfo() {
         shareTokenIds,
         poolInfo,
       });
-    } catch (e) {
+    } catch (e: any) {
       reject(e);
     }
   });
