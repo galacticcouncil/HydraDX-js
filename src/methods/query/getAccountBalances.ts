@@ -1,4 +1,8 @@
 import BigNumber from 'bignumber.js';
+import type {
+  AccountInfoWithProviders,
+  AccountInfoWithRefCount,
+} from '@polkadot/types/interfaces';
 import { AssetBalance } from '../../types';
 import Api from '../../api';
 
@@ -10,7 +14,9 @@ export async function getAccountBalances(account: any) {
 
       if (account && api) {
         const multiTokenInfo = await api.query.tokens.accounts.entries(account);
-        const baseTokenInfo = await api.query.system.account(account);
+        const baseTokenInfo = (await api.query.system.account(account)) as
+          | AccountInfoWithProviders
+          | AccountInfoWithRefCount;
         const baseTokenBalance = new BigNumber(
           baseTokenInfo.data.free.toString()
         );
