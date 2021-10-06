@@ -22,7 +22,7 @@ export function removeLiquidity(asset1Id: string, asset2Id: string, liquidityToR
       }
 
       result.catch(txCatch(reject));
-    } catch(e) {
+    } catch(e: any) {
       reject({
         section: 'xyk.removeLiquidity',
         data: [ e.message ],
