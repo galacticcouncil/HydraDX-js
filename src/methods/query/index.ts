@@ -48,7 +48,11 @@ import { getMaxReceivedTradeAmount as _getMaxReceivedTradeAmount } from './getMa
 import { getMinReceivedTradeAmount as _getMinReceivedTradeAmount } from './getMinReceivedTradeAmount';
 
 import { getAccountBalances as _getAccountBalances } from './getAccountBalances';
-import { getSpotPrice as _getSpotPrice } from './getSpotPrice';
+import {
+  getSpotPrice as _getSpotPrice,
+  getSpotPriceXyk as _getSpotPriceXyk,
+  getSpotPriceLbp as _getSpotPriceLbp,
+} from './getSpotPrice';
 
 const calculateSpotAmount = async (
   asset1Id: string,
@@ -82,6 +86,28 @@ const getTradePrice = async (
 
 const getSpotPrice = async (asset1Id: string, asset2Id: string) => {
   return Promise.resolve(toExternalBN(await _getSpotPrice(asset1Id, asset2Id)));
+};
+
+const getSpotPriceXyk = async (
+  asset1Id: string,
+  asset2Id: string,
+  blockHash?: string | undefined
+) => {
+  return Promise.resolve(
+    toExternalBN(await _getSpotPriceXyk(asset1Id, asset2Id, blockHash))
+  );
+};
+const getSpotPriceLbp = async (
+  asset1Id: string,
+  asset2Id: string,
+  poolAccount: string,
+  blockHash?: string | undefined
+) => {
+  return Promise.resolve(
+    toExternalBN(
+      await _getSpotPriceLbp(asset1Id, asset2Id, poolAccount, blockHash)
+    )
+  );
 };
 
 const getMaxReceivedTradeAmount = (
@@ -170,6 +196,8 @@ export {
   getAssetList,
   getPoolInfo,
   getSpotPrice,
+  getSpotPriceXyk,
+  getSpotPriceLbp,
   getTokenAmount,
   getPoolAssetsAmounts,
   calculateSpotAmount,
