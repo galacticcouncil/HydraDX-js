@@ -299,7 +299,7 @@ export const processChainEvent = (
             new BigNumber(dispatchError.module.error).isInteger() &&
             new BigNumber(dispatchError.module.index).isInteger()
           ) {
-            const { documentation, section, name } = api.registry.findMetaError(
+            const { docs, section, name } = api.registry.findMetaError(
               {
                 error: new BN(dispatchError.module.error),
                 index: new BN(dispatchError.module.index),
@@ -308,7 +308,7 @@ export const processChainEvent = (
             errorDetails = {
               section,
               name,
-              documentation: documentation.join(' '),
+              documentation: docs.join(' '),
             };
           }
 

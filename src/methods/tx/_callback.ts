@@ -1,6 +1,8 @@
 import Api from '../../api';
 import { processExchangeTransactionEvent } from './_events';
 
+import { RegistryError } from '@polkadot/types/types/registry';
+
 export const txCallback = (resolve: any, reject: any, methodName?: string) => ({
   dispatchError,
   dispatchInfo,
@@ -33,14 +35,14 @@ export const txCallback = (resolve: any, reject: any, methodName?: string) => ({
           let errorInfo;
 
           if (dispatchError.isModule) {
-            const { documentation, section, name } = api.registry.findMetaError(
+            const { docs, section, name } = api.registry.findMetaError(
               dispatchError.asModule
-            );
+            ) as RegistryError;
 
             errorInfo = {
               section,
               name,
-              documentation: documentation.join(' '),
+              documentation: docs.join(' '),
             };
           } else {
             errorInfo = dispatchError.toString();
