@@ -18,7 +18,7 @@ export async function calculateSpotAmount(asset1Id: string, asset2Id: string, am
         )
           return;
 
-        const price = new BigNumber(await wasm.get_spot_price(assetsAmounts.asset1, assetsAmounts.asset2, amount.toString()));
+        const price = new BigNumber(await wasm.xyk.get_spot_price(assetsAmounts.asset1, assetsAmounts.asset2, amount.toString()));
         resolve(price);
       }
     } catch(e: any) {

@@ -9,23 +9,27 @@ export interface AccountAmount extends Codec {
   free?: Balance;
 }
 
-export let wasm: any;
+export let wasm: { xyk: any; lbp: any } = { xyk: null, lbp: null };
 
-async function initialize() {
+async function initializeWasm() {
   if (typeof window !== 'undefined') {
     if (typeof process.env.NODE_ENV === 'undefined') {
-      wasm = await import('hydra-dx-wasm/build/xyk/web');
-      wasm.default();
+      wasm.xyk = await import('hydra-dx-wasm/build/xyk/web');
+      wasm.xyk.default();
+      wasm.lbp = await import('hydra-dx-wasm/build/lbp/web');
+      wasm.lbp.default();
     } else {
       const { import_wasm } = await import('../../utils/import_wasm');
-      wasm = await import_wasm();
+      wasm.xyk = await import_wasm.xyk();
+      wasm.lbp = await import_wasm.lbp();
     }
   } else {
-    wasm = await import('hydra-dx-wasm/build/xyk/nodejs');
+    wasm.xyk = await import('hydra-dx-wasm/build/xyk/nodejs');
+    wasm.lbp = await import('hydra-dx-wasm/build/lbp/nodejs');
   }
 }
 
-initialize();
+initializeWasm();
 
 // import { getAccountBalances } from './getAccountBalances';
 import { getAssetList } from './getAssetList';
@@ -109,17 +113,29 @@ const getAccountBalances = (account: any) => {
     _getAccountBalances(account)
       .then((balances: AssetBalance[]) => {
         resolve(
-          balances.map(({ assetId, balance, totalBalance, freeBalance, feeFrozenBalance, miscFrozenBalance, reservedBalance }) => {
-            return {
+          balances.map(
+            ({
               assetId,
-              balance: toExternalBN(balance),
-              totalBalance: toExternalBN(new BigNumber(totalBalance)),
-              freeBalance: toExternalBN(new BigNumber(freeBalance)),
-              feeFrozenBalance: toExternalBN(new BigNumber(feeFrozenBalance)),
-              miscFrozenBalance: toExternalBN(new BigNumber(miscFrozenBalance)),
-              reservedBalance: toExternalBN(new BigNumber(reservedBalance)),
-            };
-          })
+              balance,
+              totalBalance,
+              freeBalance,
+              feeFrozenBalance,
+              miscFrozenBalance,
+              reservedBalance,
+            }) => {
+              return {
+                assetId,
+                balance: toExternalBN(balance),
+                totalBalance: toExternalBN(new BigNumber(totalBalance)),
+                freeBalance: toExternalBN(new BigNumber(freeBalance)),
+                feeFrozenBalance: toExternalBN(new BigNumber(feeFrozenBalance)),
+                miscFrozenBalance: toExternalBN(
+                  new BigNumber(miscFrozenBalance)
+                ),
+                reservedBalance: toExternalBN(new BigNumber(reservedBalance)),
+              };
+            }
+          )
         );
       })
       .catch(e => reject(e));
@@ -130,12 +146,18 @@ const getPoolInfo = () => {
   return new Promise((resolve, reject) => {
     _getPoolInfo()
       .then((res: any) => {
-        Object.keys(res.poolInfo).forEach((key) => {
+        Object.keys(res.poolInfo).forEach(key => {
           if (res.poolInfo[key].poolAssetsAmount) {
-            res.poolInfo[key].poolAssetsAmount.asset1 = toExternalBN(res.poolInfo[key].poolAssetsAmount.asset1);
-            res.poolInfo[key].poolAssetsAmount.asset2 = toExternalBN(res.poolInfo[key].poolAssetsAmount.asset2);
+            res.poolInfo[key].poolAssetsAmount.asset1 = toExternalBN(
+              res.poolInfo[key].poolAssetsAmount.asset1
+            );
+            res.poolInfo[key].poolAssetsAmount.asset2 = toExternalBN(
+              res.poolInfo[key].poolAssetsAmount.asset2
+            );
           }
-          res.poolInfo[key].marketCap = toExternalBN(res.poolInfo[key].marketCap);
+          res.poolInfo[key].marketCap = toExternalBN(
+            res.poolInfo[key].marketCap
+          );
         });
         resolve(res);
       })

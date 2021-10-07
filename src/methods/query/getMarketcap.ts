@@ -41,7 +41,7 @@ export async function getMarketcap(assetId1: string, assetId2: string) {
 
       let promises2 = poolAssetAmounts.map((assetAmounts) => {
         if (assetAmounts) {
-          return wasm.get_spot_price(assetAmounts.asset1, assetAmounts.asset2, '1000000000000');
+          return wasm.xyk.get_spot_price(assetAmounts.asset1, assetAmounts.asset2, '1000000000000');
         }
         return null;
       });

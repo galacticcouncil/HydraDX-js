@@ -38,7 +38,7 @@ export async function getTradePrice(
 
           if (actionType === 'sell') {
             amount = new BigNumber(
-              await wasm.calculate_out_given_in(
+              await wasm.xyk.calculate_out_given_in(
                 assetsAmounts.asset1,
                 assetsAmounts.asset2,
                 tradeAmount.toString()
@@ -46,7 +46,7 @@ export async function getTradePrice(
             );
           } else if (actionType === 'buy') {
             amount = new BigNumber(
-              await wasm.calculate_in_given_out(
+              await wasm.xyk.calculate_in_given_out(
                 assetsAmounts.asset1,
                 assetsAmounts.asset2,
                 tradeAmount.toString()
