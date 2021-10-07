@@ -5,8 +5,12 @@ import {
 } from '@polkadot/types/types/registry';
 
 import { ApiListeners, HydraApiPromise } from './types';
-import TypeConfigFallback from './config/type';
-import AliasConfigFallback from './config/alias';
+
+import ChainTypeConfigFallbackHydraDx from './config/type';
+import ChainAliasConfigFallbackHydraDx from './config/alias';
+import ChainTypeConfigFallbackBasilisk from './config/typeBasilisk';
+import ChainAliasConfigFallbackBasilisk from './config/aliasBasilisk';
+
 import { processChainEvent } from './methods/tx/_events';
 
 import { initHdxEventEmitter } from './utils/eventEmitter';
@@ -30,6 +34,7 @@ const getApi = (): HydraApiPromise => api;
    } - custom types and aliases for connected chain. Fallback types and aliases
  * are defined for HydraDX node.
  * @param maxRetries - maximum number of connect attempts to the chain
+ * @param chainName
  */
 const initialize = async (
   apiListeners: ApiListeners | null = null,
@@ -41,7 +46,8 @@ const initialize = async (
       }
     | null
     | undefined = undefined,
-  maxRetries: number = 20
+  maxRetries: number = 20,
+  chainName: string = 'hydraDx'
 ): Promise<HydraApiPromise> => {
   return new Promise<any>(async (resolve, reject) => {
     const wsProvider = new WsProvider(apiUrl, false);
@@ -105,8 +111,10 @@ const initialize = async (
 
       await new ApiPromise({
         provider: wsProvider,
-        types: typesConfig ? typesConfig.types : TypeConfigFallback,
-        typesAlias: typesConfig ? typesConfig.alias : AliasConfigFallback,
+        types: typesConfig ? typesConfig.types : ChainTypeConfigFallbackHydraDx,
+        typesAlias: typesConfig
+          ? typesConfig.alias
+          : ChainAliasConfigFallbackHydraDx,
       })
         .on('error', e => {
           if (!isDisconnection) {
@@ -139,10 +147,21 @@ const initialize = async (
         })
         .on('ready', apiInstance => {
           api = apiInstance;
-          api.hydraDx = {
-            query,
-            tx,
-          };
+
+          // TODO Must be reimplemented for better way
+          switch (chainName) {
+            case 'basilisk':
+              api.basilisk = {
+                query,
+                tx,
+              };
+            default:
+              api.hydraDx = {
+                query,
+                tx,
+              };
+          }
+
           if (apiListeners && apiListeners.ready) {
             apiListeners.ready(api);
           }
@@ -151,10 +170,21 @@ const initialize = async (
         })
         .isReadyOrError.then(apiResponse => {
           api = apiResponse;
-          api.hydraDx = {
-            query,
-            tx,
-          };
+
+          // TODO Must be reimplemented for better way
+          switch (chainName) {
+            case 'basilisk':
+              api.basilisk = {
+                query,
+                tx,
+              };
+            default:
+              api.hydraDx = {
+                query,
+                tx,
+              };
+          }
+
           if (apiListeners && apiListeners.connected) {
             apiListeners.connected(api);
           }
@@ -173,7 +203,45 @@ const initialize = async (
   });
 };
 
+const initializeHydraDx = async (
+  apiListeners: ApiListeners | null = null,
+  apiUrl: string = 'ws://127.0.0.1:9944',
+  typesConfig:
+    | {
+        types: RegistryTypes;
+        alias: Record<string, OverrideModuleType>;
+      }
+    | null
+    | undefined = {
+    types: ChainTypeConfigFallbackHydraDx,
+    alias: ChainAliasConfigFallbackHydraDx,
+  },
+  maxRetries: number = 20
+): Promise<HydraApiPromise> => {
+  return initialize(apiListeners, apiUrl, typesConfig, maxRetries, 'hydraDx');
+};
+
+const initializeBasilisk = async (
+  apiListeners: ApiListeners | null = null,
+  apiUrl: string = 'ws://127.0.0.1:9944',
+  typesConfig:
+    | {
+        types: RegistryTypes;
+        alias: Record<string, OverrideModuleType>;
+      }
+    | null
+    | undefined = {
+    types: ChainTypeConfigFallbackBasilisk,
+    alias: ChainAliasConfigFallbackBasilisk,
+  },
+  maxRetries: number = 20
+): Promise<HydraApiPromise> => {
+  return initialize(apiListeners, apiUrl, typesConfig, maxRetries, 'basilisk');
+};
+
 export default {
   initialize,
+  initializeHydraDx,
+  initializeBasilisk,
   getApi,
 };

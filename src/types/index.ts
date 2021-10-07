@@ -4,6 +4,7 @@ import { AddressOrPair } from '@polkadot/api/types';
 
 export interface HydraApiPromise extends ApiPromise {
   hydraDx?: any;
+  basilisk?: any;
 }
 
 export type ApiListeners = {
@@ -24,10 +25,10 @@ export type AssetBalance = {
   assetId: number;
   balance: BigNumber;
   totalBalance: BigNumber;
-  freeBalance: BigNumber,
-  feeFrozenBalance: BigNumber,
-  miscFrozenBalance: BigNumber,
-  reservedBalance: BigNumber,
+  freeBalance: BigNumber;
+  feeFrozenBalance: BigNumber;
+  miscFrozenBalance: BigNumber;
+  reservedBalance: BigNumber;
   name?: string;
   shareToken?: boolean;
 };
@@ -45,7 +46,9 @@ export type PoolInfo = {
     shareToken: number;
     poolAssetsAmount?: {
       asset1: BigNumber | null;
+      asset1Weight?: BigNumber | null; // actual for Basilisk chain
       asset2: BigNumber | null;
+      asset2Weight?: BigNumber | null; // actual for Basilisk chain
     } | null;
     marketCap?: BigNumber;
   };
@@ -72,7 +75,7 @@ export type DirectTradeFee = {
   account2: string;
   asset: string;
   amount: BigNumber;
-}
+};
 
 export type ExchangeTransactionDetails = {
   id: string | null;
@@ -92,7 +95,8 @@ export type ExchangeTransactionDetails = {
   amountSoldBought?: BigNumber;
   totalAmountFinal?: BigNumber;
   errorDetails?:
-    string | { section: string; name: string; documentation: string };
+    | string
+    | { section: string; name: string; documentation: string };
   assetsPair?: string;
   directTrades?: {
     amountSent: BigNumber;
