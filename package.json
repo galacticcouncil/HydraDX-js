@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc && cp ./src/utils/import_wasm.js ./lib/utils/import_wasm.js",
     "postinstall": "npm run build",
-    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit"
+    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@polkadot/api": "^4.10.1",
