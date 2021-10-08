@@ -9,6 +9,8 @@ import {
   TokenTradeMap,
 } from '../types';
 
+import { bsxPairSpotPriceInStableCoin, ksmPairSpotPriceInStableCoin } from './spotPriceConversion';
+
 const decToBn = (bignumber: BigNumber): BN => bnToBn(bignumber.toString());
 
 const bnToDec = (bn: BN): BigNumber => new BigNumber(bn.toString());
@@ -132,4 +134,10 @@ export const getAssetPrices = (
   return assetPrices;
 };
 
-export { decToBn, bnToDec, getStableCoinID };
+export { 
+    decToBn, 
+    bnToDec, 
+    getStableCoinID,
+    bsxPairSpotPriceInStableCoin,
+    ksmPairSpotPriceInStableCoin
+};
