@@ -7,13 +7,21 @@ import { wasm } from './index';
 
 import { toExternalBN } from '../../utils';
 
-export async function getPoolInfo() {
+// TODO Detailed description is necessary
+/**
+ * Provides list of all available pools with bunch of pool's details
+ */
+export async function getPoolInfo(blockHash?: string | undefined) {
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
       if (!api) return reject();
-      const allPools = await api.query.xyk.poolAssets.entries();
-      const allTokens = await api.query.xyk.shareToken.entries();
+      const allPools = blockHash
+        ? await api.query.xyk.poolAssets.entriesAt(blockHash)
+        : await api.query.xyk.poolAssets.entries();
+      const allTokens = blockHash
+        ? await api.query.xyk.shareToken.entriesAt(blockHash)
+        : await api.query.xyk.shareToken.entries();
       const poolInfo: PoolInfo = {};
 
       const shareTokenIds: number[] = [];
@@ -98,7 +106,8 @@ export async function getPoolInfo() {
 
         const poolAssetsAmount = await getPoolAssetsAmounts(
           poolAssets[0].toString(),
-          poolAssets[1].toString()
+          poolAssets[1].toString(),
+          blockHash
         );
         const assetPrices = getAssetPrices(
           tokenTradeMap,
@@ -147,4 +156,8 @@ export async function getPoolInfo() {
       reject(e);
     }
   });
+}
+
+export async function getPoolsInfoXyk(blockHash?: string | undefined) {
+  return getPoolInfo(blockHash);
 }

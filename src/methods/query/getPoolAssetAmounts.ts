@@ -1,5 +1,6 @@
 import Api from '../../api';
 import { getTokenAmount } from './getTokenAmount';
+import BigNumber from 'bignumber.js';
 
 /**
  * getAssetsAmounts fetches amounts for pair of assets within pool.
@@ -82,6 +83,200 @@ export const getPoolAssetsAmounts = async (
   return {
     asset1: asset1Amount !== null ? asset1Amount.toString() : null,
     asset2: asset2Amount !== null ? asset2Amount.toString() : null,
+    accountAddress: currentPoolId,
+  };
+};
+
+/**
+ * getPoolAssetsAmountsXyk fetches amounts for pair of assets within pool.
+ * @param asset1Id: string | null
+ * @param asset2Id: string | null
+ * @param poolAccount: string | null | undefined - if pool account is specified, it will
+ *        reduce number of requests to the chain (we do not need search pool account
+ *        by asset IDs)
+ * @param blockHash?: string | undefined
+ */
+export const getPoolAssetsAmountsXyk = async (
+  asset1Id: string | null,
+  asset2Id: string | null,
+  poolAccount: string | null | undefined,
+  blockHash?: string | undefined
+): Promise<{
+  asset1: string | null;
+  asset2: string | null;
+  accountAddress: string;
+} | null> => {
+  if (
+    (asset1Id !== null && asset1Id.length === 0) ||
+    asset1Id === null ||
+    (asset2Id !== null && asset2Id.length === 0) ||
+    asset2Id === null
+  )
+    return null;
+
+  const api = Api.getApi();
+
+  if (!api) return null;
+
+  let currentPoolId = poolAccount;
+
+  if (!poolAccount) {
+    let poolsList = [];
+
+    if (blockHash) {
+      poolsList = await api.query.xyk.poolAssets.entriesAt(blockHash);
+    } else {
+      poolsList = await api.query.xyk.poolAssets.entries();
+    }
+
+    //TODO should be create type for poolsList (api.createType())
+    const parsedPoolsList = poolsList.map(item => {
+      return [item[0].toHuman(), item[1].toHuman()];
+    });
+
+    /**
+     * parsedPoolsList has next structure
+     * [
+     *    [['7MK4PSbXskZhKTiGk4K4w7Ut59ZZndUupZxMHBDxgxiGZgpa'], ['1', '2']],
+     *    [['7Hx1UVo75qgr8cy7VFqGTL4r99HRVWdn864HFter2aa2LSqW'], ['0', '1']],
+     * ]
+     */
+
+    const currentPool = parsedPoolsList.find(
+      poolInfo =>
+        asset1Id !== null &&
+        asset2Id !== null &&
+        poolInfo[1] &&
+        //@ts-ignore
+        poolInfo[1].includes(asset1Id) &&
+        //@ts-ignore
+        poolInfo[1].includes(asset2Id)
+    );
+
+    //@ts-ignore
+    currentPoolId = currentPool ? currentPool[0][0] : null;
+  }
+
+  if (!currentPoolId) {
+    return null;
+  }
+
+  const asset1Amount = await getTokenAmount(
+    currentPoolId,
+    asset1Id,
+    'free',
+    blockHash
+  );
+  const asset2Amount = await getTokenAmount(
+    currentPoolId,
+    asset2Id,
+    'free',
+    blockHash
+  );
+
+  return {
+    asset1: asset1Amount !== null ? asset1Amount.toString() : null,
+    asset2: asset2Amount !== null ? asset2Amount.toString() : null,
+    accountAddress: currentPoolId,
+  };
+};
+
+/**
+ * getPoolAssetsAmountsWeightsLbp fetches amounts for pair of assets within pool.
+ * @param asset1Id: string | null
+ * @param asset2Id: string | null
+ * @param poolAccount: string | null | undefined - if pool account is specified, it will
+ *        reduce number of requests to the chain (we do not need search pool account
+ *        by asset IDs)
+ * @param blockHash?: string | undefined
+ */
+export const getPoolAssetsAmountsWeightsLbp = async (
+  asset1Id: string | null,
+  asset2Id: string | null,
+  poolAccount?: string | null | undefined,
+  blockHash?: string | undefined
+): Promise<{
+  asset1: string | null;
+  asset2: string | null;
+  asset1Weight: string | null;
+  asset2Weight: string | null;
+  accountAddress: string;
+} | null> => {
+  if (
+    (asset1Id !== null && asset1Id.length === 0) ||
+    asset1Id === null ||
+    (asset2Id !== null && asset2Id.length === 0) ||
+    asset2Id === null
+  )
+    return null;
+
+  const api = Api.getApi();
+
+  if (!api) return null;
+
+  let currentPoolId = poolAccount;
+
+  if (!poolAccount) {
+    let poolsList = [];
+
+    if (blockHash) {
+      poolsList = await api.query.lbp.poolData.entriesAt(blockHash);
+    } else {
+      poolsList = await api.query.lbp.poolData.entries();
+    }
+
+    // TODO Must be updated for parsing assets weights !!!
+
+    //TODO should be create type for poolsList (api.createType())
+    const parsedPoolsList = poolsList.map(item => {
+      return [item[0].toHuman(), item[1].toHuman()];
+    });
+
+    /**
+     * parsedPoolsList has next structure
+     * [
+     *    [['7MK4PSbXskZhKTiGk4K4w7Ut59ZZndUupZxMHBDxgxiGZgpa'], ['1', '2'], [weightAsset1, weightAsset2]],
+     *    [['7Hx1UVo75qgr8cy7VFqGTL4r99HRVWdn864HFter2aa2LSqW'], ['0', '1'], [weightAsset1, weightAsset2]],
+     * ]
+     */
+
+    const currentPool = parsedPoolsList.find(
+      poolInfo =>
+        asset1Id !== null &&
+        asset2Id !== null &&
+        poolInfo[1] &&
+        //@ts-ignore
+        poolInfo[1].includes(asset1Id) &&
+        //@ts-ignore
+        poolInfo[1].includes(asset2Id)
+    );
+
+    //@ts-ignore
+    currentPoolId = currentPool ? currentPool[0][0] : null;
+  }
+
+  if (!currentPoolId) {
+    return null;
+  }
+
+  const asset1Amount = await getTokenAmount(
+    currentPoolId,
+    asset1Id,
+    'free',
+    blockHash
+  );
+  const asset2Amount = await getTokenAmount(
+    currentPoolId,
+    asset2Id,
+    'free',
+    blockHash
+  );
+
+  return {
+    asset1: asset1Amount !== null ? asset1Amount.toString() : null,
+    asset2: asset2Amount !== null ? asset2Amount.toString() : null,
+    asset1Weight: '', // TODO Must be updated
+    asset2Weight: '', // TODO Must be updated
     accountAddress: currentPoolId,
   };
 };

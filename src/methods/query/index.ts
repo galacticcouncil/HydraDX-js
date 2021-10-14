@@ -33,9 +33,18 @@ initializeWasm();
 
 // import { getAccountBalances } from './getAccountBalances';
 import { getAssetList } from './getAssetList';
-import { getPoolInfo as _getPoolInfo } from './getPoolInfo';
+import {
+  getPoolInfo as _getPoolInfo,
+  getPoolsInfoXyk as _getPoolsInfoXyk,
+} from './getPoolInfo';
 // import { getSpotPrice } from './getSpotPrice';
 import { getTokenAmount } from './getTokenAmount';
+// import {
+//   getPoolAssetsAmounts as _getPoolAssetsAmounts,
+//   getPoolAssetsAmountsXyk as _getPoolAssetsAmountsXyk,
+//   getPoolAssetsAmountsWeightsLbp as _getPoolAssetsAmountsWeightsLbp,
+// } from './getPoolAssetAmounts';
+
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { calculateSpotAmount as _calculateSpotAmount } from './calculateSpotAmount';
 import { getTradePrice as _getTradePrice } from './getTradePrice';
@@ -70,7 +79,8 @@ const getTradePrice = async (
   asset1Id: string,
   asset2Id: string,
   tradeAmount: BigNumber,
-  actionType: string
+  actionType: string,
+  blockHash?: string | undefined
 ) => {
   return Promise.resolve(
     toExternalBN(
@@ -78,29 +88,39 @@ const getTradePrice = async (
         asset1Id,
         asset2Id,
         toInternalBN(tradeAmount),
-        actionType
+        actionType,
+        blockHash
       )
     )
   );
 };
 
-const getSpotPrice = async (asset1Id: string, asset2Id: string) => {
-  return Promise.resolve(toExternalBN(await _getSpotPrice(asset1Id, asset2Id)));
-};
-
-const getSpotPriceXyk = async (
+const getSpotPrice = async (
   asset1Id: string,
   asset2Id: string,
   blockHash?: string | undefined
 ) => {
   return Promise.resolve(
-    toExternalBN(await _getSpotPriceXyk(asset1Id, asset2Id, blockHash))
+    toExternalBN(await _getSpotPrice(asset1Id, asset2Id, blockHash))
+  );
+};
+
+const getSpotPriceXyk = async (
+  asset1Id: string,
+  asset2Id: string,
+  poolAccount?: string | null | undefined,
+  blockHash?: string | undefined
+) => {
+  return Promise.resolve(
+    toExternalBN(
+      await _getSpotPriceXyk(asset1Id, asset2Id, poolAccount, blockHash)
+    )
   );
 };
 const getSpotPriceLbp = async (
   asset1Id: string,
   asset2Id: string,
-  poolAccount: string,
+  poolAccount?: string | null | undefined,
   blockHash?: string | undefined
 ) => {
   return Promise.resolve(
@@ -168,9 +188,32 @@ const getAccountBalances = (account: any) => {
   });
 };
 
-const getPoolInfo = () => {
+const getPoolInfo = (blockHash?: string | undefined) => {
   return new Promise((resolve, reject) => {
-    _getPoolInfo()
+    _getPoolInfo(blockHash)
+      .then((res: any) => {
+        Object.keys(res.poolInfo).forEach(key => {
+          if (res.poolInfo[key].poolAssetsAmount) {
+            res.poolInfo[key].poolAssetsAmount.asset1 = toExternalBN(
+              res.poolInfo[key].poolAssetsAmount.asset1
+            );
+            res.poolInfo[key].poolAssetsAmount.asset2 = toExternalBN(
+              res.poolInfo[key].poolAssetsAmount.asset2
+            );
+          }
+          res.poolInfo[key].marketCap = toExternalBN(
+            res.poolInfo[key].marketCap
+          );
+        });
+        resolve(res);
+      })
+      .catch(e => reject(e));
+  });
+};
+
+const getPoolsInfoXyk = (blockHash?: string | undefined) => {
+  return new Promise((resolve, reject) => {
+    _getPoolsInfoXyk(blockHash)
       .then((res: any) => {
         Object.keys(res.poolInfo).forEach(key => {
           if (res.poolInfo[key].poolAssetsAmount) {
@@ -195,6 +238,7 @@ export {
   getAccountBalances,
   getAssetList,
   getPoolInfo,
+  getPoolsInfoXyk,
   getSpotPrice,
   getSpotPriceXyk,
   getSpotPriceLbp,

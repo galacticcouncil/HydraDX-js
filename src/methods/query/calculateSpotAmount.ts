@@ -3,6 +3,9 @@ import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { wasm } from './index';
 
+/**
+ * @deprecated The method should not be used and removed as redundant
+ */
 export async function calculateSpotAmount(
   asset1Id: string,
   asset2Id: string,

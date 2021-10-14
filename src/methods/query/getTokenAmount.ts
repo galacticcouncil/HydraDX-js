@@ -20,26 +20,17 @@ export const getTokenAmount = async (
   if (!api) return null;
 
   if (assetId === '0') {
-    let amountData = null;
-    if (blockHash) {
-      amountData = await api.query.system.account.at(blockHash, accountId);
-    } else {
-      amountData = await api.query.system.account(accountId);
-    }
+    const amountData = blockHash
+      ? await api.query.system.account.at(blockHash, accountId)
+      : await api.query.system.account(accountId);
+
     // @ts-ignore
     return bnToDec(amountData.data[type]);
   } else {
-    let amount: AccountAmount;
     try {
-      if (blockHash) {
-        amount = await api.query.tokens.accounts.at(
-          blockHash,
-          accountId,
-          assetId
-        );
-      } else {
-        amount = await api.query.tokens.accounts(accountId, assetId);
-      }
+      const amount: AccountAmount = blockHash
+        ? await api.query.tokens.accounts.at(blockHash, accountId, assetId)
+        : await api.query.tokens.accounts(accountId, assetId);
 
       // @ts-ignore
       return amount[type] ? bnToDec(amount[type]) : null;
