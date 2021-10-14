@@ -3,11 +3,13 @@ import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { wasm } from './index';
 
+// TODO asset1Id and asset2Id should be renamed for more accurate understanding
 export async function getTradePrice(
   asset1Id: string,
   asset2Id: string,
   tradeAmount: BigNumber,
-  actionType: string
+  actionType: string,
+  blockHash?: string | undefined
 ) {
   return new Promise<BigNumber>(async (resolve, reject) => {
     try {
@@ -26,7 +28,8 @@ export async function getTradePrice(
         if (tradeAmount) {
           const assetsAmounts = await getPoolAssetsAmounts(
             asset1IdForCalculation,
-            asset2IdForCalculation
+            asset2IdForCalculation,
+            blockHash
           );
 
           if (
