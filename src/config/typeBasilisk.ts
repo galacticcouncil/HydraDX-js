@@ -88,7 +88,10 @@ export default {
   PoolId: 'AccountId',
   BalanceOf: 'Balance',
   AssetType: {
-    _enum: ['Token'],
+    _enum: {
+      Token: 'Null',
+      PoolShare: '(AssetId,AssetId)',
+    },
   },
   Pool: {
     owner: 'AccountId',
@@ -109,10 +112,17 @@ export default {
   AssetDetails: {
     name: 'Vec<u8>',
     asset_type: 'AssetType',
+    existential_deposit: 'Balance',
     locked: 'bool',
   },
+  AssetDetailsT: 'AssetDetails',
   AssetMetadata: {
     symbol: 'Vec<u8>',
     decimals: 'u8',
   },
+  AssetInstance: 'AssetInstanceV1',
+  MultiLocation: 'MultiLocationV1',
+  MultiAsset: 'MultiAssetV1',
+  Xcm: 'XcmV1',
+  XcmOrder: 'XcmOrderV1',
 };
