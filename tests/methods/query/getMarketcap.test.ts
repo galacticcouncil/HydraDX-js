@@ -19,7 +19,7 @@ test('Test getMarketcap structure', async () => {
     const asset2 = assetList[1].assetId;
     // const result = await api.hydraDx.query.getPoolAssetsAmounts(asset1.toString(), asset2.toString());
 
-    const address = await createPool(api, alice, asset2.toString(), (asset2 + 1).toString(), new BigNumber(1).multipliedBy('1e12'), new BigNumber(1).multipliedBy('1e18'));
+    const { account } = await createPool(api, alice, asset2.toString(), (asset2 + 1).toString(), new BigNumber(1).multipliedBy('1e12'), new BigNumber(1).multipliedBy('1e18'));
 
     let poolInfo = await api.hydraDx.query.getPoolInfo();
 
@@ -31,13 +31,13 @@ test('Test getMarketcap structure', async () => {
         const poolTotal = parseInt(poolResult.asset1) + parseInt(poolResult.asset2);
 
         const pu: any = {};
-        if (address === pool) {
+        if (account === pool) {
             pu[pool] = {
                 'marketCap': poolTotal
             };
             newPool = pu;
         }
-        if (address === '') {
+        if (account === '') {
             pu[pool] = {
                 'marketCap': poolTotal
             };
@@ -45,7 +45,7 @@ test('Test getMarketcap structure', async () => {
         }
     }));
 
-    if (address == '') {
+    if (account == '') {
         const expected: any = [];
 
         pools.map(async (pool) => {
@@ -58,7 +58,7 @@ test('Test getMarketcap structure', async () => {
         expect(newPool).toEqual(expected);
     } else {
         const expected: any = {};
-        expected[address] = {
+        expected[account] = {
             marketCap: 2000000000000
         };
         expect(newPool).toEqual(expected);

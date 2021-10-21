@@ -26,9 +26,9 @@ test('Test addLiquidity', async () => {
   let targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
   expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('1');
 
-  await addLiquidity(asset1.toString(), asset2.toString(), new BigNumber('1000'), new BigNumber('500'), alice);
+  await addLiquidity(asset1.toString(), asset2.toString(), new BigNumber('1'), new BigNumber('1'), alice);
   targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
-  expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('2');
+  expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('1.000000000001');
 
   try {
     await addLiquidity(asset1.toString(), asset2.toString(), new BigNumber('0'), new BigNumber('0'), alice);

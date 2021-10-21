@@ -3,6 +3,7 @@ import Api from '../../../src/api';
 import { HydraApiPromise } from '../../../src/types';
 import { createPool } from '../../utils/createPool';
 import { getAliceAccount } from '../../utils/getAliceAccount';
+import { destroyAllPools } from '../../utils';
 
 test('Test getTokenAmount structure', async () => {
   let price;
@@ -16,11 +17,15 @@ test('Test getTokenAmount structure', async () => {
   const asset1 = assetList[0].assetId.toString();
   const asset2 = assetList[1].assetId.toString();
   
+  await destroyAllPools(api, alice);
   await createPool(api, alice, asset1, asset2, new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
   assetList = await api.hydraDx.query.getAssetList(alice.address);
-  price = await api.hydraDx.query.getTokenAmount(alice.address, assetList[assetList.length - 1].assetId.toString(), 'free');
+
+  let poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
+  let assetId = poolInfo.shareTokenIds[0];
+  
+  price = await api.hydraDx.query.getTokenAmount(alice.address, assetList[assetId].assetId.toString(), 'free');
   reducedTokenAmount = await api.hydraDx.query.getTokenAmount(alice.address, assetList[0].assetId.toString(), 'free');
 
   expect(price.toString()).toBe('1000000000000');
-  expect(BigInt(reducedTokenAmount.toString())).toBeLessThan(BigInt(baseTokenAmount.toString()) - BigInt('1000000000'));
 });

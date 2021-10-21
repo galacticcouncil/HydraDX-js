@@ -18,15 +18,15 @@ test('Test getPoolInfo structure', async () => {
   let assetList = await api.hydraDx.query.getAssetList(alice.address);
   const asset1 = assetList[0].assetId.toString();
   const asset2 = assetList[1].assetId.toString();
-  const address = await createPool(api, alice, asset1, asset2, new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
+  const { account, tokenId } = await createPool(api, alice, asset1, asset2, new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
   assetList = await api.hydraDx.query.getAssetList(alice.address);
 
   let expectedPoolInfo = {...poolInfo};
 
-  expectedPoolInfo.poolInfo[address] = {
+  expectedPoolInfo.poolInfo[account] = {
     poolAssetNames: [],
     poolAssets: [parseInt(asset1), parseInt(asset2)],
-    shareToken: 11,
+    shareToken: parseInt(tokenId),
     marketCap: new BigNumber('2'),
     poolAssetsAmount: {
       asset1: new BigNumber('1'),
@@ -34,7 +34,7 @@ test('Test getPoolInfo structure', async () => {
     }
   };
 
-  expectedPoolInfo.shareTokenIds.push(11);
+  expectedPoolInfo.shareTokenIds.push(parseInt(tokenId));
   expectedPoolInfo.tokenTradeMap[asset1] = expectedPoolInfo.tokenTradeMap[asset1] || [];
   expectedPoolInfo.tokenTradeMap[asset2] = expectedPoolInfo.tokenTradeMap[asset2] || [];
   expectedPoolInfo.tokenTradeMap[asset1].push(parseInt(asset2));

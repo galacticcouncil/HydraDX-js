@@ -22,7 +22,7 @@ test('Test swap', async () => {
   let poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
 
   await destroyAllPools(api, alice);
-  if (!poolInfo.tokenTradeMap[asset1].includes(parseInt(asset2))) {
+  if (!poolInfo.tokenTradeMap[asset1] || !poolInfo.tokenTradeMap[asset1].includes(parseInt(asset2))) {
     try {
       await createPool(asset1.toString(), asset2.toString(), new BigNumber('0.02').multipliedBy('1e12'), new BigNumber('2').multipliedBy('1e18'), alice);
     } catch (e) {
@@ -33,7 +33,7 @@ test('Test swap', async () => {
   let result : any = await swap({
     asset1Id: asset1.toString(), 
     asset2Id: asset2.toString(), 
-    amount: new BigNumber('0.001').multipliedBy('1e12'), 
+    amount: new BigNumber('0.0001').multipliedBy('1e12'), 
     actionType: 'sell', 
     expectedOut: '',
     slippage: new BigNumber(1), 
@@ -41,8 +41,6 @@ test('Test swap', async () => {
   });
 
   expect(result.method[0]).toBe('IntentionRegistered');
-  expect(result.data.amount.toString()).toBe('1000000000');
-  expect(result.data.amountXykTrade.toString()).toBe('1000000000');
-  expect(result.data.totalAmountFinal.isLessThan(result.data.amount)).toBeTruthy();
-  expect(result.data.amountOutXykTrade.isLessThan(result.data.amountXykTrade)).toBeTruthy();
+  expect(result.data.amount.toString()).toBe('100000000');
+  expect(result.data.amountXykTrade.toString()).toBe('100000000');
 });

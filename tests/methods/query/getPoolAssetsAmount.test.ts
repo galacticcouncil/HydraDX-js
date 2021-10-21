@@ -16,12 +16,12 @@ test('Test getPoolAssetsAmount structure', async () => {
   await createPool(api, alice, asset1.toString(), asset2.toString(), new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
   await createPool(api, alice, asset1.toString(), (asset2 + 1).toString(), new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
   
-  const address = await createPool(api, alice, asset2.toString(), (asset2 + 1).toString(), new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
+  const { account } = await createPool(api, alice, asset2.toString(), (asset2 + 1).toString(), new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
   const result = await api.hydraDx.query.getPoolAssetsAmounts(asset2.toString(), (asset2 + 1).toString());
 
   expect(result).toEqual({
     asset1: '1000000000000',
     asset2: '1000000000000',
-    accountAddress: address,
+    accountAddress: account,
   });
 });
