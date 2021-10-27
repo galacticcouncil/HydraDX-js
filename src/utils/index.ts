@@ -9,17 +9,36 @@ import {
   TokenTradeMap,
 } from '../types';
 
+/**
+ * Convert BigNumber value to BN
+ * @param bignumber
+ */
 const decToBn = (bignumber: BigNumber): BN => bnToBn(bignumber.toString());
 
+/**
+ * Convert BN value to BigNumber
+ * @param bn
+ */
 const bnToDec = (bn: BN): BigNumber => new BigNumber(bn.toString());
 
 const getStableCoinID = () => 1;
 
+/**
+ * Convert BigNumber value from value with decimal part to 1e+n format.
+ * @param number
+ * @param multiply
+ */
 export const toInternalBN = (number: BigNumber, multiply: number = 12) =>
   number.multipliedBy(`1e+${multiply}`).integerValue();
 
+/**
+ * Convert BigNumber value from 1e+n format to value with decimal part.
+ * @param number
+ * @param divide
+ */
 export const toExternalBN = (number: BigNumber, divide: number = 12) =>
   number.integerValue().dividedBy(`1e+${divide}`);
+
 
 export const decorateExchangeTxDataToExternalBN = (
   txDataFull: ExchangeTxEventData

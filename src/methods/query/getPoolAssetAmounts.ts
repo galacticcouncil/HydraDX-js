@@ -229,14 +229,51 @@ export const getPoolAssetsAmountsWeightsLbp = async (
 
     //TODO should be create type for poolsList (api.createType())
     const parsedPoolsList = poolsList.map(item => {
+      /**
+       * item contains next data:
+       *
+       * [
+         0x60a337a70c97253566bd07d40004200da42dd98ed4bf57282dd6c84814cda5d7c1e43828f6ff5dd0eecfd4e6ac8a70c25f6df23d135610e3100cf79cc7b98637728840383cd037c41cc6deb509f91571,
+           {
+            owner: bXmPf7DcVmFuHEmzH3UX8t6AUkfNQW8pnTeXGhFhqbfngjAak,
+            start: 0,
+            end: 0,
+            assets: { asset_in: 0, asset_out: 1 },
+            initial_weight: 10000000,
+            final_weight: 90000000,
+            weight_curve: Linear,
+            fee: { numerator: 2, denominator: 100 },
+            fee_collector: bXmPf7DcVmFuHEmzH3UX8t6AUkfNQW8pnTeXGhFhqbfngjAak,
+          },
+         ]
+       *
+       */
       return [item[0].toHuman(), item[1].toHuman()];
     });
+
+
+//     const poolAddress = 'bXikYFVEuifjmPT3j41zwqwrGAJTzMv69weEqrvAotP9VfHxS';
+//
+//     const poolData = await api.query.lbp.poolData.entries()
+//
+//     const asset0Amount = await api.query.system.account(poolAddress);
+//     const asset1Amount = await api.query.tokens.accounts(poolAddress, '1');
+//
+//     poolData.map(item => {
+//       console.log(item)
+//       //console.log('item[0] pool address - ', item[0].toHuman())
+//       //console.log('item[1] - ', item[1])
+//     });
+//
+// //console.log('poolData - ', poolData );
+//
+// // console.log('asset0Amount - ', asset0Amount.data );
+// // console.log('asset1Amount - ', asset1Amount);
 
     /**
      * parsedPoolsList has next structure
      * [
      *    [['7MK4PSbXskZhKTiGk4K4w7Ut59ZZndUupZxMHBDxgxiGZgpa'], ['1', '2'], [weightAsset1, weightAsset2]],
-     *    [['7Hx1UVo75qgr8cy7VFqGTL4r99HRVWdn864HFter2aa2LSqW'], ['0', '1'], [weightAsset1, weightAsset2]],
      * ]
      */
 
