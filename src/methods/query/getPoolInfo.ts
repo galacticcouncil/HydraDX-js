@@ -6,6 +6,8 @@ import { getAssetPrices } from '../../utils';
 import { wasm } from './index';
 
 import { toExternalBN } from '../../utils';
+import type { AnyJson, Codec } from '@polkadot/types/types';
+import Any = jasmine.Any;
 
 // TODO Detailed description is necessary
 /**
@@ -160,4 +162,94 @@ export async function getPoolInfo(blockHash?: string | undefined) {
 
 export async function getPoolsInfoXyk(blockHash?: string | undefined) {
   return getPoolInfo(blockHash);
+}
+
+export async function getPoolInfoLbp({
+  poolAccount,
+  asset0Id,
+  asset1Id,
+}: {
+  poolAccount?: string | undefined | null;
+  asset0Id?: string | undefined;
+  asset1Id?: string | undefined;
+}): Promise<{
+  poolId: string;
+  saleStart: BigNumber;
+  saleEnd: BigNumber;
+  owner: string;
+  initialWeight: BigNumber;
+  finalWeight: BigNumber;
+  asset0Id: string;
+  asset1Id: string;
+  weight_curve: string;
+  feeNumerator: string;
+  feeDenominator: string;
+  feeCollector: string;
+} | null> {
+  // We should terminate execution if required params are not provided
+  if (!poolAccount && !asset0Id && !asset1Id) return null;
+
+  const api = Api.getApi();
+
+  if (!api) return null;
+
+  let poolAddress: string | undefined | null | Codec | AnyJson = poolAccount;
+
+  if (!poolAccount) {
+    poolAddress = await api.query.lbp.getPoolId(asset0Id, asset1Id);
+    poolAddress = poolAddress.toHuman();
+  }
+
+  const poolData = await api.query.lbp.poolData(poolAddress);
+
+  if (!poolData) return null;
+
+  /**
+   * poolData contains next data:
+   *
+   * [
+   0x60a337a70c97253566bd07d40004200da42dd98ed4bf57282dd6c84814cda5d7c1e43828f6ff5dd0eecfd4e6ac8a70c25f6df23d135610e3100cf79cc7b98637728840383cd037c41cc6deb509f91571,
+   {
+            owner: bXmPf7DcVmFuHEmzH3UX8t6AUkfNQW8pnTeXGhFhqbfngjAak,
+            start: 0,
+            end: 0,
+            assets: { asset_in: 0, asset_out: 1 },
+            initial_weight: 10000000,
+            final_weight: 90000000,
+            weight_curve: Linear,
+            fee: { numerator: 2, denominator: 100 },
+            fee_collector: bXmPf7DcVmFuHEmzH3UX8t6AUkfNQW8pnTeXGhFhqbfngjAak,
+          },
+   ]
+   *
+   */
+
+  const poolDataHuman = poolData.toHuman();
+
+  const {
+    owner,
+    start,
+    end,
+    assets: { asset_in, asset_out },
+    initial_weight,
+    final_weight,
+    weight_curve,
+    fee: { numerator, denominator },
+    fee_collector,
+  }: AnyJson = poolDataHuman[1];
+
+  return {
+    poolId: poolData[0][0],
+    saleStart: new BigNumber(start.toHuman()),
+    saleEnd: new BigNumber(start.toHuman()),
+    owner: owner.toHuman(),
+    initialWeight: new BigNumber(initial_weight.toHuman()),
+    finalWeight: new BigNumber(final_weight.toHuman()),
+    asset0Id: asset_in.toHuman(),
+    asset1Id: asset_out.toHuman(),
+    weight_curve: weight_curve.toHuman(),
+    feeNumerator: numerator.toHuman(),
+    feeDenominator: denominator.toHuman(),
+    feeCollector: fee_collector.toHuman(),
+  };
 }

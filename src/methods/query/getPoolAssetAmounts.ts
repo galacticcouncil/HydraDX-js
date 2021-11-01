@@ -251,7 +251,7 @@ export const getPoolAssetsAmountsWeightsLbp = async (
       return [item[0].toHuman(), item[1].toHuman()];
     });
 
-
+//
 //     const poolAddress = 'bXikYFVEuifjmPT3j41zwqwrGAJTzMv69weEqrvAotP9VfHxS';
 //
 //     const poolData = await api.query.lbp.poolData.entries()

@@ -5,7 +5,13 @@ import {
   getPoolAssetsAmountsXyk,
   getPoolAssetsAmountsWeightsLbp,
 } from './getPoolAssetAmounts';
-import { getTokenAmount, wasm } from './index';
+
+import { getPoolInfoLbp } from './getPoolInfo';
+import { getTokenAmount } from './getTokenAmount';
+import { getPoolAssetsWeightsLbp } from './getPoolAssetsWeights';
+import { getBlockHeightRelayChain } from './getBlockHeightRelayChain';
+
+import { wasm } from './index';
 
 export async function getSpotPrice(
   asset1Id: string,
@@ -95,54 +101,68 @@ export async function getSpotPriceXyk(
 }
 
 /**
- * Provides price for one unit (1000000000000) of asset1 in LBP section.
+ * Provides price for one unit (1000000000000) of asset0 in LBP section.
+ * @param asset0Id
  * @param asset1Id
- * @param asset2Id
  * @param poolAccount: string | null | undefined - if pool account is specified, it will
- *        reduce number of requests to the chain (we do not need search pool account
- *        by asset IDs)
+ *        reduce number of requests to the chain
  * @param blockHash
  */
 export async function getSpotPriceLbp(
+  asset0Id: string,
   asset1Id: string,
-  asset2Id: string,
-  poolAccount?: string | null | undefined,
-  blockHash?: string | undefined
-) {
-  return new Promise<BigNumber>(async (resolve, reject) => {
-    try {
-      const api = Api.getApi();
+  blockHash: string,
+  poolAccount?: string | undefined
+): Promise<BigNumber | null> {
+  const api = Api.getApi();
+  if (!api) return null;
 
-      if (api) {
-        const assetsAmounts = await getPoolAssetsAmountsWeightsLbp(
-          asset1Id,
-          asset2Id,
-          poolAccount,
-          blockHash
-        );
+  try {
+    const poolInfo = await getPoolInfoLbp({
+      asset0Id,
+      asset1Id,
+      poolAccount,
+    });
 
-        if (
-          assetsAmounts === null ||
-          assetsAmounts.asset1 === null ||
-          assetsAmounts.asset2 === null
-        )
-          return;
+    if (!poolInfo) return null;
 
-        const price = new BigNumber(
-          await wasm.lbp.get_spot_price(
-            assetsAmounts.asset1,
-            assetsAmounts.asset2,
-            assetsAmounts.asset1Weight,
-            assetsAmounts.asset2Weight,
-            '1000000000000'
-          )
-        );
-        resolve(price);
-      } else {
-        throw new Error('API is not available');
-      }
-    } catch (e: any) {
-      reject(e);
-    }
-  });
+    const relayChainBlockHeight = await getBlockHeightRelayChain();
+
+    if (!relayChainBlockHeight) return null;
+
+    const assetsWeights = await getPoolAssetsWeightsLbp(
+      poolInfo.saleStart,
+      poolInfo.saleEnd,
+      poolInfo.initialWeight,
+      poolInfo.finalWeight,
+      relayChainBlockHeight
+    );
+
+    const asset0Amount = getTokenAmount(
+      poolInfo.poolId,
+      asset0Id,
+      'free',
+      blockHash
+    );
+    const asset1Amount = getTokenAmount(
+      poolInfo.poolId,
+      asset1Id,
+      'free',
+      blockHash
+    );
+
+    if (asset0Amount === null || asset1Amount === null) return null;
+
+    return new BigNumber(
+      await wasm.lbp.get_spot_price(
+        asset0Amount.toString(),
+        asset1Amount.toString(),
+        assetsWeights.asset0Weight.toString(),
+        assetsWeights.asset1Weight.toString(),
+        '1000000000000'
+      )
+    );
+  } catch (e: any) {
+    return null;
+  }
 }
