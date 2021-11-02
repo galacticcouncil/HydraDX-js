@@ -14,3 +14,24 @@ JS SDK for interacting with HydraDX nodes
 Reason for using bignumber.js instead of bn.js - bn.js doesn't support decimal part what is not comfortable in
 work on front-end side. As SDK is intended to make work with chain data easier, so numbers with explicit decimal part
 are more preferred.
+
+
+## Wasm Utils
+
+API instance contains a bunch of wasm functions for `xyk` and `lbp` modules. 
+They are available under `api.wasmUtils.<module>.<functionName>`. Each util functions is wrapper for 
+original function from [hydra-dx-wasm](https://github.com/galacticcouncil/HydraDX-wasm) library 
+and returns raw result of wasm function calculation.
+
+###Available utils:
+
+XYK module:
+- getSpotPrice
+- calculateOutGivenIn
+- calculateInGivenOut
+
+LBP module:
+- getSpotPrice
+- calculateOutGivenIn
+- calculateInGivenOut
+- calculateLinearWeights
