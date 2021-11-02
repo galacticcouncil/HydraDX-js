@@ -188,7 +188,11 @@ export async function getPoolInfoLbp({
   let poolAddress: string | Codec | AnyJson = poolAccount || '';
 
   if (!poolAccount && asset0Id !== undefined && asset1Id !== undefined) {
-    poolAddress = await api.query.lbp.getPoolId(asset0Id, asset1Id);
+    // lbp.getPoolAccount is a custom RPC call, which is defined during API
+    // initialization but not visible for TypeScript
+    // @ts-ignore
+    poolAddress = await api.rpc.lbp.getPoolAccount(asset0Id, asset1Id);
+    // @ts-ignore
     poolAddress = poolAddress.toHuman();
   }
 

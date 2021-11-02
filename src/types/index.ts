@@ -13,6 +13,11 @@ import {
   calculateLinearWeightsLbp,
 } from '../utils/wasmUtils';
 
+export const ChainName = {
+  hydraDx: 'hydraDx',
+  basilisk: 'basilisk',
+} as const;
+
 export interface HydraApiPromise extends ApiPromise {
   hydraDx?: any;
   basilisk?: any;

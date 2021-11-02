@@ -15,6 +15,7 @@ import { processChainEvent } from './methods/tx/_events';
 
 import { initHdxEventEmitter } from './utils/eventEmitter';
 import { decorateExchangeTxDataScopeToExternalBN } from './utils';
+import { exposeApiMethods, customRpcConfig } from './utils/apiUtils';
 
 // TODO Evoking of initializeWasm should be reviewed as redundant
 import { initializeWasm } from './utils/wasmUtils';
@@ -27,6 +28,7 @@ import wasmUtils from './utils/wasmUtils';
 let api: HydraApiPromise;
 
 const getApi = (): HydraApiPromise => api;
+
 
 /**
  * initialize
@@ -109,6 +111,8 @@ const initialize = async (
     });
 
     wsProvider.on('connected', async () => {
+      // If API is existing, we return API instance
+      // TODO should be reviewed in case disconnection
       if (api) {
         resolve(api);
         return api;
@@ -120,6 +124,7 @@ const initialize = async (
         typesAlias: typesConfig
           ? typesConfig.alias
           : ChainAliasConfigFallbackHydraDx,
+        rpc: customRpcConfig,
       })
         .on('error', e => {
           if (!isDisconnection) {
@@ -157,15 +162,21 @@ const initialize = async (
           // TODO Must be reimplemented for better way
           switch (chainName) {
             case 'basilisk':
-              api.basilisk = {
-                query,
-                tx,
-              };
+              api.basilisk = exposeApiMethods(
+                {
+                  query,
+                  tx,
+                },
+                'basilisk'
+              );
             default:
-              api.hydraDx = {
-                query,
-                tx,
-              };
+              api.hydraDx = exposeApiMethods(
+                {
+                  query,
+                  tx,
+                },
+                'hydraDx'
+              );
           }
 
           if (apiListeners && apiListeners.ready) {
@@ -181,15 +192,21 @@ const initialize = async (
           // TODO Must be reimplemented for better way
           switch (chainName) {
             case 'basilisk':
-              api.basilisk = {
-                query,
-                tx,
-              };
+              api.basilisk = exposeApiMethods(
+                {
+                  query,
+                  tx,
+                },
+                'basilisk'
+              );
             default:
-              api.hydraDx = {
-                query,
-                tx,
-              };
+              api.hydraDx = exposeApiMethods(
+                {
+                  query,
+                  tx,
+                },
+                'hydraDx'
+              );
           }
 
           if (apiListeners && apiListeners.connected) {
@@ -210,6 +227,16 @@ const initialize = async (
   });
 };
 
+/**
+ * "initializeHydraDx" initialises API instance for HydraDX node.
+ * This initialization process uses default HydraDX chain types for WS connection.
+ * All SDK functions are available within API instance inside module 'hydraDx'
+ * (api.hydraDx.<query|tx>.<methodName>)
+ * @param apiListeners
+ * @param apiUrl
+ * @param typesConfig
+ * @param maxRetries
+ */
 const initializeHydraDx = async (
   apiListeners: ApiListeners | null = null,
   apiUrl: string = 'ws://127.0.0.1:9944',
@@ -228,6 +255,17 @@ const initializeHydraDx = async (
   return initialize(apiListeners, apiUrl, typesConfig, maxRetries, 'hydraDx');
 };
 
+/**
+ * "initializeBasilisk" initialises API instance for basilisk node.
+ * This initialization process uses default Basilisk chain types for WS connection.
+ * All SDK functions are available within API instance inside module 'basilisk'
+ * (api.basilisk.<query|tx>.<methodName>)
+ *
+ * @param apiListeners
+ * @param apiUrl
+ * @param typesConfig
+ * @param maxRetries
+ */
 const initializeBasilisk = async (
   apiListeners: ApiListeners | null = null,
   apiUrl: string = 'ws://127.0.0.1:9944',

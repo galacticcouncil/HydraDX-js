@@ -5,7 +5,7 @@ let api: HydraApiPromise;
 test('Test getSpotPriceLbp query', async () => {
   api = await Api.initializeBasilisk({}, process.env.WS_URL);
 
-  const price = await api.basilisk.query.getSpotPriceLbp('0', '3');
+  const price = await api.basilisk.query.getSpotPriceLbp('0', '1');
   console.log('price >>> - ', price)
-  expect(price).not.toBe('0');
+  expect(price).not.toBe(null);
 });

@@ -3,7 +3,6 @@ import Api from '../../api';
 import {
   getPoolAssetsAmounts,
   getPoolAssetsAmountsXyk,
-  getPoolAssetsAmountsWeightsLbp,
 } from './getPoolAssetAmounts';
 
 import { getPoolInfoLbp } from './getPoolInfo';
@@ -116,8 +115,6 @@ export async function getSpotPriceLbp(
       poolAccount,
     });
 
-    console.log('>>>poolInfo - ', poolInfo)
-
     if (!poolInfo) return null;
 
     const relayChainBlockHeight = await getBlockHeightRelayChain(blockHash);
@@ -156,7 +153,7 @@ export async function getSpotPriceLbp(
       )
     );
   } catch (e: any) {
-    console.log(e)
+    console.log(e);
     return null;
   }
 }
