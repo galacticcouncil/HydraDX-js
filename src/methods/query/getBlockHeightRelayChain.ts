@@ -1,11 +1,12 @@
 import Api from '../../api';
 import BigNumber from 'bignumber.js';
+import type { RelayChainValidationDataHuman } from '../../types';
 
 /**
  * getBlockHeightRelayChain - provides blockHeight of relay chain
  */
 export const getBlockHeightRelayChain = async (
-  blockHash?: string | undefined
+  blockHash?: string | null | undefined
 ): Promise<BigNumber | null> => {
   try {
     const api = Api.getApi();
@@ -26,7 +27,7 @@ export const getBlockHeightRelayChain = async (
       ? await api.query.parachainSystem.validationData.at(blockHash)
       : await api.query.parachainSystem.validationData();
 
-    const dataToHuman = validationDataResponse.toHuman();
+    const dataToHuman = validationDataResponse.toHuman() as RelayChainValidationDataHuman;
 
     if (
       !dataToHuman ||

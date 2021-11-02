@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import {
   PoolInfo,
   TokenTradeMap,
-  LbpPoolDataRaw,
+  LbpPoolDataHuman,
   LbpPoolData,
 } from '../../types';
 import Api from '../../api';
@@ -213,7 +213,7 @@ export async function getPoolInfoLbp({
    *
    */
 
-  const poolDataHuman = poolData.toHuman() as LbpPoolDataRaw;
+  const poolDataHuman = poolData.toHuman() as LbpPoolDataHuman;
 
   const {
     owner,

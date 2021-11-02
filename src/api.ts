@@ -152,6 +152,7 @@ const initialize = async (
         })
         .on('ready', apiInstance => {
           api = apiInstance;
+          api.wasmUtils = wasmUtils;
 
           // TODO Must be reimplemented for better way
           switch (chainName) {
@@ -159,13 +160,11 @@ const initialize = async (
               api.basilisk = {
                 query,
                 tx,
-                wasmUtils,
               };
             default:
               api.hydraDx = {
                 query,
                 tx,
-                wasmUtils,
               };
           }
 
@@ -175,8 +174,9 @@ const initialize = async (
           addTxEventListener(api);
           resolve(api);
         })
-        .isReadyOrError.then(apiResponse => {
+        .isReadyOrError.then((apiResponse: any) => {
           api = apiResponse;
+          api.wasmUtils = wasmUtils;
 
           // TODO Must be reimplemented for better way
           switch (chainName) {
@@ -184,13 +184,11 @@ const initialize = async (
               api.basilisk = {
                 query,
                 tx,
-                wasmUtils,
               };
             default:
               api.hydraDx = {
                 query,
                 tx,
-                wasmUtils,
               };
           }
 

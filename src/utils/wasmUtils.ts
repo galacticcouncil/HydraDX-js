@@ -31,7 +31,7 @@ initializeWasm();
  * @param asset0Amount
  * @param asset1Amount
  */
-const getSpotPriceXyk = (
+export const getSpotPriceXyk = (
   asset0Amount: string,
   asset1Amount: string
 ): string => {
@@ -39,7 +39,7 @@ const getSpotPriceXyk = (
   return wasm.xyk.get_spot_price(asset0Amount, asset1Amount, unitAmount);
 };
 
-const calculateOutGivenInXyk = (
+export const calculateOutGivenInXyk = (
   asset0Amount: string,
   asset1Amount: string,
   amountForCalc: string
@@ -51,7 +51,7 @@ const calculateOutGivenInXyk = (
   );
 };
 
-const calculateInGivenOutXyk = (
+export const calculateInGivenOutXyk = (
   asset0Amount: string,
   asset1Amount: string,
   amountForCalc: string
@@ -76,7 +76,7 @@ const calculateInGivenOutXyk = (
  * @param asset0Weight
  * @param asset1Weight
  */
-const getSpotPriceLbp = (
+export const getSpotPriceLbp = (
   asset0Amount: string,
   asset1Amount: string,
   asset0Weight: string,
@@ -92,7 +92,7 @@ const getSpotPriceLbp = (
   );
 };
 
-const calculateOutGivenInLbp = (
+export const calculateOutGivenInLbp = (
   asset0Amount: string,
   asset1Amount: string,
   amountForCalc: string
@@ -104,7 +104,7 @@ const calculateOutGivenInLbp = (
   );
 };
 
-const calculateInGivenOutLbp = (
+export const calculateInGivenOutLbp = (
   asset0Amount: string,
   asset1Amount: string,
   amountForCalc: string
@@ -128,7 +128,7 @@ const calculateInGivenOutLbp = (
  * @param {string} relayChainBlockHeight - block height of relay chain
  * @return {string}
  */
-const calculateLinearWeightsLbp = (
+export const calculateLinearWeightsLbp = (
   saleStart: string,
   saleEnd: string,
   initialWeight: string,

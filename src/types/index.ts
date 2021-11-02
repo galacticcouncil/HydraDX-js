@@ -3,9 +3,32 @@ import { ApiPromise } from '@polkadot/api';
 import { AddressOrPair } from '@polkadot/api/types';
 import type { Codec, AnyJson } from '@polkadot/types/types';
 
+import {
+  getSpotPriceXyk,
+  calculateInGivenOutXyk,
+  calculateOutGivenInXyk,
+  getSpotPriceLbp,
+  calculateInGivenOutLbp,
+  calculateOutGivenInLbp,
+  calculateLinearWeightsLbp,
+} from '../utils/wasmUtils';
+
 export interface HydraApiPromise extends ApiPromise {
   hydraDx?: any;
   basilisk?: any;
+  wasmUtils: {
+    xyk: {
+      getSpotPrice: typeof getSpotPriceXyk;
+      calculateOutGivenIn: typeof calculateOutGivenInXyk;
+      calculateInGivenOut: typeof calculateInGivenOutXyk;
+    };
+    lbp: {
+      getSpotPrice: typeof getSpotPriceLbp;
+      calculateOutGivenIn: typeof calculateOutGivenInLbp;
+      calculateInGivenOut: typeof calculateInGivenOutLbp;
+      calculateLinearWeights: typeof calculateLinearWeightsLbp;
+    };
+  };
 }
 
 export type ApiListeners = {
@@ -123,7 +146,7 @@ export type ExchangeTxEventData = {
 
 export type MergedPairedEvents = { [key: string]: ExchangeTxEventData };
 
-export type LbpPoolDataRaw = {
+export type LbpPoolDataHuman = {
   owner: string;
   start: string;
   end: string;
@@ -134,7 +157,8 @@ export type LbpPoolDataRaw = {
   fee: { numerator: string; denominator: string };
   fee_collector: string;
   [index: string]: AnyJson;
-}
+};
+
 export type LbpPoolData = {
   poolId: string;
   saleStart: BigNumber;
@@ -148,4 +172,12 @@ export type LbpPoolData = {
   feeNumerator: string;
   feeDenominator: string;
   feeCollector: string;
-}
+};
+
+export type RelayChainValidationDataHuman = {
+  parentHead: string;
+  relayParentNumber: string;
+  relayParentStorageRoot: string;
+  maxPovSize: string;
+  [index: string]: AnyJson;
+};

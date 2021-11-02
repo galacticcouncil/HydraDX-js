@@ -120,20 +120,14 @@ const getSpotPriceXyk = async (
 const getSpotPriceLbp = async (
   asset1Id: string,
   asset2Id: string,
-  blockHash?: string | undefined,
-  poolAccount?: string | null | undefined,
+  blockHash?: string | null | undefined,
+  poolAccount?: string | null | undefined
 ) => {
-  return Promise.resolve(async () => {
-    const spotPrice = await _getSpotPriceLbp(
-      asset1Id,
-      asset2Id,
-      blockHash,
-      poolAccount
-    );
-
-    if (!spotPrice) return null;
-    return toExternalBN(spotPrice);
-  });
+  return Promise.resolve(
+    toExternalBN(
+      await _getSpotPriceLbp(asset1Id, asset2Id, blockHash, poolAccount)
+    )
+  );
 };
 
 const getMaxReceivedTradeAmount = (

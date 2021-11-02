@@ -14,7 +14,7 @@ export const getTokenAmount = async (
   accountId: string,
   assetId: string,
   type: string,
-  blockHash?: string | undefined
+  blockHash?: string | null | undefined
 ): Promise<BigNumber | null> => {
   const api = Api.getApi();
   if (!api) return null;

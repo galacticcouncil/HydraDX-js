@@ -103,8 +103,8 @@ export async function getSpotPriceXyk(
 export async function getSpotPriceLbp(
   asset0Id: string,
   asset1Id: string,
-  blockHash: string,
-  poolAccount?: string | undefined
+  blockHash?: string | null | undefined,
+  poolAccount?: string | null | undefined
 ): Promise<BigNumber | null> {
   const api = Api.getApi();
   if (!api) return null;
@@ -115,6 +115,8 @@ export async function getSpotPriceLbp(
       asset1Id,
       poolAccount,
     });
+
+    console.log('>>>poolInfo - ', poolInfo)
 
     if (!poolInfo) return null;
 
@@ -154,6 +156,7 @@ export async function getSpotPriceLbp(
       )
     );
   } catch (e: any) {
+    console.log(e)
     return null;
   }
 }
