@@ -13,9 +13,9 @@ test('Test getReservedTokenAmount structure', async () => {
   let reservedTokenOrg = await api.hydraDx.query.getReservedTokenAmount(alice.address, '0');
   let reserveAmount = (new BigNumber('10000')).multipliedBy('1e12');
 
-  await propose(api, alice, '0x0000000000000000000000000000000000000000000000000000000000000000', reserveAmount.toString());
+  await propose(api, alice, '0x0000000000000000000000000000000000000000000000000000000000000000', new BigNumber(reserveAmount.toString()));
 
-  let reservedTokenNow = await api.hydraDx.query.getFreeTokenAmount(alice.address, '0');
+  let reservedTokenNow = await api.hydraDx.query.getReservedTokenAmount(alice.address, '0');
 
-  expect(reservedTokenOrg.isEqualTo(reservedTokenNow.minux(reserveAmount))).toBeTruthy();
+  expect(reservedTokenOrg.isEqualTo(reservedTokenNow.minus(reserveAmount))).toBeTruthy();
 });

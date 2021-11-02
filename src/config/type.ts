@@ -19,6 +19,7 @@ export default {
     genesisHash: 'Vec<u8>',
     lastBlockHash: 'Vec<u8>',
   },
+  Currency : "AssetId",
   CurrencyId: 'AssetId',
   CurrencyIdOf: 'AssetId',
   Intention: {
