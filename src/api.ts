@@ -16,8 +16,13 @@ import { processChainEvent } from './methods/tx/_events';
 import { initHdxEventEmitter } from './utils/eventEmitter';
 import { decorateExchangeTxDataScopeToExternalBN } from './utils';
 
+// TODO Evoking of initializeWasm should be reviewed as redundant
+import { initializeWasm } from './utils/wasmUtils';
+initializeWasm();
+
 import * as query from './methods/query';
 import * as tx from './methods/tx';
+import wasmUtils from './utils/wasmUtils';
 
 let api: HydraApiPromise;
 
@@ -154,11 +159,13 @@ const initialize = async (
               api.basilisk = {
                 query,
                 tx,
+                wasmUtils,
               };
             default:
               api.hydraDx = {
                 query,
                 tx,
+                wasmUtils,
               };
           }
 
@@ -177,11 +184,13 @@ const initialize = async (
               api.basilisk = {
                 query,
                 tx,
+                wasmUtils,
               };
             default:
               api.hydraDx = {
                 query,
                 tx,
+                wasmUtils,
               };
           }
 

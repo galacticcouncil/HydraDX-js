@@ -8,28 +8,28 @@ import { AssetBalance } from '../../types';
 export interface AccountAmount extends Codec {
   free?: Balance;
 }
-
-export let wasm: { xyk: any; lbp: any } = { xyk: null, lbp: null };
-
-async function initializeWasm() {
-  if (typeof window !== 'undefined') {
-    if (typeof process.env.NODE_ENV === 'undefined') {
-      wasm.xyk = await import('hydra-dx-wasm/build/xyk/web');
-      wasm.xyk.default();
-      wasm.lbp = await import('hydra-dx-wasm/build/lbp/web');
-      wasm.lbp.default();
-    } else {
-      const { import_wasm } = await import('../../utils/import_wasm');
-      wasm.xyk = await import_wasm.xyk();
-      wasm.lbp = await import_wasm.lbp();
-    }
-  } else {
-    wasm.xyk = await import('hydra-dx-wasm/build/xyk/nodejs');
-    wasm.lbp = await import('hydra-dx-wasm/build/lbp/nodejs');
-  }
-}
-
-initializeWasm();
+//
+// export let wasm: { xyk: any; lbp: any } = { xyk: null, lbp: null };
+//
+// async function initializeWasm() {
+//   if (typeof window !== 'undefined') {
+//     if (typeof process.env.NODE_ENV === 'undefined') {
+//       wasm.xyk = await import('hydra-dx-wasm/build/xyk/web');
+//       wasm.xyk.default();
+//       wasm.lbp = await import('hydra-dx-wasm/build/lbp/web');
+//       wasm.lbp.default();
+//     } else {
+//       const { import_wasm } = await import('../../utils/import_wasm');
+//       wasm.xyk = await import_wasm.xyk();
+//       wasm.lbp = await import_wasm.lbp();
+//     }
+//   } else {
+//     wasm.xyk = await import('hydra-dx-wasm/build/xyk/nodejs');
+//     wasm.lbp = await import('hydra-dx-wasm/build/lbp/nodejs');
+//   }
+// }
+//
+// initializeWasm();
 
 // import { getAccountBalances } from './getAccountBalances';
 import { getAssetList } from './getAssetList';
@@ -120,14 +120,20 @@ const getSpotPriceXyk = async (
 const getSpotPriceLbp = async (
   asset1Id: string,
   asset2Id: string,
+  blockHash?: string | undefined,
   poolAccount?: string | null | undefined,
-  blockHash?: string | undefined
 ) => {
-  return Promise.resolve(
-    toExternalBN(
-      await _getSpotPriceLbp(asset1Id, asset2Id, poolAccount, blockHash)
-    )
-  );
+  return Promise.resolve(async () => {
+    const spotPrice = await _getSpotPriceLbp(
+      asset1Id,
+      asset2Id,
+      blockHash,
+      poolAccount
+    );
+
+    if (!spotPrice) return null;
+    return toExternalBN(spotPrice);
+  });
 };
 
 const getMaxReceivedTradeAmount = (

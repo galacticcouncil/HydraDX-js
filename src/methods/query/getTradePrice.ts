@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
-import { wasm } from './index';
+import wasmUtils from '../../utils/wasmUtils';
 
 // TODO asset1Id and asset2Id should be renamed for more accurate understanding
 export async function getTradePrice(
@@ -41,7 +41,7 @@ export async function getTradePrice(
 
           if (actionType === 'sell') {
             amount = new BigNumber(
-              await wasm.xyk.calculate_out_given_in(
+              wasmUtils.xyk.calculateOutGivenIn(
                 assetsAmounts.asset1,
                 assetsAmounts.asset2,
                 tradeAmount.toString()
@@ -49,7 +49,7 @@ export async function getTradePrice(
             );
           } else if (actionType === 'buy') {
             amount = new BigNumber(
-              await wasm.xyk.calculate_in_given_out(
+              wasmUtils.xyk.calculateInGivenOut(
                 assetsAmounts.asset1,
                 assetsAmounts.asset2,
                 tradeAmount.toString()
@@ -102,7 +102,7 @@ export async function getTradePriceXyk(
 
           if (actionType === 'sell') {
             amount = new BigNumber(
-              await wasm.xyk.calculate_out_given_in(
+              wasmUtils.xyk.calculateOutGivenIn(
                 assetsAmounts.asset1,
                 assetsAmounts.asset2,
                 tradeAmount.toString()
@@ -110,7 +110,7 @@ export async function getTradePriceXyk(
             );
           } else if (actionType === 'buy') {
             amount = new BigNumber(
-              await wasm.xyk.calculate_in_given_out(
+              wasmUtils.xyk.calculateInGivenOut(
                 assetsAmounts.asset1,
                 assetsAmounts.asset2,
                 tradeAmount.toString()

@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { wasm } from './index';
-
+import wasmUtils from '../../utils/wasmUtils';
 /**
  * getPoolAssetsWeightsLbp provides weights for assetA and assetB.
  *
@@ -30,7 +29,7 @@ export const getPoolAssetsWeightsLbp = async (
 
   if (!saleStart.isZero() && !saleEnd.isZero()) {
     asset0Weight = new BigNumber(
-      wasm.lbp.calculate_linear_weights(
+      wasmUtils.lbp.calculateLinearWeights(
         saleStart.toString(),
         saleEnd.toString(),
         poolInitialWeight.toString(), // initial weight A

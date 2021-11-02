@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ApiPromise } from '@polkadot/api';
 import { AddressOrPair } from '@polkadot/api/types';
+import type { Codec, AnyJson } from '@polkadot/types/types';
 
 export interface HydraApiPromise extends ApiPromise {
   hydraDx?: any;
@@ -121,3 +122,30 @@ export type ExchangeTxEventData = {
 };
 
 export type MergedPairedEvents = { [key: string]: ExchangeTxEventData };
+
+export type LbpPoolDataRaw = {
+  owner: string;
+  start: string;
+  end: string;
+  assets: { asset_in: string; asset_out: string };
+  initial_weight: string;
+  final_weight: string;
+  weight_curve: string;
+  fee: { numerator: string; denominator: string };
+  fee_collector: string;
+  [index: string]: AnyJson;
+}
+export type LbpPoolData = {
+  poolId: string;
+  saleStart: BigNumber;
+  saleEnd: BigNumber;
+  owner: string;
+  initialWeight: BigNumber;
+  finalWeight: BigNumber;
+  asset0Id: string;
+  asset1Id: string;
+  weight_curve: string;
+  feeNumerator: string;
+  feeDenominator: string;
+  feeCollector: string;
+}

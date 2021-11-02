@@ -11,7 +11,7 @@ import { getTokenAmount } from './getTokenAmount';
 import { getPoolAssetsWeightsLbp } from './getPoolAssetsWeights';
 import { getBlockHeightRelayChain } from './getBlockHeightRelayChain';
 
-import { wasm } from './index';
+import wasmUtils from '../../utils/wasmUtils';
 
 export async function getSpotPrice(
   asset1Id: string,
@@ -37,11 +37,7 @@ export async function getSpotPrice(
           return;
 
         const price = new BigNumber(
-          await wasm.xyk.get_spot_price(
-            assetsAmounts.asset1,
-            assetsAmounts.asset2,
-            '1000000000000'
-          )
+          wasmUtils.xyk.getSpotPrice(assetsAmounts.asset1, assetsAmounts.asset2)
         );
         resolve(price);
       }
@@ -86,11 +82,7 @@ export async function getSpotPriceXyk(
           return;
 
         const price = new BigNumber(
-          await wasm.xyk.get_spot_price(
-            assetsAmounts.asset1,
-            assetsAmounts.asset2,
-            '1000000000000'
-          )
+          wasmUtils.xyk.getSpotPrice(assetsAmounts.asset1, assetsAmounts.asset2)
         );
         resolve(price);
       }
@@ -126,7 +118,7 @@ export async function getSpotPriceLbp(
 
     if (!poolInfo) return null;
 
-    const relayChainBlockHeight = await getBlockHeightRelayChain();
+    const relayChainBlockHeight = await getBlockHeightRelayChain(blockHash);
 
     if (!relayChainBlockHeight) return null;
 
@@ -154,12 +146,11 @@ export async function getSpotPriceLbp(
     if (asset0Amount === null || asset1Amount === null) return null;
 
     return new BigNumber(
-      await wasm.lbp.get_spot_price(
+      wasmUtils.lbp.getSpotPrice(
         asset0Amount.toString(),
         asset1Amount.toString(),
         assetsWeights.asset0Weight.toString(),
-        assetsWeights.asset1Weight.toString(),
-        '1000000000000'
+        assetsWeights.asset1Weight.toString()
       )
     );
   } catch (e: any) {

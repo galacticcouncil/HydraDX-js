@@ -1,7 +1,8 @@
 import BigNumber from 'bignumber.js';
 import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
-import { wasm } from './index';
+
+import wasmUtils from '../../utils/wasmUtils';
 
 /**
  * @deprecated The method should not be used and removed as redundant
@@ -26,10 +27,10 @@ export async function calculateSpotAmount(
           return;
 
         const price = new BigNumber(
-          await wasm.xyk.get_spot_price(
+          wasmUtils.xyk.getSpotPrice(
             assetsAmounts.asset1,
-            assetsAmounts.asset2,
-            amount.toString()
+            assetsAmounts.asset2
+            // amount.toString() // TODO this parameter cannot be passed
           )
         );
         resolve(price);

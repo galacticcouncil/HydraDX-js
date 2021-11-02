@@ -1,9 +1,14 @@
 import BigNumber from 'bignumber.js';
-import { PoolInfo, TokenTradeMap } from '../../types';
+import {
+  PoolInfo,
+  TokenTradeMap,
+  LbpPoolDataRaw,
+  LbpPoolData,
+} from '../../types';
 import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { getAssetPrices } from '../../utils';
-import { wasm } from './index';
+import wasmUtils from '../../utils/wasmUtils';
 
 import { toExternalBN } from '../../utils';
 import type { AnyJson, Codec } from '@polkadot/types/types';
@@ -89,10 +94,9 @@ export async function getPoolInfo(blockHash?: string | undefined) {
 
         let promises2 = poolAssetAmounts.map(assetAmounts => {
           if (assetAmounts) {
-            return wasm.xyk.get_spot_price(
+            return wasmUtils.xyk.getSpotPrice(
               assetAmounts.asset1,
-              assetAmounts.asset2,
-              '1000000000000'
+              assetAmounts.asset2
             );
           }
           return null;
@@ -103,7 +107,7 @@ export async function getPoolInfo(blockHash?: string | undefined) {
         let spotPrices = await Promise.all(promises2);
 
         for (let i = 0; i < spotPrices.length; i++) {
-          poolAssetAmounts[i].spotPrice = new BigNumber(spotPrices[i]);
+          poolAssetAmounts[i].spotPrice = new BigNumber(spotPrices[i]!); // TODO types should be improved
         }
 
         const poolAssetsAmount = await getPoolAssetsAmounts(
@@ -172,30 +176,18 @@ export async function getPoolInfoLbp({
   poolAccount?: string | undefined | null;
   asset0Id?: string | undefined;
   asset1Id?: string | undefined;
-}): Promise<{
-  poolId: string;
-  saleStart: BigNumber;
-  saleEnd: BigNumber;
-  owner: string;
-  initialWeight: BigNumber;
-  finalWeight: BigNumber;
-  asset0Id: string;
-  asset1Id: string;
-  weight_curve: string;
-  feeNumerator: string;
-  feeDenominator: string;
-  feeCollector: string;
-} | null> {
+}): Promise<LbpPoolData | null> {
   // We should terminate execution if required params are not provided
-  if (!poolAccount && !asset0Id && !asset1Id) return null;
+  if (!poolAccount && asset0Id === undefined && asset1Id === undefined)
+    return null;
 
   const api = Api.getApi();
 
   if (!api) return null;
 
-  let poolAddress: string | undefined | null | Codec | AnyJson = poolAccount;
+  let poolAddress: string | Codec | AnyJson = poolAccount || '';
 
-  if (!poolAccount) {
+  if (!poolAccount && asset0Id !== undefined && asset1Id !== undefined) {
     poolAddress = await api.query.lbp.getPoolId(asset0Id, asset1Id);
     poolAddress = poolAddress.toHuman();
   }
@@ -207,24 +199,21 @@ export async function getPoolInfoLbp({
   /**
    * poolData contains next data:
    *
-   * [
-   0x60a337a70c97253566bd07d40004200da42dd98ed4bf57282dd6c84814cda5d7c1e43828f6ff5dd0eecfd4e6ac8a70c25f6df23d135610e3100cf79cc7b98637728840383cd037c41cc6deb509f91571,
-   {
-            owner: bXmPf7DcVmFuHEmzH3UX8t6AUkfNQW8pnTeXGhFhqbfngjAak,
-            start: 0,
-            end: 0,
-            assets: { asset_in: 0, asset_out: 1 },
-            initial_weight: 10000000,
-            final_weight: 90000000,
-            weight_curve: Linear,
-            fee: { numerator: 2, denominator: 100 },
-            fee_collector: bXmPf7DcVmFuHEmzH3UX8t6AUkfNQW8pnTeXGhFhqbfngjAak,
-          },
-   ]
+     {
+        owner: bXmPf7DcVmF...,
+        start: 0,
+        end: 0,
+        assets: { asset_in: 0, asset_out: 1 },
+        initial_weight: 10000000,
+        final_weight: 90000000,
+        weight_curve: Linear,
+        fee: { numerator: 2, denominator: 100 },
+        fee_collector: bXmPf7DcVmFuHEm...,
+     },
    *
    */
 
-  const poolDataHuman = poolData.toHuman();
+  const poolDataHuman = poolData.toHuman() as LbpPoolDataRaw;
 
   const {
     owner,
@@ -236,20 +225,20 @@ export async function getPoolInfoLbp({
     weight_curve,
     fee: { numerator, denominator },
     fee_collector,
-  }: AnyJson = poolDataHuman[1];
+  } = poolDataHuman;
 
   return {
-    poolId: poolData[0][0],
-    saleStart: new BigNumber(start.toHuman()),
-    saleEnd: new BigNumber(start.toHuman()),
-    owner: owner.toHuman(),
-    initialWeight: new BigNumber(initial_weight.toHuman()),
-    finalWeight: new BigNumber(final_weight.toHuman()),
-    asset0Id: asset_in.toHuman(),
-    asset1Id: asset_out.toHuman(),
-    weight_curve: weight_curve.toHuman(),
-    feeNumerator: numerator.toHuman(),
-    feeDenominator: denominator.toHuman(),
-    feeCollector: fee_collector.toHuman(),
+    poolId: poolAddress as string,
+    saleStart: new BigNumber(start),
+    saleEnd: new BigNumber(end),
+    owner: owner,
+    initialWeight: new BigNumber(initial_weight),
+    finalWeight: new BigNumber(final_weight),
+    asset0Id: asset_in,
+    asset1Id: asset_out,
+    weight_curve: weight_curve,
+    feeNumerator: numerator,
+    feeDenominator: denominator,
+    feeCollector: fee_collector,
   };
 }

@@ -4,7 +4,9 @@ import BigNumber from 'bignumber.js';
 /**
  * getBlockHeightRelayChain - provides blockHeight of relay chain
  */
-export const getBlockHeightRelayChain = async (): Promise<BigNumber | null> => {
+export const getBlockHeightRelayChain = async (
+  blockHash?: string | undefined
+): Promise<BigNumber | null> => {
   try {
     const api = Api.getApi();
 
@@ -20,7 +22,9 @@ export const getBlockHeightRelayChain = async (): Promise<BigNumber | null> => {
         maxPovSize: 5242880,
       }
      */
-    const validationDataResponse = await api.query.parachainSystem.validationData();
+    const validationDataResponse = blockHash
+      ? await api.query.parachainSystem.validationData.at(blockHash)
+      : await api.query.parachainSystem.validationData();
 
     const dataToHuman = validationDataResponse.toHuman();
 
