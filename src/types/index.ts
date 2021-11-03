@@ -155,12 +155,12 @@ export type LbpPoolDataHuman = {
   owner: string;
   start: string;
   end: string;
-  assets: { asset_in: string; asset_out: string };
-  initial_weight: string;
-  final_weight: string;
-  weight_curve: string;
+  assets: string[];
+  initialWeight: string;
+  finalWeight: string;
+  weightCurve: string;
   fee: { numerator: string; denominator: string };
-  fee_collector: string;
+  feeCollector: string;
   [index: string]: AnyJson;
 };
 
@@ -173,7 +173,7 @@ export type LbpPoolData = {
   finalWeight: BigNumber;
   asset0Id: string;
   asset1Id: string;
-  weight_curve: string;
+  weightCurve: string;
   feeNumerator: string;
   feeDenominator: string;
   feeCollector: string;

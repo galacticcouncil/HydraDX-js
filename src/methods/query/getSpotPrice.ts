@@ -129,18 +129,19 @@ export async function getSpotPriceLbp(
       relayChainBlockHeight
     );
 
-    const asset0Amount = getTokenAmount(
+    const asset0Amount = await getTokenAmount(
       poolInfo.poolId,
       asset0Id,
       'free',
       blockHash
     );
-    const asset1Amount = getTokenAmount(
+    const asset1Amount = await getTokenAmount(
       poolInfo.poolId,
       asset1Id,
       'free',
       blockHash
     );
+
 
     if (asset0Amount === null || asset1Amount === null) return null;
 
