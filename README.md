@@ -2,7 +2,7 @@
 
 JS SDK for interacting with HydraDX and Basilisk nodes
 
-##How to use?
+## How to use?
 1) Import SDK library.
 2) Initialize API instance. You can initialize API for 2 chains - `hydraDx` and `basilisk`. So 
 you should use `API.initializeHydraDx(...params)` or `API.initializeBasilisk(...params)` accordingly. This
@@ -19,7 +19,7 @@ initialised API instance.
       }  
     ```
 
-###Initialization parameters:
+### Initialization parameters:
 `initialize<HydraDx|Basilisk>(apiListeners, apiUrl, typesConfig, maxRetries)`
 
 - `apiListeners` listeners for in-chain events. Can be empty object.
@@ -36,7 +36,7 @@ initialised API instance.
   or after loosing connection.
   
 
-##SDK methods
+## SDK methods
 Scope of available methods depends on initialized chain. Some methods are available only for the  
 specific chain.
 
@@ -76,7 +76,7 @@ They are available under `api.wasmUtils.<module>.<functionName>`
 original function from [hydra-dx-wasm](https://github.com/galacticcouncil/HydraDX-wasm) library 
 and returns raw result of wasm function calculation.
 
-###Available utils:
+### Available utils:
 
 **XYK module:**
 - `getSpotPrice`
@@ -90,7 +90,7 @@ and returns raw result of wasm function calculation.
 - `calculateLinearWeights`
 
 
-## input/Output data types:
+## Input/Output data types:
 
 - SDK receives numbers from users only as `BigNumber` (bignumber.js) with decimal part (not BN - bn.js). *Each received
   number converts for inner usage (35,4666382916 → 354666382916) (function - `toInternalBN`)*
