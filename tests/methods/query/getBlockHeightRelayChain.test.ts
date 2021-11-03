@@ -6,10 +6,11 @@ let api: HydraApiPromise;
 test('Test getBlockHeightRelayChain query', async () => {
   api = await Api.initializeBasilisk({}, process.env.WS_URL);
 
-  const blockHeight = await api.basilisk.query.getBlockHeightRelayChain(
-
-  );
+  const blockHeight = await api.basilisk.query.getBlockHeightRelayChain();
 
   expect(blockHeight).not.toBe(null);
-  console.log('blockHeight >>> - ', blockHeight);
+  console.log(
+    'blockHeight >>> - ',
+    blockHeight ? blockHeight.toString() : blockHeight
+  );
 });

@@ -1,20 +1,6 @@
 # HydraDX-js
 
-JS SDK for interacting with HydraDX nodes
-
-
-## input/Output data types:
-
-- SDK receives numbers from users only as `BigNumber` (bignumber.js) with decimal part (not BN - bn.js). *Each received 
-  number converts for inner usage (35,4666382916 → 354666382916) (function - `toInternalBN`)*
-- SDK makes inner manipulations with numbers as BigNumber in  1e+n format (n == 12 || 18).
-- SDN returns numbers to users as `BigNumber` with decimal part. Each result of inner calculations or API response 
-  converts to BigNumber with decimal part *(354666382916 → 35,4666382916) (function - `toExternalBN`)*
-
-Reason for using bignumber.js instead of bn.js - bn.js doesn't support decimal part what is not comfortable in
-work on front-end side. As SDK is intended to make work with chain data easier, so numbers with explicit decimal part
-are more preferred.
-
+JS SDK for interacting with HydraDX and Basilisk nodes
 
 ##How to use?
 1) Import SDK library.
@@ -50,6 +36,38 @@ initialised API instance.
   or after loosing connection.
   
 
+##SDK methods
+Scope of available methods depends on initialized chain. Some methods are available only for the  
+specific chain.
+
+
+| Method                    | Type  | hydraDx | basilisk | description |
+|---------------------------|-------|:-------:|:--------:|-------------|
+| getBlockHeightRelayChain  | query |    -    |     +    |             |
+| getPoolAssetsWeightsLbp   | query |    -    |     +    |             |
+| getSpotPriceLbp           | query |    -    |     +    |             |
+| _getSpotPriceXyk_         | query |    +    |     -    |             |
+| _getTradePrice_           | query |    +    |     -    |             |
+| _getPoolsInfoXyk_         | query |    +    |     +    |             |
+| _getAssetList_            | query |    +    |     +    |             |
+| _getPoolInfo_               | query |    +    |          |             |
+| _getAccountBalances_        | query |    +    |     +    |             |
+| getTokenAmount            | query |    +    |     +    |             |
+| _getPoolAssetsAmounts_      | query |    +    |          |             |
+| getMaxReceivedTradeAmount | query |    +    |     +    |             |
+| getMinReceivedTradeAmount | query |    +    |     +    |             |
+| getFreeTokenAmount        | query |    +    |     +    |             |
+| getReservedTokenAmount    | query |    +    |     +    |             |
+| getFrozenFeeTokenAmount   | query |    +    |     +    |             |
+| getMiscFrozenTokenAmount  | query |    +    |     +    |             |
+| _createPool_                | tx    |    +    |     +    |             |
+| _addLiquidity_              | tx    |    +    |     +    |             |
+| _removeLiquidity_           | tx    |    +    |     +    |             |
+| _mintAsset_                 | tx    |    +    |     +    |             |
+| _swap_                      | tx    |    +    |     +    |             |
+
+_*These methods must be reviewed and refactored_
+
 ## Wasm Utils
 
 API instance contains a bunch of wasm functions for `xyk` and `lbp` modules. 
@@ -70,3 +88,16 @@ and returns raw result of wasm function calculation.
 - `calculateOutGivenIn`
 - `calculateInGivenOut`
 - `calculateLinearWeights`
+
+
+## input/Output data types:
+
+- SDK receives numbers from users only as `BigNumber` (bignumber.js) with decimal part (not BN - bn.js). *Each received
+  number converts for inner usage (35,4666382916 → 354666382916) (function - `toInternalBN`)*
+- SDK makes inner manipulations with numbers as BigNumber in  1e+n format (n == 12 || 18).
+- SDN returns numbers to users as `BigNumber` with decimal part. Each result of inner calculations or API response
+  converts to BigNumber with decimal part *(354666382916 → 35,4666382916) (function - `toExternalBN`)*
+
+Reason for using bignumber.js instead of bn.js - bn.js doesn't support decimal part what is not comfortable in
+work on front-end side. As SDK is intended to make work with chain data easier, so numbers with explicit decimal part
+are more preferred.

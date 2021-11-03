@@ -43,6 +43,9 @@ import {
   getSpotPriceLbp as _getSpotPriceLbp,
 } from './getSpotPrice';
 
+/**
+ * @deprecated
+ */
 const calculateSpotAmount = async (
   asset1Id: string,
   asset2Id: string,
