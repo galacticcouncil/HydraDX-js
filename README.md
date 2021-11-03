@@ -23,6 +23,15 @@ you should use `API.initializeHydraDx(...params)` or `API.initializeBasilisk(...
 method returns API instance which you can use immediately. 
 3) Later in your code you can get API instance by evoking `API.getApi()` what returns previously
 initialised API instance.
+4) API instance structure has different structure depending on initialization method 
+   (`initializeHydraDx` or `initializeBasilisk`):
+    ```javascript
+      api: {
+        hydraDx?: <sdk_methods>,
+        basilisk?: <sdk_methods>,
+        wasmUtils: <module>.<wasm_utils_methods>
+      }  
+    ```
 
 ###Initialization parameters:
 `initialize<HydraDx|Basilisk>(apiListeners, apiUrl, typesConfig, maxRetries)`
@@ -44,7 +53,8 @@ initialised API instance.
 ## Wasm Utils
 
 API instance contains a bunch of wasm functions for `xyk` and `lbp` modules. 
-They are available under `api.wasmUtils.<module>.<functionName>`. Each util functions is wrapper for 
+They are available under `api.wasmUtils.<module>.<functionName>` 
+(e.g. `api.wasmUtils.lbp.calculateLinearWeights(...params)`). Each util functions is wrapper for 
 original function from [hydra-dx-wasm](https://github.com/galacticcouncil/HydraDX-wasm) library 
 and returns raw result of wasm function calculation.
 
