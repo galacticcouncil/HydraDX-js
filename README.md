@@ -60,13 +60,13 @@ and returns raw result of wasm function calculation.
 
 ###Available utils:
 
-XYK module:
-- getSpotPrice
-- calculateOutGivenIn
-- calculateInGivenOut
+**XYK module:**
+- `getSpotPrice`
+- `calculateOutGivenIn`
+- `calculateInGivenOut`
 
-LBP module:
-- getSpotPrice
-- calculateOutGivenIn
-- calculateInGivenOut
-- calculateLinearWeights
+**LBP module:**
+- `getSpotPrice`
+- `calculateOutGivenIn`
+- `calculateInGivenOut`
+- `calculateLinearWeights`

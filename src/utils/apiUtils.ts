@@ -131,6 +131,20 @@ export const customRpcConfig = {
         }
       ],
       type: 'AccountId'
+    },
+    getPoolBalances: {
+      description: 'Get XYK pool balances by pool account address',
+      params: [
+        {
+          name: 'poolAddress',
+          type: 'AccountId'
+        },
+        {
+          name: 'at',
+          type: 'BlockHash',
+        }
+      ],
+      type: 'ResponseType'
     }
   }
 }
