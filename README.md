@@ -16,6 +16,31 @@ work on front-end side. As SDK is intended to make work with chain data easier, 
 are more preferred.
 
 
+##How to use?
+1) Import SDK library.
+2) Initialize API instance. You can initialize API for 2 chains - `hydraDx` and `basilisk`. So 
+you should use `API.initializeHydraDx(...params)` or `API.initializeBasilisk(...params)` accordingly. This
+method returns API instance which you can use immediately. 
+3) Later in your code you can get API instance by evoking `API.getApi()` what returns previously
+initialised API instance.
+
+###Initialization parameters:
+`initialize<HydraDx|Basilisk>(apiListeners, apiUrl, typesConfig, maxRetries)`
+
+- `apiListeners` listeners for in-chain events. Can be empty object.
+- `apiUrl` - URL for WS connection to the chain. By default, it's `ws://127.0.0.1:9944`
+- `typesConfig` - types configuration for the connected chain. By default, SDK uses types configs 
+  for initialized chain. (Default types can be found for investigation here `./src/config/`)
+  ```javascript
+  {
+    types: RegistryTypes;
+    alias: Record<string, OverrideModuleType>;
+  }
+  ```
+- `maxRetries` - number of connection attempts to the specified chain during initialization
+  or after loosing connection.
+  
+
 ## Wasm Utils
 
 API instance contains a bunch of wasm functions for `xyk` and `lbp` modules. 
