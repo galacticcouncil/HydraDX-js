@@ -50,21 +50,22 @@ specific chain.
 | _getTradePrice_           | query |    +    |     -    |             |
 | _getPoolsInfoXyk_         | query |    +    |     +    |             |
 | _getAssetList_            | query |    +    |     +    |             |
-| _getPoolInfo_               | query |    +    |          |             |
-| _getAccountBalances_        | query |    +    |     +    |             |
+| _getPoolInfo_             | query |    +    |          |             |
+| _getAccountBalances_      | query |    +    |     +    |             |
 | getTokenAmount            | query |    +    |     +    |             |
-| _getPoolAssetsAmounts_      | query |    +    |          |             |
+| _getPoolAssetsAmounts_    | query |    +    |     +    |             |
+| getPoolAssetsAmountsLbp   | query |    -    |     +    |             |
 | getMaxReceivedTradeAmount | query |    +    |     +    |             |
 | getMinReceivedTradeAmount | query |    +    |     +    |             |
 | getFreeTokenAmount        | query |    +    |     +    |             |
 | getReservedTokenAmount    | query |    +    |     +    |             |
 | getFrozenFeeTokenAmount   | query |    +    |     +    |             |
 | getMiscFrozenTokenAmount  | query |    +    |     +    |             |
-| _createPool_                | tx    |    +    |     +    |             |
-| _addLiquidity_              | tx    |    +    |     +    |             |
-| _removeLiquidity_           | tx    |    +    |     +    |             |
-| _mintAsset_                 | tx    |    +    |     +    |             |
-| _swap_                      | tx    |    +    |     +    |             |
+| _createPool_              | tx    |    +    |     +    |             |
+| _addLiquidity_            | tx    |    +    |     +    |             |
+| _removeLiquidity_         | tx    |    +    |     +    |             |
+| _mintAsset_               | tx    |    +    |     +    |             |
+| _swap_                    | tx    |    +    |     +    |             |
 
 _*These methods must be reviewed and refactored_
 

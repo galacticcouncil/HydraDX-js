@@ -1,5 +1,6 @@
 import Api from '../../api';
 import { getTokenAmount } from './getTokenAmount';
+import { getPoolInfoLbp } from './getPoolInfo';
 import BigNumber from 'bignumber.js';
 
 /**
@@ -178,5 +179,61 @@ export const getPoolAssetsAmountsXyk = async (
     asset1: asset1Amount !== null ? asset1Amount.toString() : null,
     asset2: asset2Amount !== null ? asset2Amount.toString() : null,
     accountAddress: currentPoolId,
+  };
+};
+
+/**
+ * getPoolAssetsAmountsLbp fetches amounts for pair of assets within pool.
+ * @param asset0Id
+ * @param asset1Id: string | null
+ * @param poolAccount: string | null | undefined - if pool account is specified, it will
+ *        reduce number of requests to the chain (we do not need fetch poolInfo by asset IDs)
+ * @param blockHash?: string | undefined
+ */
+export const getPoolAssetsAmountsLbp = async (
+  asset0Id: string,
+  asset1Id: string,
+  poolAccount: string | null | undefined,
+  blockHash?: string | undefined
+): Promise<{
+  asset0: BigNumber;
+  asset1: BigNumber;
+} | null> => {
+  if (!asset0Id || !asset1Id) return null;
+
+  const api = Api.getApi();
+  if (!api) return null;
+
+  let currentPoolAccount = poolAccount;
+
+  if (!currentPoolAccount) {
+    const currentPool = await getPoolInfoLbp({
+      asset0Id,
+      asset1Id,
+    });
+
+    if (currentPool === null) return null;
+
+    currentPoolAccount = currentPool.poolId;
+  }
+
+  const asset0Amount = await getTokenAmount(
+    currentPoolAccount,
+    asset0Id,
+    'free',
+    blockHash
+  );
+  const asset1Amount = await getTokenAmount(
+    currentPoolAccount,
+    asset1Id,
+    'free',
+    blockHash
+  );
+
+  if (asset0Amount === null || asset1Amount === null) return null;
+
+  return {
+    asset0: asset0Amount,
+    asset1: asset1Amount,
   };
 };

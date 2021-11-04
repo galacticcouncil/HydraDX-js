@@ -17,12 +17,12 @@ import {
 } from './getPoolInfo';
 // import { getSpotPrice } from './getSpotPrice';
 import { getTokenAmount } from './getTokenAmount';
-// import {
-//   getPoolAssetsAmounts as _getPoolAssetsAmounts,
-//   getPoolAssetsAmountsXyk as _getPoolAssetsAmountsXyk,
-// } from './getPoolAssetAmounts';
+import {
+  getPoolAssetsAmounts, // TODO add toExternalBN conversion
+  // getPoolAssetsAmountsXyk as _getPoolAssetsAmountsXyk,  // TODO add toExternalBN conversion
+  getPoolAssetsAmountsLbp as _getPoolAssetsAmountsLbp,
+} from './getPoolAssetAmounts';
 
-import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { calculateSpotAmount as _calculateSpotAmount } from './calculateSpotAmount';
 import { getTradePrice as _getTradePrice } from './getTradePrice';
 import { getFreeTokenAmount } from './getFreeTokenAmount';
@@ -171,6 +171,38 @@ const getAccountBalances = (account: any) => {
   });
 };
 
+const getPoolAssetsAmountsLbp = (
+  asset0Id: string,
+  asset1Id: string,
+  poolAccount: string | null | undefined,
+  blockHash?: string | undefined
+): Promise<{
+  asset0: BigNumber;
+  asset1: BigNumber;
+} | null> => {
+  return new Promise((resolve, reject) => {
+    _getPoolAssetsAmountsLbp(asset0Id, asset1Id, poolAccount, blockHash)
+      .then(
+        (
+          amounts: {
+            asset0: BigNumber;
+            asset1: BigNumber;
+          } | null
+        ) => {
+          if (amounts === null) {
+            resolve(null);
+            return;
+          }
+          resolve({
+            asset0: toExternalBN(amounts.asset0)!,
+            asset1: toExternalBN(amounts.asset1)!,
+          });
+        }
+      )
+      .catch(e => reject(null));
+  });
+};
+
 const getPoolInfo = (blockHash?: string | undefined) => {
   return new Promise((resolve, reject) => {
     _getPoolInfo(blockHash)
@@ -217,6 +249,12 @@ const getPoolsInfoXyk = (blockHash?: string | undefined) => {
   });
 };
 
+
+/**
+ * If we export new method, it must be added to methods expose
+ * list in "./src/utils/apiUtils.ts"
+ */
+
 export {
   getAccountBalances,
   getAssetList,
@@ -227,6 +265,7 @@ export {
   getSpotPriceLbp,
   getTokenAmount,
   getPoolAssetsAmounts,
+  getPoolAssetsAmountsLbp,
   calculateSpotAmount,
   getTradePrice,
   getFreeTokenAmount,
@@ -236,7 +275,6 @@ export {
   getMarketcap,
   getMaxReceivedTradeAmount,
   getMinReceivedTradeAmount,
-
   getBlockHeightRelayChain,
   getPoolAssetsWeightsLbp,
 };

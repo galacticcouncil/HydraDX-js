@@ -11,7 +11,10 @@ const basiliskQueryMethods = [
   'getSpotPriceXyk',
   'getSpotPriceLbp',
   'getTokenAmount',
+
   'getPoolAssetsAmounts',
+  'getPoolAssetsAmountsLbp',
+
   'calculateSpotAmount',
   'getTradePrice',
   'getFreeTokenAmount',

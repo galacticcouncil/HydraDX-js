@@ -36,7 +36,10 @@ export const toInternalBN = (number: BigNumber, multiply: number = 12) =>
  * @param number
  * @param divide
  */
-export const toExternalBN = (number: BigNumber | null, divide: number = 12) =>
+export const toExternalBN = (
+  number: BigNumber | null,
+  divide: number = 12
+): BigNumber | null =>
   number ? number.integerValue().dividedBy(`1e+${divide}`) : number;
 
 export const decorateExchangeTxDataToExternalBN = (
