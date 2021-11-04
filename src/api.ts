@@ -21,8 +21,8 @@ import { exposeApiMethods, customRpcConfig } from './utils/apiUtils';
 import { initializeWasm } from './utils/wasmUtils';
 initializeWasm();
 
-import * as query from './methods/query';
-import * as tx from './methods/tx';
+import query from './methods/query';
+import tx from './methods/tx';
 import wasmUtils from './utils/wasmUtils';
 
 let api: HydraApiPromise;

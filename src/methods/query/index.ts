@@ -101,14 +101,14 @@ const getSpotPriceXyk = async (
   );
 };
 const getSpotPriceLbp = async (
+  asset0Id: string,
   asset1Id: string,
-  asset2Id: string,
   blockHash?: string | null | undefined,
   poolAccount?: string | null | undefined
 ) => {
   return Promise.resolve(
     toExternalBN(
-      await _getSpotPriceLbp(asset1Id, asset2Id, blockHash, poolAccount)
+      await _getSpotPriceLbp(asset0Id, asset1Id, blockHash, poolAccount)
     )
   );
 };
@@ -255,7 +255,7 @@ const getPoolsInfoXyk = (blockHash?: string | undefined) => {
  * list in "./src/utils/apiUtils.ts"
  */
 
-export {
+export default {
   getAccountBalances,
   getAssetList,
   getPoolInfo,

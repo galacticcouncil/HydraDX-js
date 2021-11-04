@@ -3,6 +3,9 @@ import { ApiPromise } from '@polkadot/api';
 import { AddressOrPair } from '@polkadot/api/types';
 import type { Codec, AnyJson } from '@polkadot/types/types';
 
+import queryMethods from '../methods/query';
+import txMethods from '../methods/tx';
+
 import {
   getSpotPriceXyk,
   calculateInGivenOutXyk,
@@ -18,9 +21,18 @@ export const ChainName = {
   basilisk: 'basilisk',
 } as const;
 
+type SdkMethods<Type> = {
+  [Property in keyof Type]: Type[Property];
+};
+
+export type SdkMethodsScope = {
+  query: SdkMethods<typeof queryMethods>;
+  tx: SdkMethods<typeof txMethods>;
+};
+
 export interface HydraApiPromise extends ApiPromise {
-  hydraDx?: any;
-  basilisk?: any;
+  hydraDx: SdkMethodsScope;
+  basilisk: SdkMethodsScope;
   wasmUtils: {
     xyk: {
       getSpotPrice: typeof getSpotPriceXyk;

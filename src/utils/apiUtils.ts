@@ -1,4 +1,4 @@
-import { ChainName } from '../types';
+import { ChainName, SdkMethodsScope } from '../types';
 
 type ChainName = typeof ChainName[keyof typeof ChainName];
 
@@ -69,7 +69,7 @@ const hydraDxTxMethods = [
 export const exposeApiMethods = (
   methodsScope: { query: any; tx: any },
   chainName: ChainName
-) => {
+): SdkMethodsScope => {
   const exposedMethods = {
     query: {},
     tx: methodsScope.tx,
@@ -100,7 +100,7 @@ export const exposeApiMethods = (
       exposedMethods.query = methodsScope.query;
   }
 
-  return exposedMethods;
+  return exposedMethods as SdkMethodsScope;
 };
 
 export const customRpcConfig = {
@@ -110,15 +110,15 @@ export const customRpcConfig = {
       params: [
         {
           name: 'asset0Id',
-          type: 'AssetId'
+          type: 'AssetId',
         },
         {
           name: 'asset0Id',
           type: 'AssetId',
-        }
+        },
       ],
-      type: 'AccountId'
-    }
+      type: 'AccountId',
+    },
   },
   xyk: {
     getPoolAccount: {
@@ -126,28 +126,28 @@ export const customRpcConfig = {
       params: [
         {
           name: 'asset0Id',
-          type: 'AssetId'
+          type: 'AssetId',
         },
         {
           name: 'asset0Id',
           type: 'AssetId',
-        }
+        },
       ],
-      type: 'AccountId'
+      type: 'AccountId',
     },
     getPoolBalances: {
       description: 'Get XYK pool balances by pool account address',
       params: [
         {
           name: 'poolAddress',
-          type: 'AccountId'
+          type: 'AccountId',
         },
         {
           name: 'at',
           type: 'BlockHash',
-        }
+        },
       ],
-      type: 'ResponseType'
-    }
-  }
-}
+      type: 'ResponseType',
+    },
+  },
+};

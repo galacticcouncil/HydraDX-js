@@ -105,7 +105,7 @@ const swap = ({
   });
 };
 
-export {
+export default {
   createPool,
   addLiquidity,
   removeLiquidity,
