@@ -98,9 +98,29 @@ SDK provide a bunch of utils. Some of them you can import directly from SDK pack
 Other can be used only with initialized API instance as they need api connection to the chain. 
 These chain dependent utils can be found in API instnace - `api.utils.<utilName>`.
 
-- `getFormattedAddress(address: string, format?: number)` - Returns formatted address regarding provided ss58Format value. If ss58Format
+- `getFormattedAddress(address: string, format?: number): Promise<string | null>` - Returns formatted address regarding provided ss58Format value. If ss58Format
     is not provided, value will be fetched from initiated in current api instance
     chain (api.registry.getChainProperties())
+  
+
+- `setBlocksTimeout(delayBlocksNumber: number | BigNumber): Promise<BigNumber | null>` - Set delay for specified number of blocks. As successful result returns 
+  blockHeight of latest finalized block, which has been omitted.  With this method you can make chains 
+  of actions with delays:
+    ```javascript
+      const api = Api.getApi();
+      
+      // some_action_1
+      
+      await api.utils.setBlocksTimeo(3) // delay for 3 blocks
+    
+      // some_action_2
+    
+      const lastBlockHeight = await api.utils.setBlocksTimeo(new BigNumber(5)) // delay for 5 blocks
+    
+      console.log(lastBlockHeight); // -> latest omitted block 
+    
+      // some_action_3
+    ```
 
 
 ## Input/Output data types:

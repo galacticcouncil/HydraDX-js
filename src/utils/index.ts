@@ -185,4 +185,35 @@ export const getFormattedAddress = async (
   return encodeAddress(address, chainFormat);
 };
 
+/**
+ * Set delay for specified number of blocks. As successful result returns
+ * blockHeight of latest finalized block, which has been omitted.
+ *
+ * @param delayBlocksNumber
+ */
+export const setBlocksTimeout = (
+  delayBlocksNumber: number | BigNumber
+): Promise<BigNumber | null> => {
+  return new Promise(async resolve => {
+    const api = Api.getApi();
+    if (!api) {
+      resolve(null);
+      return;
+    }
+
+    let blockIndex = !BigNumber.isBigNumber(delayBlocksNumber)
+      ? new BigNumber(delayBlocksNumber)
+      : delayBlocksNumber;
+
+    const unsubscribe = await api.rpc.chain.subscribeNewHeads(header => {
+      blockIndex = blockIndex.minus(1);
+      if (blockIndex.isZero()) {
+        unsubscribe();
+        resolve(new BigNumber(header.number.toString().replace(/,/g, '')));
+        return;
+      }
+    });
+  });
+};
+
 export { decToBn, bnToDec, getStableCoinID };

@@ -111,6 +111,7 @@ export const exposeApiMethods = (
 export const exposeApiUtils = () => {
   return {
     getFormattedAddress: sdkUtils.getFormattedAddress as typeof sdkUtils.getFormattedAddress,
+    setBlocksTimeout: sdkUtils.setBlocksTimeout as typeof sdkUtils.setBlocksTimeout,
   };
 };
 

@@ -49,6 +49,7 @@ export interface HydraApiPromise extends ApiPromise {
   };
   utils: {
     getFormattedAddress: typeof sdkUtils.getFormattedAddress;
+    setBlocksTimeout: typeof sdkUtils.setBlocksTimeout;
   };
 }
 
