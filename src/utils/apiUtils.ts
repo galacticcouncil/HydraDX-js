@@ -67,6 +67,10 @@ const hydraDxTxMethods = [
   'processChainEvent',
 ];
 
+const objectFromEntries = (object: any, [key, value]: [any, any]) => {
+  return Object.assign(object, { [key]: value });
+};
+
 export const exposeApiMethods = (
   methodsScope: { query: any; tx: any },
   chainName: ChainName
@@ -81,7 +85,7 @@ export const exposeApiMethods = (
     const filteredArr = methodsArr.filter(function ([key]) {
       return pattern.includes(key);
     });
-    return Object.fromEntries(filteredArr);
+    return filteredArr.reduce(objectFromEntries);
   };
 
   switch (chainName) {
@@ -107,8 +111,8 @@ export const exposeApiMethods = (
 export const exposeApiUtils = () => {
   return {
     getFormattedAddress: sdkUtils.getFormattedAddress as typeof sdkUtils.getFormattedAddress,
-  }
-}
+  };
+};
 
 export const customRpcConfig = {
   lbp: {
