@@ -103,7 +103,7 @@ These chain dependent utils can be found in API instnace - `api.utils.<utilName>
     chain (api.registry.getChainProperties())
   
 
-- `setBlocksTimeout(delayBlocksNumber: number | BigNumber): Promise<BigNumber | null>` - Set delay for specified number of blocks. As successful result returns 
+- `setBlocksDelay(delayBlocksNumber: number | BigNumber): Promise<BigNumber | null>` - Set delay for specified number of blocks. As successful result returns 
   blockHeight of latest finalized block, which has been omitted.  With this method you can make chains 
   of actions with delays:
     ```javascript
@@ -115,7 +115,7 @@ These chain dependent utils can be found in API instnace - `api.utils.<utilName>
     
       // some_action_2
     
-      const lastBlockHeight = await api.utils.setBlocksTimeo(new BigNumber(5)) // delay for 5 blocks
+      const lastBlockHeight = await api.utils.setBlocksDelay(new BigNumber(5)) // delay for 5 blocks
     
       console.log(lastBlockHeight); // -> latest omitted block 
     

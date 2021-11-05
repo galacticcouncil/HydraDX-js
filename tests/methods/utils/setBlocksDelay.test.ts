@@ -3,10 +3,10 @@ import Api from '../../../src/api';
 let api: HydraApiPromise;
 import BigNumber from 'bignumber.js';
 
-test('Test setBlockTimeout util', async () => {
+test('Test setBlocksDelay util', async () => {
   api = await Api.initializeBasilisk({}, process.env.WS_URL);
 
-  const blockHeight = await api.utils.setBlocksTimeout(new BigNumber(2));
+  const blockHeight = await api.utils.setBlocksDelay(new BigNumber(2));
 
   expect(blockHeight).not.toBe(null);
 });

@@ -191,7 +191,7 @@ export const getFormattedAddress = async (
  *
  * @param delayBlocksNumber
  */
-export const setBlocksTimeout = (
+export const setBlocksDelay = (
   delayBlocksNumber: number | BigNumber
 ): Promise<BigNumber | null> => {
   return new Promise(async resolve => {
