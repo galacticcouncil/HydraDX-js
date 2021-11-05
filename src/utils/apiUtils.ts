@@ -1,4 +1,5 @@
 import { ChainName, SdkMethodsScope } from '../types';
+import * as sdkUtils from '../utils';
 
 type ChainName = typeof ChainName[keyof typeof ChainName];
 
@@ -102,6 +103,12 @@ export const exposeApiMethods = (
 
   return exposedMethods as SdkMethodsScope;
 };
+
+export const exposeApiUtils = () => {
+  return {
+    getFormattedAddress: sdkUtils.getFormattedAddress as typeof sdkUtils.getFormattedAddress,
+  }
+}
 
 export const customRpcConfig = {
   lbp: {

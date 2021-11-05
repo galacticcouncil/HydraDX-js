@@ -5,6 +5,7 @@ import type { Codec, AnyJson } from '@polkadot/types/types';
 
 import queryMethods from '../methods/query';
 import txMethods from '../methods/tx';
+import * as sdkUtils from '../utils';
 
 import {
   getSpotPriceXyk,
@@ -45,6 +46,9 @@ export interface HydraApiPromise extends ApiPromise {
       calculateInGivenOut: typeof calculateInGivenOutLbp;
       calculateLinearWeights: typeof calculateLinearWeightsLbp;
     };
+  };
+  utils: {
+    getFormattedAddress: typeof sdkUtils.getFormattedAddress;
   };
 }
 

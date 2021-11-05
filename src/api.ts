@@ -15,7 +15,7 @@ import { processChainEvent } from './methods/tx/_events';
 
 import { initHdxEventEmitter } from './utils/eventEmitter';
 import { decorateExchangeTxDataScopeToExternalBN } from './utils';
-import { exposeApiMethods, customRpcConfig } from './utils/apiUtils';
+import { exposeApiMethods, exposeApiUtils, customRpcConfig } from './utils/apiUtils';
 
 // TODO Evoking of initializeWasm should be reviewed as redundant
 import { initializeWasm } from './utils/wasmUtils';
@@ -158,6 +158,7 @@ const initialize = async (
         .on('ready', apiInstance => {
           api = apiInstance;
           api.wasmUtils = wasmUtils;
+          api.utils = exposeApiUtils();
 
           // TODO Must be reimplemented for better way
           switch (chainName) {
@@ -188,6 +189,7 @@ const initialize = async (
         .isReadyOrError.then((apiResponse: any) => {
           api = apiResponse;
           api.wasmUtils = wasmUtils;
+          api.utils = exposeApiUtils();
 
           // TODO Must be reimplemented for better way
           switch (chainName) {

@@ -1,4 +1,5 @@
 import { bnToBn } from '@polkadot/util';
+import { encodeAddress } from '@polkadot/util-crypto';
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 import type { StorageKey } from '@polkadot/types';
@@ -8,6 +9,8 @@ import {
   MergedPairedEvents,
   TokenTradeMap,
 } from '../types';
+
+import Api from '../api';
 
 /**
  * Convert BigNumber value to BN
@@ -151,6 +154,28 @@ export const getAssetPrices = (
   }
 
   return assetPrices;
+};
+
+export const getFormattedAddress = async (
+  address: string,
+  format?: number
+): Promise<string | null> => {
+  let chainFormat = format;
+
+  if (format === undefined) {
+    const api = Api.getApi();
+
+    if (!api) return null;
+
+    const chainInfo = await api.registry.getChainProperties();
+    if (!chainInfo) return null;
+    chainFormat = +chainInfo.ss58Format.toString();
+    console.log('>>>chainInfo - ', chainInfo)
+
+  }
+
+
+  return encodeAddress(address, chainFormat);
 };
 
 export { decToBn, bnToDec, getStableCoinID };
