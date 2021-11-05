@@ -156,6 +156,16 @@ export const getAssetPrices = (
   return assetPrices;
 };
 
+/**
+ * Returns formatted address regarding provided ss58Format value. If ss58Format
+ * is not provided, value will be fetched from initiated in current api instance
+ * chain (api.registry.getChainProperties())
+ *
+ * @param address
+ * @param format
+ * @return string | null - function returns null in case api call has been
+ * required but has got failed.
+ */
 export const getFormattedAddress = async (
   address: string,
   format?: number
@@ -170,10 +180,7 @@ export const getFormattedAddress = async (
     const chainInfo = await api.registry.getChainProperties();
     if (!chainInfo) return null;
     chainFormat = +chainInfo.ss58Format.toString();
-    console.log('>>>chainInfo - ', chainInfo)
-
   }
-
 
   return encodeAddress(address, chainFormat);
 };

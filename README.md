@@ -91,6 +91,18 @@ and returns raw result of wasm function calculation.
 - `calculateLinearWeights`
 
 
+## Utils
+
+SDK provide a bunch of utils. Some of them you can import directly from SDK package.
+
+Other can be used only with initialized API instance as they need api connection to the chain. 
+These chain dependent utils can be found in API instnace - `api.utils.<utilName>`.
+
+- `getFormattedAddress(address: string, format?: number)` - Returns formatted address regarding provided ss58Format value. If ss58Format
+    is not provided, value will be fetched from initiated in current api instance
+    chain (api.registry.getChainProperties())
+
+
 ## Input/Output data types:
 
 - SDK receives numbers from users only as `BigNumber` (bignumber.js) with decimal part (not BN - bn.js). *Each received
