@@ -10,9 +10,8 @@ import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { getAssetPrices } from '../../utils';
 import wasmUtils from '../../utils/wasmUtils';
 
-import { toExternalBN } from '../../utils';
 import type { AnyJson, Codec } from '@polkadot/types/types';
-import Any = jasmine.Any;
+// import Any = jasmine.Any;
 
 // TODO Detailed description is necessary
 /**
