@@ -7,7 +7,7 @@ import  { getPoolAssetsAmounts } from './getPoolAssetAmounts';
 import { getPoolInfo } from './getPoolInfo';
 import { wasm } from './index';
 
-export async function getMarketcap(assetId1: string, assetId2: string) {
+export async function getMarketcap(assetId1: string, assetId2: string, blockHash?: string | Uint8Array) {
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
@@ -18,8 +18,10 @@ export async function getMarketcap(assetId1: string, assetId2: string) {
           error: 'None or both assets should be set',
         });
       }
-
-      const poolsList = await api.query.xyk.poolAssets.entries();
+      const lastHdr = await api.rpc.chain.getHeader();
+      const poolsList = blockHash
+        ? await api.query.xyk.poolAssets.entriesAt(blockHash)
+        : await api.query.xyk.poolAssets.entries();
       let parsedPoolsList = poolsList.map(item => {
         return [item[0].toHuman(), item[1].toHuman()];
       });
@@ -28,7 +30,7 @@ export async function getMarketcap(assetId1: string, assetId2: string) {
         const assetPair = poolInfo[1];
 
         if (assetPair && Array.isArray(assetPair) && assetPair[0] && assetPair[1]) {
-          return getPoolAssetsAmounts(assetPair[0].toString(), assetPair[1].toString());
+          return getPoolAssetsAmounts(assetPair[0].toString(), assetPair[1].toString(), blockHash);
         }
         
         return null;

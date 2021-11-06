@@ -11,7 +11,7 @@ test('Test createPool', async () => {
   api = await Api.initialize({}, process.env.WS_URL);
 
   const alice = getAliceAccount();
-  let assetList = await api.hydraDx.query.getAssetList(alice.address);
+  let assetList = await api.hydraDx.query.getAssetList();
   const asset1 = assetList[0].assetId;
   let asset2 = assetList[assetList.length - 1].assetId;
 
@@ -20,7 +20,7 @@ test('Test createPool', async () => {
   let targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
   expect(targetBalance[targetBalance.length - 1].balanceFormatted).toBe('1000000000');
 
-  assetList = await api.hydraDx.query.getAssetList(alice.address);
+  assetList = await api.hydraDx.query.getAssetList();
   asset2 = assetList[assetList.length - 1].assetId;
   try {
     await createPool(asset1.toString(), asset2.toString(), new BigNumber('0'), new BigNumber('0'), alice);
@@ -29,7 +29,7 @@ test('Test createPool', async () => {
     expect(e.data[0].name).toBe('CannotCreatePoolWithZeroLiquidity');
   }
 
-  assetList = await api.hydraDx.query.getAssetList(alice.address);
+  assetList = await api.hydraDx.query.getAssetList();
   asset2 = assetList[assetList.length - 1].assetId;
   try {
     await createPool(asset1.toString(), asset2.toString(), new BigNumber('-1'), new BigNumber('-1'), alice);

@@ -8,7 +8,8 @@ import { getTokenAmount } from './getTokenAmount';
  */
 export const getPoolAssetsAmounts = async (
   asset1Id: string | null,
-  asset2Id: string | null
+  asset2Id: string | null,
+  blockHash?: string | Uint8Array
 ): Promise<{
   asset1: string | null;
   asset2: string | null;
@@ -25,8 +26,10 @@ export const getPoolAssetsAmounts = async (
   const api = Api.getApi();
 
   if (!api) return null;
-
-  const poolsList = await api.query.xyk.poolAssets.entries();
+  const poolsList =
+    blockHash
+      ? await api.query.xyk.poolAssets.entriesAt(blockHash)
+      : await api.query.xyk.poolAssets.entries();
 
   //TODO should be create type for poolsList (api.createType())
   const parsedPoolsList = poolsList.map(item => {
@@ -59,8 +62,8 @@ export const getPoolAssetsAmounts = async (
     return null;
   }
 
-  const asset1Amount = await getTokenAmount(currentPoolId, asset1Id, 'free');
-  const asset2Amount = await getTokenAmount(currentPoolId, asset2Id, 'free');
+  const asset1Amount = await getTokenAmount(currentPoolId, asset1Id, 'free', blockHash);
+  const asset2Amount = await getTokenAmount(currentPoolId, asset2Id, 'free', blockHash);
 
   return {
     asset1: asset1Amount !== null ? asset1Amount.toString() : null,

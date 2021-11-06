@@ -14,7 +14,7 @@ test('Test swap', async () => {
   api = await Api.initialize({}, process.env.WS_URL);
 
   const alice = getAliceAccount();
-  const assetList = await api.hydraDx.query.getAssetList(alice.address);
+  const assetList = await api.hydraDx.query.getAssetList();
   const asset1 = assetList[0].assetId;
   const asset2 = assetList[1].assetId;
 
