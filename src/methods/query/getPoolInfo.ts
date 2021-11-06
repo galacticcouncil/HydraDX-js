@@ -7,13 +7,17 @@ import { wasm } from './index';
 
 import { toExternalBN } from '../../utils';
 
-export async function getPoolInfo() {
+export async function getPoolInfo(blockHash?: string | Uint8Array) {
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
       if (!api) return reject();
-      const allPools = await api.query.xyk.poolAssets.entries();
-      const allTokens = await api.query.xyk.shareToken.entries();
+      const allPools = blockHash
+        ? await api.query.xyk.poolAssets.entriesAt(blockHash)
+        : await api.query.xyk.poolAssets.entries();
+      const allTokens = blockHash
+        ? await api.query.xyk.shareToken.entriesAt(blockHash)
+        : await api.query.xyk.shareToken.entries();
       const poolInfo: PoolInfo = {};
 
       const shareTokenIds: number[] = [];

@@ -30,17 +30,17 @@ test('Test getAccountBalances', async () => {
 });
 
 test('Test getAssetList', async () => {
-  const assetList = await api.hydraDx.query.getAssetList(aliceAccount);
+  const assetList = await api.hydraDx.query.getAssetList();
   expect(assetList).toBeDefined();
 });
 
 test('Test getPoolInfo', async () => {
-  const poolInfo = await api.hydraDx.query.getPoolInfo(aliceAccount);
+  const poolInfo = await api.hydraDx.query.getPoolInfo();
   expect(poolInfo).toBeDefined();
 });
 
 test('Test getSpotPrice', async () => {
-  assetList = await api.hydraDx.query.getAssetList(aliceAccount);
+  assetList = await api.hydraDx.query.getAssetList();
   asset1 = assetList[0].assetId.toString();
   asset2 = assetList[assetList.length - 1].assetId.toString();
   

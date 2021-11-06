@@ -6,17 +6,22 @@ import type {
 import { AssetBalance } from '../../types';
 import Api from '../../api';
 
-export async function getAccountBalances(account: any) {
+export async function getAccountBalances(account?: string, blockHash?: string | Uint8Array) {
   return new Promise<AssetBalance[]>(async (resolve, reject) => {
     try {
       const api = Api.getApi();
       const balances: AssetBalance[] = [];
 
       if (account && api) {
-        const multiTokenInfo = await api.query.tokens.accounts.entries(account);
-        const baseTokenInfo = (await api.query.system.account(account)) as
+        const multiTokenInfo = blockHash
+          ? await api.query.tokens.accounts.entriesAt(account, blockHash)
+          : await api.query.tokens.accounts.entries(account);
+        const baseTokenInfo = blockHash
+          ? await api.query.system.account.at(account, blockHash)
+          : await api.query.system.account(account) as
           | AccountInfoWithProviders
           | AccountInfoWithRefCount;
+
         const baseTokenBalance = new BigNumber(
           baseTokenInfo.data.free.toString()
         );
