@@ -6,6 +6,10 @@ import {
   decorateExchangeTxDataToExternalBN,
 } from '../../utils';
 
+import { createPoolLbpSudo as _createPoolLbpSudo } from './createPoolLbpSudo';
+import { updatePoolDataLbpSudo as _updatePoolDataLbpSudo } from './updatePoolDataLbpSudo';
+import { setBalanceSudo as _setBalanceSudo } from './setBalanceSudo';
+
 import { createPool as _createPool } from './createPool';
 import { addLiquidity as _addLiquidity } from './addLiquidity';
 import { removeLiquidity as _removeLiquidity } from './removeLiquidity';
@@ -32,6 +36,102 @@ const createPool = (
     account,
     signer
   );
+};
+
+const setBalanceSudo = (
+  addressForUpdate: AddressOrPair,
+  assetId: string,
+  freeBalance: BigNumber,
+  reservedBalance: BigNumber
+) => {
+  return _setBalanceSudo(
+    addressForUpdate,
+    assetId,
+    toInternalBN(freeBalance),
+    toInternalBN(reservedBalance)
+  );
+};
+
+const createPoolLbpSudo = ({
+  poolOwner,
+  assetA,
+  assetAAmount,
+  assetB,
+  assetBAmount,
+  initialWeight,
+  finalWeight,
+  weightCurve,
+  fee,
+  feeCollector,
+}: {
+  poolOwner: AddressOrPair;
+  assetA: string;
+  assetAAmount: BigNumber;
+  assetB: string;
+  assetBAmount: BigNumber;
+  initialWeight: BigNumber;
+  finalWeight: BigNumber;
+  weightCurve: string;
+  fee: {
+    numerator: BigNumber;
+    denominator: BigNumber;
+  };
+  feeCollector: AddressOrPair;
+}) => {
+  return _createPoolLbpSudo({
+    poolOwner,
+    assetA,
+    assetAAmount: toInternalBN(assetAAmount),
+    assetB,
+    assetBAmount: toInternalBN(assetBAmount),
+    initialWeight: toInternalBN(initialWeight),
+    finalWeight: toInternalBN(finalWeight),
+    weightCurve,
+    fee: {
+      numerator: toInternalBN(fee.numerator),
+      denominator: toInternalBN(fee.denominator),
+    },
+    feeCollector,
+  });
+};
+
+const updatePoolDataLbpSudo = ({
+  poolId,
+  poolOwner,
+  start,
+  end,
+  initialWeight,
+  finalWeight,
+  fee,
+  feeCollector,
+}: {
+  poolId: AddressOrPair;
+  poolOwner?: AddressOrPair;
+  start?: BigNumber;
+  end?: BigNumber;
+  initialWeight?: BigNumber;
+  finalWeight?: BigNumber;
+  fee?: {
+    numerator: BigNumber;
+    denominator: BigNumber;
+  };
+  feeCollector?: AddressOrPair;
+}) => {
+  return _updatePoolDataLbpSudo({
+    poolId,
+    poolOwner,
+    start: start ? toInternalBN(start) : start,
+    end: end ? toInternalBN(end) : end,
+    initialWeight: initialWeight ? toInternalBN(initialWeight) : initialWeight,
+    finalWeight: finalWeight ? toInternalBN(finalWeight) : finalWeight,
+    fee: fee
+      ? {
+          numerator: toInternalBN(fee.numerator),
+          denominator: toInternalBN(fee.denominator),
+        }
+      : fee,
+    feeCollector,
+  });
 };
 
 const addLiquidity = (
@@ -105,6 +205,10 @@ const swap = ({
   });
 };
 
+/**
+ * If we export new method, it must be added to methods expose
+ * list in "./src/utils/apiUtils.ts"
+ */
 export default {
   createPool,
   addLiquidity,
@@ -112,4 +216,9 @@ export default {
   mintAsset,
   swap,
   processChainEvent,
+
+  // Sudo transactions
+  createPoolLbpSudo,
+  updatePoolDataLbpSudo,
+  setBalanceSudo,
 };
