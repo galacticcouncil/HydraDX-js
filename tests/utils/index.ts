@@ -1,5 +1,8 @@
+export { createEnvironment } from './createEnvironment';
 export { createPool } from './createPool';
+export { destroyAllPools } from './destroyAllPools';
 export { getAliceAccount } from './getAliceAccount';
+export { getAllPoolInfo } from './getAllPoolInfo';
 export { getRandomAccount } from './getRandomAccount';
 export { transfer } from './transfer';
 export { addLiquidity } from './addLiquidity';
