@@ -2,6 +2,7 @@ import { bnToBn } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
+import { KeyringPair } from '@polkadot/keyring/types';
 import type { StorageKey } from '@polkadot/types';
 import type { AnyTuple, Codec, AnyJson } from '@polkadot/types/types';
 import {
@@ -11,6 +12,7 @@ import {
 } from '../types';
 
 import Api from '../api';
+import { Keyring } from '@polkadot/keyring';
 
 /**
  * Convert BigNumber value to BN
@@ -214,6 +216,29 @@ export const setBlocksDelay = (
       }
     });
   });
+};
+
+/**
+ * Provides sudo pair for sudo transactions. By default pair is generated for
+ * default sudo account Alice.
+ * TODO add opportunity specify account
+ *
+ * @param blockHash
+ */
+export const getSudoPair = async (
+  blockHash?: string | Uint8Array
+): Promise<KeyringPair | null> => {
+  const api = Api.getApi();
+  if (!api) {
+    return null;
+  }
+  const keyring = new Keyring({ type: 'sr25519', ss58Format: 2 });
+
+  const sudoKey = blockHash
+    ? await api.query.sudo.key.at(blockHash)
+    : await api.query.sudo.key();
+
+  return keyring.getPair(sudoKey);
 };
 
 export { decToBn, bnToDec, getStableCoinID };

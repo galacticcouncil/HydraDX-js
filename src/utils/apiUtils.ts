@@ -36,6 +36,9 @@ const basiliskTxMethods = [
   'mintAsset',
   'swap',
   'processChainEvent',
+  'setBalanceSudo',
+  'createPoolLbpSudo',
+  'updatePoolDataLbpSudo',
 ];
 
 const hydraDxQueryMethods = [
@@ -65,6 +68,7 @@ const hydraDxTxMethods = [
   'mintAsset',
   'swap',
   'processChainEvent',
+  'setBalanceSudo',
 ];
 
 const objectFromEntries = (object: any, [key, value]: [any, any]) => {
