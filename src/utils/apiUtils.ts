@@ -39,6 +39,9 @@ const basiliskTxMethods = [
   'setBalanceSudo',
   'createPoolLbpSudo',
   'updatePoolDataLbpSudo',
+  'addLiquidityLbpSudo',
+  'removeLiquidityLbpSudo',
+  'swapLbp',
 ];
 
 const hydraDxQueryMethods = [

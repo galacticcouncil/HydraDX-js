@@ -9,6 +9,9 @@ import {
 import { createPoolLbpSudo as _createPoolLbpSudo } from './createPoolLbpSudo';
 import { updatePoolDataLbpSudo as _updatePoolDataLbpSudo } from './updatePoolDataLbpSudo';
 import { setBalanceSudo as _setBalanceSudo } from './setBalanceSudo';
+import { addLiquidityLbpSudo as _addLiquidityLbpSudo } from './addLiquidityLbpSudo';
+import { removeLiquidityLbpSudo as _removeLiquidityLbpSudo } from './removeLiquidityLbpSudo';
+import { swapLbp as _swapLbp } from './swapLbp';
 
 import { createPool as _createPool } from './createPool';
 import { addLiquidity as _addLiquidity } from './addLiquidity';
@@ -152,6 +155,24 @@ const addLiquidity = (
   );
 };
 
+const addLiquidityLbpSudo = (
+  asset1Id: string,
+  asset2Id: string,
+  amount: BigNumber,
+  maxSellPrice: BigNumber,
+  account: AddressOrPair,
+  signer?: Signer
+) => {
+  return _addLiquidityLbpSudo(
+    asset1Id,
+    asset2Id,
+    toInternalBN(amount),
+    toInternalBN(maxSellPrice),
+    account,
+    signer
+  );
+};
+
 const removeLiquidity = (
   asset1Id: string,
   asset2Id: string,
@@ -160,6 +181,22 @@ const removeLiquidity = (
   signer?: Signer
 ) => {
   return _removeLiquidity(
+    asset1Id,
+    asset2Id,
+    toInternalBN(liquidityToRemove),
+    account,
+    signer
+  );
+};
+
+const removeLiquidityLbpSudo = (
+  asset1Id: string,
+  asset2Id: string,
+  liquidityToRemove: BigNumber,
+  account: AddressOrPair,
+  signer?: Signer
+) => {
+  return _removeLiquidityLbpSudo(
     asset1Id,
     asset2Id,
     toInternalBN(liquidityToRemove),
@@ -205,6 +242,43 @@ const swap = ({
   });
 };
 
+const swapLbp = ({
+  asset1Id,
+  asset2Id,
+  amount,
+  expectedOut,
+  actionType,
+  slippage,
+  account,
+  signer,
+}: {
+  asset1Id: string;
+  asset2Id: string;
+  amount: BigNumber;
+  expectedOut: string;
+  actionType: string;
+  slippage: BigNumber;
+  account: AddressOrPair;
+  signer?: Signer;
+}) => {
+  return new Promise((resolve, reject) => {
+    _swapLbp({
+      asset1Id,
+      asset2Id,
+      amount: toInternalBN(amount),
+      expectedOut,
+      actionType,
+      slippage: toInternalBN(slippage),
+      account,
+      signer,
+    })
+      .then((txData: ExchangeTxEventData) => {
+        resolve(decorateExchangeTxDataToExternalBN(txData));
+      })
+      .catch(txErrorData => reject(txErrorData));
+  });
+};
+
 /**
  * If we export new method, it must be added to methods expose
  * list in "./src/utils/apiUtils.ts"
@@ -221,4 +295,7 @@ export default {
   createPoolLbpSudo,
   updatePoolDataLbpSudo,
   setBalanceSudo,
+  addLiquidityLbpSudo,
+  removeLiquidityLbpSudo,
+  swapLbp,
 };
