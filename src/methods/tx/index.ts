@@ -87,12 +87,12 @@ const createPoolLbpSudo = ({
     assetAAmount: toInternalBN(assetAAmount),
     assetB,
     assetBAmount: toInternalBN(assetBAmount),
-    initialWeight: toInternalBN(initialWeight),
-    finalWeight: toInternalBN(finalWeight),
+    initialWeight: initialWeight,
+    finalWeight: finalWeight,
     weightCurve,
     fee: {
-      numerator: toInternalBN(fee.numerator),
-      denominator: toInternalBN(fee.denominator),
+      numerator: fee.numerator,
+      denominator: fee.denominator,
     },
     feeCollector,
   });
@@ -123,14 +123,14 @@ const updatePoolDataLbpSudo = ({
   return _updatePoolDataLbpSudo({
     poolId,
     poolOwner,
-    start: start ? toInternalBN(start) : start,
-    end: end ? toInternalBN(end) : end,
-    initialWeight: initialWeight ? toInternalBN(initialWeight) : initialWeight,
-    finalWeight: finalWeight ? toInternalBN(finalWeight) : finalWeight,
+    start: start,
+    end: end,
+    initialWeight: initialWeight,
+    finalWeight: finalWeight,
     fee: fee
       ? {
-          numerator: toInternalBN(fee.numerator),
-          denominator: toInternalBN(fee.denominator),
+          numerator: fee.numerator,
+          denominator: fee.denominator,
         }
       : fee,
     feeCollector,

@@ -2,8 +2,21 @@ import Api from '../../api';
 import { bnToBn } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
-import { getSudoPair } from '../../utils';
+import { getAccountKeyring } from '../../utils';
 
+/**
+ *
+ * @param poolOwner
+ * @param assetA
+ * @param assetAAmount
+ * @param assetB
+ * @param assetBAmount
+ * @param initialWeight
+ * @param finalWeight
+ * @param weightCurve
+ * @param fee
+ * @param feeCollector
+ */
 export function createPoolLbpSudo({
   poolOwner = '',
   assetA = '',
@@ -34,33 +47,36 @@ export function createPoolLbpSudo({
   feeCollector: AddressOrPair;
 }): Promise<void> {
   return new Promise<void>(async (resolve, reject) => {
-    const api = Api.getApi();
+    try {
+      const api = Api.getApi();
 
-    if (!api) reject('API is not available');
+      if (!api)
+        reject({
+          section: 'lbp.createPoolLbpSudo',
+          data: ['API is not available'],
+        });
 
-    const sudoPair = await getSudoPair();
+      const sudoPair = await getAccountKeyring('//Alice');
 
-    const unsub = await api.tx.sudo
-      .sudo(
-        api.tx.lbp.createPool(
-          poolOwner,
-          assetA,
-          assetAAmount.toString(),
-          assetB,
-          assetBAmount.toString(),
-          initialWeight.toString(),
-          finalWeight.toString(),
-          weightCurve,
-          {
-            numerator: fee.numerator.toString(),
-            denominator: fee.denominator.toString(),
-          },
-          feeCollector
+      const unsub = await api.tx.sudo
+        .sudo(
+          api.tx.lbp.createPool(
+            poolOwner,
+            assetA,
+            assetAAmount.toString(),
+            assetB,
+            assetBAmount.toString(),
+            initialWeight.toString(),
+            finalWeight.toString(),
+            weightCurve,
+            {
+              numerator: fee.numerator.toString(),
+              denominator: fee.denominator.toString(),
+            },
+            feeCollector
+          )
         )
-      )
-      .signAndSend(
-        sudoPair?.address as AddressOrPair,
-        ({ events = [], status }) => {
+        .signAndSend(sudoPair as AddressOrPair, ({ events = [], status }) => {
           if (status.isFinalized) {
             events.forEach(({ event: { data, method, section }, phase }) => {
               console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
@@ -69,7 +85,12 @@ export function createPoolLbpSudo({
             unsub();
             resolve();
           }
-        }
-      );
+        });
+    } catch (e: any) {
+      reject({
+        section: 'lbp.createPoolLbpSudo',
+        data: [e.message],
+      });
+    }
   });
 }

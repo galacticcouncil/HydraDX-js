@@ -221,7 +221,7 @@ export const setBlocksDelay = (
 /**
  * Provides sudo pair for sudo transactions. By default pair is generated for
  * default sudo account Alice.
- * TODO add opportunity specify account
+ * TODO add opportunity specify account and FIX "Unable to retrieve keypair" error
  *
  * @param blockHash
  */
@@ -234,14 +234,11 @@ export const getSudoPair = async (
   }
   const keyring = new Keyring({ type: 'sr25519' });
 
-  const alice = keyring.addFromUri('//Alice');
-
   const sudoKey = blockHash
     ? await api.query.sudo.key.at(blockHash)
     : await api.query.sudo.key();
 
-  // return keyring.getPair(sudoKey);
-  return alice;
+  return keyring.getPair(sudoKey);
 };
 
 /**
