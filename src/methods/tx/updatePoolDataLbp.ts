@@ -15,7 +15,7 @@ import { getAccountKeyring } from '../../utils';
  * @param fee
  * @param feeCollector
  */
-export function updatePoolDataLbpSudo({
+export function updatePoolDataLbp({
   poolId = '',
   poolOwner,
   start,
@@ -43,29 +43,27 @@ export function updatePoolDataLbpSudo({
 
       if (!api)
         reject({
-          section: 'lbp.createPoolLbpSudo',
+          section: 'lbp.updatePoolDataLbp',
           data: ['API is not available'],
         });
 
       const sudoPair = await getAccountKeyring('//Alice');
 
-      const unsub = await api.tx.sudo
-        .sudo(
-          api.tx.lbp.updatePoolData(
-            (poolId = ''),
-            poolOwner,
-            start ? start.toString() : start,
-            end ? end.toString() : end,
-            initialWeight ? initialWeight.toString() : initialWeight,
-            finalWeight ? finalWeight.toString() : finalWeight,
-            fee
-              ? {
-                  numerator: fee.numerator.toString(),
-                  denominator: fee.denominator.toString(),
-                }
-              : fee,
-            feeCollector
-          )
+      const unsub = await api.tx.lbp
+        .updatePoolData(
+          poolId,
+          poolOwner,
+          start ? start.toString() : start,
+          end ? end.toString() : end,
+          initialWeight ? initialWeight.toString() : initialWeight,
+          finalWeight ? finalWeight.toString() : finalWeight,
+          fee
+            ? {
+                numerator: fee.numerator.toString(),
+                denominator: fee.denominator.toString(),
+              }
+            : fee,
+          feeCollector
         )
         .signAndSend(sudoPair as AddressOrPair, ({ events = [], status }) => {
           if (status.isFinalized) {
@@ -79,7 +77,7 @@ export function updatePoolDataLbpSudo({
         });
     } catch (e: any) {
       reject({
-        section: 'lbp.updatePoolDataLbpSudo',
+        section: 'lbp.updatePoolDataLbp',
         data: [e.message],
       });
     }

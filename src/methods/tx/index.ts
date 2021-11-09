@@ -7,7 +7,7 @@ import {
 } from '../../utils';
 
 import { createPoolLbpSudo as _createPoolLbpSudo } from './createPoolLbpSudo';
-import { updatePoolDataLbpSudo as _updatePoolDataLbpSudo } from './updatePoolDataLbpSudo';
+import { updatePoolDataLbp } from './updatePoolDataLbp';
 import { setBalanceSudo as _setBalanceSudo } from './setBalanceSudo';
 import { addLiquidityLbpSudo as _addLiquidityLbpSudo } from './addLiquidityLbpSudo';
 import { removeLiquidityLbpSudo as _removeLiquidityLbpSudo } from './removeLiquidityLbpSudo';
@@ -94,45 +94,6 @@ const createPoolLbpSudo = ({
       numerator: fee.numerator,
       denominator: fee.denominator,
     },
-    feeCollector,
-  });
-};
-
-const updatePoolDataLbpSudo = ({
-  poolId,
-  poolOwner,
-  start,
-  end,
-  initialWeight,
-  finalWeight,
-  fee,
-  feeCollector,
-}: {
-  poolId: AddressOrPair;
-  poolOwner?: AddressOrPair;
-  start?: BigNumber;
-  end?: BigNumber;
-  initialWeight?: BigNumber;
-  finalWeight?: BigNumber;
-  fee?: {
-    numerator: BigNumber;
-    denominator: BigNumber;
-  };
-  feeCollector?: AddressOrPair;
-}) => {
-  return _updatePoolDataLbpSudo({
-    poolId,
-    poolOwner,
-    start: start,
-    end: end,
-    initialWeight: initialWeight,
-    finalWeight: finalWeight,
-    fee: fee
-      ? {
-          numerator: fee.numerator,
-          denominator: fee.denominator,
-        }
-      : fee,
     feeCollector,
   });
 };
@@ -290,10 +251,10 @@ export default {
   mintAsset,
   swap,
   processChainEvent,
+  updatePoolDataLbp,
 
   // Sudo transactions
   createPoolLbpSudo,
-  updatePoolDataLbpSudo,
   setBalanceSudo,
   addLiquidityLbpSudo,
   removeLiquidityLbpSudo,
