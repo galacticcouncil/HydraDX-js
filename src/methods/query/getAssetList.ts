@@ -1,6 +1,10 @@
 import { AssetRecord } from '../../types';
 import Api from '../../api';
 
+// TODO Update for work with different chains (HydraDX and Basilisk).
+//  Base asset is different for different chains - HDX | BSX.
+//  It can be fetched from the chain (api.registry.getChainProperties())
+
 export async function getAssetList(blockHash?: string | undefined) {
   return new Promise(async (resolve, reject) => {
     try {

@@ -12,7 +12,7 @@ export function addLiquidityLbpSudo(
   maxSellPrice: BigNumber,
   account: AddressOrPair,
   signer?: Signer
-) {
+): Promise<void> {
   return new Promise(async (resolve, reject) => {
     const sudoPair = await getSudoPair();
 

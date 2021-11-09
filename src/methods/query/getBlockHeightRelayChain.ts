@@ -23,6 +23,7 @@ export const getBlockHeightRelayChain = async (
         maxPovSize: 5242880,
       }
      */
+    console.log('>>>> api.query - ', Object.keys(api.query))
     const validationDataResponse = blockHash
       ? await api.query.parachainSystem.validationData.at(blockHash)
       : await api.query.parachainSystem.validationData();

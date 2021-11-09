@@ -12,7 +12,7 @@ import {
 } from '../types';
 
 import Api from '../api';
-import { Keyring } from '@polkadot/keyring';
+import { Keyring } from '@polkadot/api';
 
 /**
  * Convert BigNumber value to BN
@@ -227,18 +227,38 @@ export const setBlocksDelay = (
  */
 export const getSudoPair = async (
   blockHash?: string | Uint8Array
-): Promise<KeyringPair | null> => {
+): Promise<KeyringPair | null | string> => {
   const api = Api.getApi();
   if (!api) {
     return null;
   }
-  const keyring = new Keyring({ type: 'sr25519', ss58Format: 2 });
+  const keyring = new Keyring({ type: 'sr25519' });
+
+  const alice = keyring.addFromUri('//Alice');
 
   const sudoKey = blockHash
     ? await api.query.sudo.key.at(blockHash)
     : await api.query.sudo.key();
 
-  return keyring.getPair(sudoKey);
+  // return keyring.getPair(sudoKey);
+  return alice;
+};
+
+/**
+ * Provides sudo pair for sudo transactions. By default pair is generated for
+ * default sudo account Alice.
+ *
+ * @param sudoAccount
+ */
+export const getAccountKeyring = async (
+  sudoAccount: string = '//Alice'
+): Promise<KeyringPair | null | string> => {
+  const api = Api.getApi();
+  if (!api) {
+    return null;
+  }
+  const keyring = new Keyring({ type: 'sr25519' });
+  return keyring.addFromUri(sudoAccount);
 };
 
 export { decToBn, bnToDec, getStableCoinID };

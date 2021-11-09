@@ -5,7 +5,13 @@ import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { txCallback, txCatch } from './_callback';
 import { getSudoPair } from '../../utils';
 
-export function removeLiquidityLbpSudo(asset1Id: string, asset2Id: string, liquidityToRemove: BigNumber, account: AddressOrPair, signer?: Signer) {
+export function removeLiquidityLbpSudo(
+  asset1Id: string,
+  asset2Id: string,
+  liquidityToRemove: BigNumber,
+  account: AddressOrPair,
+  signer?: Signer
+): Promise<void> {
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
@@ -17,24 +23,25 @@ export function removeLiquidityLbpSudo(asset1Id: string, asset2Id: string, liqui
             asset2Id,
             bnToBn(liquidityToRemove.toString())
           )
-        ).signAndSend(
+        )
+        .signAndSend(
           sudoPair?.address as AddressOrPair,
           ({ events = [], status }) => {
             if (status.isFinalized) {
               events.forEach(({ event: { data, method, section }, phase }) => {
                 console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
               });
-  
+
               unsub();
               resolve();
             }
           }
         );
-    } catch(e: any) {
+    } catch (e: any) {
       reject({
         section: 'lbp.removeLiquidity',
-        data: [ e.message ],
+        data: [e.message],
       });
     }
   });
-};
+}
