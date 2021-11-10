@@ -11,7 +11,7 @@ test('Test updatePoolDataLbp query', async () => {
 
   const alice = getAliceAccount();
 
-  const currentPool = await getPoolInfoLbp({
+  const currentPool = await api.basilisk.query.getPoolInfoLbp({
     asset0Id: '0',
     asset1Id: '1',
   });

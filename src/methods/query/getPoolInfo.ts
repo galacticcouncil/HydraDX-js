@@ -172,9 +172,9 @@ export async function getPoolInfoLbp({
   asset0Id,
   asset1Id,
 }: {
-  poolAccount?: string | undefined | null;
-  asset0Id?: string | undefined;
-  asset1Id?: string | undefined;
+  poolAccount?: string | null;
+  asset0Id?: string;
+  asset1Id?: string;
 }): Promise<LbpPoolData | null> {
   // We should terminate execution if required params are not provided
   if (!poolAccount && asset0Id === undefined && asset1Id === undefined)

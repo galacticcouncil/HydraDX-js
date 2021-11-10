@@ -6,13 +6,14 @@ type ChainName = typeof ChainName[keyof typeof ChainName];
 const basiliskQueryMethods = [
   'getAccountBalances',
   'getAssetList',
-  'getPoolInfo',
+
   'getPoolsInfoXyk',
+  'getPoolInfoLbp',
+
   'getSpotPrice',
   'getSpotPriceXyk',
   'getSpotPriceLbp',
   'getTokenAmount',
-
   'getPoolAssetsAmounts',
   'getPoolAssetsAmountsLbp',
 
@@ -47,7 +48,6 @@ const basiliskTxMethods = [
 const hydraDxQueryMethods = [
   'getAccountBalances',
   'getAssetList',
-  'getPoolInfo',
   'getPoolsInfoXyk',
   'getSpotPrice',
   'getSpotPriceXyk',

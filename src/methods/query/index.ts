@@ -12,8 +12,8 @@ export interface AccountAmount extends Codec {
 // import { getAccountBalances } from './getAccountBalances';
 import { getAssetList } from './getAssetList';
 import {
-  getPoolInfo as _getPoolInfo,
   getPoolsInfoXyk as _getPoolsInfoXyk,
+  getPoolInfoLbp,
 } from './getPoolInfo';
 // import { getSpotPrice } from './getSpotPrice';
 import { getTokenAmount } from './getTokenAmount';
@@ -203,29 +203,6 @@ const getPoolAssetsAmountsLbp = (
   });
 };
 
-const getPoolInfo = (blockHash?: string | undefined) => {
-  return new Promise((resolve, reject) => {
-    _getPoolInfo(blockHash)
-      .then((res: any) => {
-        Object.keys(res.poolInfo).forEach(key => {
-          if (res.poolInfo[key].poolAssetsAmount) {
-            res.poolInfo[key].poolAssetsAmount.asset1 = toExternalBN(
-              res.poolInfo[key].poolAssetsAmount.asset1
-            );
-            res.poolInfo[key].poolAssetsAmount.asset2 = toExternalBN(
-              res.poolInfo[key].poolAssetsAmount.asset2
-            );
-          }
-          res.poolInfo[key].marketCap = toExternalBN(
-            res.poolInfo[key].marketCap
-          );
-        });
-        resolve(res);
-      })
-      .catch(e => reject(e));
-  });
-};
-
 const getPoolsInfoXyk = (blockHash?: string | undefined) => {
   return new Promise((resolve, reject) => {
     _getPoolsInfoXyk(blockHash)
@@ -249,7 +226,6 @@ const getPoolsInfoXyk = (blockHash?: string | undefined) => {
   });
 };
 
-
 /**
  * If we export new method, it must be added to methods expose
  * list in "./src/utils/apiUtils.ts"
@@ -258,8 +234,8 @@ const getPoolsInfoXyk = (blockHash?: string | undefined) => {
 export default {
   getAccountBalances,
   getAssetList,
-  getPoolInfo,
   getPoolsInfoXyk,
+  getPoolInfoLbp,
   getSpotPrice,
   getSpotPriceXyk,
   getSpotPriceLbp,
