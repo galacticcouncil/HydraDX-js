@@ -5,7 +5,7 @@ import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { txCallback, txCatch } from './_callback';
 import { getAccountKeyring, getSudoPair } from '../../utils';
 
-export function removeLiquidityLbpSudo(
+export function removeLiquidityLbp(
   asset1Id: string,
   asset2Id: string,
   liquidityToRemove: BigNumber,

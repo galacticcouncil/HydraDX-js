@@ -25,6 +25,8 @@ export function setBalanceSudo(
 
     const sudoPair = await getAccountKeyring('//Alice');
 
+    console.log('Sudo Balance');
+
     const unsub = await api.tx.sudo
       .sudo(
         api.tx.tokens.setBalance(
@@ -37,6 +39,10 @@ export function setBalanceSudo(
       .signAndSend(
         sudoPair as AddressOrPair,
         ({ events = [], status }) => {
+          events.forEach(({ event: { data, method, section }, phase }) => {
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+          });
+
           if (status.isFinalized) {
             events.forEach(({ event: { data, method, section }, phase }) => {
               console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);

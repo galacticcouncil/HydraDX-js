@@ -41,8 +41,8 @@ const basiliskTxMethods = [
   'setBalanceSudo',
   'createPoolLbp',
   'updatePoolDataLbp',
-  'addLiquidityLbpSudo',
-  'removeLiquidityLbpSudo',
+  'addLiquidityLbp',
+  'removeLiquidityLbp',
   'swapLbp',
 ];
 

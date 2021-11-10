@@ -9,8 +9,8 @@ import {
 import { createPoolLbp as _createPoolLbp } from './createPoolLbp';
 import { updatePoolDataLbp } from './updatePoolDataLbp';
 import { setBalanceSudo as _setBalanceSudo } from './setBalanceSudo';
-import { addLiquidityLbpSudo as _addLiquidityLbpSudo } from './addLiquidityLbpSudo';
-import { removeLiquidityLbpSudo as _removeLiquidityLbpSudo } from './removeLiquidityLbpSudo';
+import { addLiquidityLbp as _addLiquidityLbp } from './addLiquidityLbp';
+import { removeLiquidityLbp as _removeLiquidityLbp } from './removeLiquidityLbp';
 import { swapLbp as _swapLbp } from './swapLbp';
 
 import { createPool as _createPool } from './createPool';
@@ -122,7 +122,7 @@ const addLiquidity = (
   );
 };
 
-const addLiquidityLbpSudo = (
+const addLiquidityLbp = (
   asset1Id: string,
   asset2Id: string,
   amount: BigNumber,
@@ -130,7 +130,7 @@ const addLiquidityLbpSudo = (
   account: AddressOrPair,
   signer?: Signer
 ) => {
-  return _addLiquidityLbpSudo(
+  return _addLiquidityLbp(
     asset1Id,
     asset2Id,
     toInternalBN(amount),
@@ -156,14 +156,14 @@ const removeLiquidity = (
   );
 };
 
-const removeLiquidityLbpSudo = (
+const removeLiquidityLbp = (
   asset1Id: string,
   asset2Id: string,
   liquidityToRemove: BigNumber,
   account: AddressOrPair,
   signer?: Signer
 ) => {
-  return _removeLiquidityLbpSudo(
+  return _removeLiquidityLbp(
     asset1Id,
     asset2Id,
     toInternalBN(liquidityToRemove),
@@ -262,7 +262,7 @@ export default {
 
   // Sudo transactions
   setBalanceSudo,
-  addLiquidityLbpSudo,
-  removeLiquidityLbpSudo,
+  addLiquidityLbp,
+  removeLiquidityLbp,
   swapLbp,
 };
