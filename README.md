@@ -75,7 +75,7 @@ specific chain.
 _*These methods must be reviewed and refactored_
 
 ---
-###Query
+### Query
 
 #### getBlockHeightRelayChain(blockHash?: string | null): `BigNumber | null`
 - **interface**: `api.<hydraDx|basilisk>.query.getBlockHeightRelayChain`
@@ -103,7 +103,7 @@ feeCollector: string;
 - **interface**: `api.basilisk.query.getPoolInfoLbp`
 - **summary**:    Retrieve pool details by asset IDs or pool address. Block hash can be provided.
 
-###TX
+### TX
 
 #### createPoolLbp(_params): `Promise<AddressOrPair | null>`
 - **_params**: 
