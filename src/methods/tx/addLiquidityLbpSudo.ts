@@ -3,7 +3,7 @@ import { bnToBn } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { txCallback, txCatch } from './_callback';
-import { getSudoPair } from '../../utils';
+import { getAccountKeyring, getSudoPair } from '../../utils';
 
 export function addLiquidityLbpSudo(
   asset1Id: string,
@@ -14,7 +14,8 @@ export function addLiquidityLbpSudo(
   signer?: Signer
 ): Promise<void> {
   return new Promise(async (resolve, reject) => {
-    const sudoPair = await getSudoPair();
+    // const sudoPair = await getSudoPair();
+    const sudoPair = await getAccountKeyring('//Alice');
 
     try {
       const api = Api.getApi();
@@ -27,7 +28,7 @@ export function addLiquidityLbpSudo(
           bnToBn(maxSellPrice.toString())
         )
       ).signAndSend(
-        sudoPair?.address as AddressOrPair,
+        sudoPair as AddressOrPair,
         ({ events = [], status }) => {
           if (status.isFinalized) {
             events.forEach(({ event: { data, method, section }, phase }) => {

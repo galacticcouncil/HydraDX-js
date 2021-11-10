@@ -3,7 +3,7 @@ import { bnToBn } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { txCallback, txCatch } from './_callback';
-import { getSudoPair } from '../../utils';
+import { getAccountKeyring, getSudoPair } from '../../utils';
 
 export function removeLiquidityLbpSudo(
   asset1Id: string,
@@ -15,7 +15,8 @@ export function removeLiquidityLbpSudo(
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
-      const sudoPair = await getSudoPair();
+      const sudoPair = await getAccountKeyring('//Alice');
+      // const sudoPair = await getSudoPair();
       const unsub = await api.tx.sudo
         .sudo(
           api.tx.lbp.removeLiquidity(
@@ -25,7 +26,7 @@ export function removeLiquidityLbpSudo(
           )
         )
         .signAndSend(
-          sudoPair?.address as AddressOrPair,
+          sudoPair as AddressOrPair,
           ({ events = [], status }) => {
             if (status.isFinalized) {
               events.forEach(({ event: { data, method, section }, phase }) => {
