@@ -24,6 +24,7 @@ export function updatePoolDataLbp({
   finalWeight,
   fee,
   feeCollector,
+  signer,
 }: {
   poolId: AddressOrPair;
   poolOwner?: AddressOrPair;
@@ -36,6 +37,7 @@ export function updatePoolDataLbp({
     denominator: BigNumber;
   };
   feeCollector?: AddressOrPair;
+  signer?: Signer;
 }): Promise<void> {
   return new Promise<void>(async (resolve, reject) => {
     try {
@@ -47,7 +49,9 @@ export function updatePoolDataLbp({
           data: ['API is not available'],
         });
 
-      const sudoPair = await getAccountKeyring('//Alice');
+      let defaultSigner = await getAccountKeyring('//Alice');
+
+      const currentSigner = signer ? signer : defaultSigner;
 
       const unsub = await api.tx.lbp
         .updatePoolData(
@@ -65,16 +69,19 @@ export function updatePoolDataLbp({
             : fee,
           feeCollector
         )
-        .signAndSend(sudoPair as AddressOrPair, ({ events = [], status }) => {
-          if (status.isFinalized) {
-            events.forEach(({ event: { data, method, section }, phase }) => {
-              console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-            });
+        .signAndSend(
+          currentSigner as AddressOrPair,
+          ({ events = [], status }) => {
+            if (status.isFinalized) {
+              events.forEach(({ event: { data, method, section }, phase }) => {
+                console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+              });
 
-            unsub();
-            resolve();
+              unsub();
+              resolve();
+            }
           }
-        });
+        );
     } catch (e: any) {
       reject({
         section: 'lbp.updatePoolDataLbp',

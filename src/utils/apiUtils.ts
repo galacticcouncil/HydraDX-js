@@ -39,7 +39,7 @@ const basiliskTxMethods = [
   'swap',
   'processChainEvent',
   'setBalanceSudo',
-  'createPoolLbpSudo',
+  'createPoolLbp',
   'updatePoolDataLbp',
   'addLiquidityLbpSudo',
   'removeLiquidityLbpSudo',

@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import { getAliceAccount } from '../../utils/getAliceAccount';
 import { getFormattedAddress, toExternalBN } from '../../../src/utils';
 
-test('Test createPoolLbpSudo query', async () => {
+test('Test createPoolLbp query', async () => {
   api = await Api.initializeBasilisk({}, process.env.WS_URL);
 
   const alice = getAliceAccount();
@@ -25,7 +25,7 @@ test('Test createPoolLbpSudo query', async () => {
     new BigNumber(0)
   );
 
-  await api.basilisk.tx.createPoolLbpSudo({
+  const newPool = await api.basilisk.tx.createPoolLbp({
     poolOwner: aliceAddress!,
     assetA: '0',
     assetAAmount: new BigNumber(100),
@@ -39,7 +39,10 @@ test('Test createPoolLbpSudo query', async () => {
       denominator: new BigNumber(10),
     },
     feeCollector: aliceAddress!,
+    isSudo: true,
   });
 
-  // expect(isBalanceChanged).toBe(true);
+  console.log('>>>>> newPool - ', newPool);
+
+  expect(newPool).not.toBe(null);
 });

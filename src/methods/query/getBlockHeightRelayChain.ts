@@ -6,7 +6,7 @@ import type { RelayChainValidationDataHuman } from '../../types';
  * getBlockHeightRelayChain - provides blockHeight of relay chain
  */
 export const getBlockHeightRelayChain = async (
-  blockHash?: string | null | undefined
+  blockHash?: string | null
 ): Promise<BigNumber | null> => {
   try {
     const api = Api.getApi();
@@ -23,7 +23,6 @@ export const getBlockHeightRelayChain = async (
         maxPovSize: 5242880,
       }
      */
-    console.log('>>>> api.query - ', Object.keys(api.query))
     const validationDataResponse = blockHash
       ? await api.query.parachainSystem.validationData.at(blockHash)
       : await api.query.parachainSystem.validationData();

@@ -6,7 +6,7 @@ import {
   decorateExchangeTxDataToExternalBN,
 } from '../../utils';
 
-import { createPoolLbpSudo as _createPoolLbpSudo } from './createPoolLbpSudo';
+import { createPoolLbp as _createPoolLbp } from './createPoolLbp';
 import { updatePoolDataLbp } from './updatePoolDataLbp';
 import { setBalanceSudo as _setBalanceSudo } from './setBalanceSudo';
 import { addLiquidityLbpSudo as _addLiquidityLbpSudo } from './addLiquidityLbpSudo';
@@ -55,7 +55,7 @@ const setBalanceSudo = (
   );
 };
 
-const createPoolLbpSudo = ({
+const createPoolLbp = ({
   poolOwner,
   assetA,
   assetAAmount,
@@ -66,6 +66,8 @@ const createPoolLbpSudo = ({
   weightCurve,
   fee,
   feeCollector,
+  signer,
+  isSudo,
 }: {
   poolOwner: AddressOrPair;
   assetA: string;
@@ -80,8 +82,10 @@ const createPoolLbpSudo = ({
     denominator: BigNumber;
   };
   feeCollector: AddressOrPair;
+  signer?: Signer;
+  isSudo?: boolean;
 }) => {
-  return _createPoolLbpSudo({
+  return _createPoolLbp({
     poolOwner,
     assetA,
     assetAAmount: toInternalBN(assetAAmount),
@@ -95,6 +99,8 @@ const createPoolLbpSudo = ({
       denominator: fee.denominator,
     },
     feeCollector,
+    signer,
+    isSudo,
   });
 };
 
@@ -252,9 +258,9 @@ export default {
   swap,
   processChainEvent,
   updatePoolDataLbp,
+  createPoolLbp,
 
   // Sudo transactions
-  createPoolLbpSudo,
   setBalanceSudo,
   addLiquidityLbpSudo,
   removeLiquidityLbpSudo,

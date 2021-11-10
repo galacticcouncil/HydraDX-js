@@ -75,6 +75,7 @@ specific chain.
 _*These methods must be reviewed and refactored_
 
 ---
+###Query
 
 #### getBlockHeightRelayChain(blockHash?: string | null): `BigNumber | null`
 - **interface**: `api.<hydraDx|basilisk>.query.getBlockHeightRelayChain`
@@ -101,6 +102,54 @@ feeCollector: string;
 ```
 - **interface**: `api.basilisk.query.getPoolInfoLbp`
 - **summary**:    Retrieve pool details by asset IDs or pool address. Block hash can be provided.
+
+###TX
+
+#### createPoolLbp(_params): `Promise<AddressOrPair | null>`
+- **_params**: 
+```
+{
+  poolOwner: AddressOrPair;
+  assetA: string;
+  assetAAmount: BigNumber; // amount in 1e+1 format which wich will be converted to 1e+12 automatically by SDK
+  assetB: string;
+  assetBAmount: BigNumber; // amount in 1e+1 format which wich will be converted to 1e+12 automatically by SDK
+  initialWeight: BigNumber;
+  finalWeight: BigNumber;
+  weightCurve: string; // "Linear" only is available for now
+  fee: {
+    numerator: BigNumber;
+    denominator: BigNumber;
+  };
+  feeCollector: AddressOrPair;
+  signer?: Signer;
+  isSudo?: boolean; // "false" by default
+}
+```
+- **interface**: `api.basilisk.tx.createPoolLbp`
+- **summary**:    Create LBP pool with provided parameters. Can be created from sudo as well (`isSudo: true`). Returns address of newly created pool.
+
+
+#### updatePoolDataLbp(_params): `Promise<void>`
+- **_params**:
+```
+{
+  poolId: AddressOrPair;
+  poolOwner?: AddressOrPair;
+  start?: BigNumber; // block height in relay chain
+  end?: BigNumber; // block height in relay chain
+  initialWeight?: BigNumber;
+  finalWeight?: BigNumber;
+  fee?: {
+    numerator: BigNumber;
+    denominator: BigNumber;
+  };
+  feeCollector?: AddressOrPair;
+  signer?: Signer;
+}
+```
+- **interface**: `api.basilisk.tx.updatePoolDataLbp`
+- **summary**:    Update LBP pool data with provided parameters.
 
 
 
