@@ -83,7 +83,8 @@ _*These methods must be reviewed and refactored_
 
 
 
-#### getPoolInfoLbp({ poolAccount?: string | null; asset0Id?: string; asset1Id?: string; blockHash?: string | Uint8Array; }): 
+#### getPoolInfoLbp({ poolAccount?: string | null; asset0Id?: string; asset1Id?: string; blockHash?: string | Uint8Array; }): Promise<_result | null>
+- **result**:
 ```
 {
 poolId: string;
