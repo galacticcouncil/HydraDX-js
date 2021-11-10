@@ -19,6 +19,8 @@ initialised API instance.
       }  
     ```
 
+---
+
 ### Initialization parameters:
 `initialize<HydraDx|Basilisk>(apiListeners, apiUrl, typesConfig, maxRetries)`
 
@@ -35,6 +37,7 @@ initialised API instance.
 - `maxRetries` - number of connection attempts to the specified chain during initialization
   or after loosing connection.
   
+---
 
 ## SDK methods
 Scope of available methods depends on initialized chain. Some methods are available only for the  
@@ -70,6 +73,38 @@ specific chain.
 | _swap_                    | tx    |    +    |     +    |             |
 
 _*These methods must be reviewed and refactored_
+
+---
+
+#### getBlockHeightRelayChain(blockHash?: string | null): `BigNumber | null`
+- **interface**: `api.<hydraDx|basilisk>.query.getBlockHeightRelayChain`
+- **summary**:    Retrieve block height for latest of specific block of relay chain.
+
+
+
+#### getPoolInfoLbp({ poolAccount?: string | null; asset0Id?: string; asset1Id?: string; blockHash?: string | Uint8Array; }): 
+```
+{
+poolId: string;
+saleStart: BigNumber;
+saleEnd: BigNumber;
+owner: string;
+initialWeight: BigNumber;
+finalWeight: BigNumber;
+asset0Id: string;
+asset1Id: string;
+weightCurve: string;
+feeNumerator: string;
+feeDenominator: string;
+feeCollector: string;
+}
+```
+- **interface**: `api.basilisk.query.getPoolInfoLbp`
+- **summary**:    Retrieve pool details by asset IDs or pool address. Block hash can be provided.
+
+
+
+---
 
 ## Wasm Utils
 
