@@ -41,7 +41,7 @@ export function swap({
   };
 
   if (actionType === 'buy') {
-    tx = api.tx.exchange
+    tx = api.tx.xyk
       //TODO: CALCULATE LIMITS FROM SPOT PRICE
       .buy(
         asset1Id,
@@ -51,7 +51,7 @@ export function swap({
         false
       );
   } else {
-    tx = api.tx.exchange
+    tx = api.tx.xyk
       //TODO: CALCULATE LIMITS FROM SPOT PRICE
       .sell(
         asset1Id,

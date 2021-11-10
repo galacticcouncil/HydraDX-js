@@ -40,8 +40,9 @@ export function swapLbp({
     if (status.isInBlock) txCallback(resolve, reject, 'exchange')(callbackData);
   };
 
+  console.log(api.tx.lbp);
   if (actionType === 'buy') {
-    tx = api.tx.exchange
+    tx = api.tx.lbp
       //TODO: CALCULATE LIMITS FROM SPOT PRICE
       .buy(
         asset1Id,
@@ -51,7 +52,7 @@ export function swapLbp({
         false
       );
   } else {
-    tx = api.tx.exchange
+    tx = api.tx.lbp
       //TODO: CALCULATE LIMITS FROM SPOT PRICE
       .sell(
         asset1Id,

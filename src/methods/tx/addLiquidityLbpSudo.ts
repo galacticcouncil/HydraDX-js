@@ -28,7 +28,8 @@ export function addLiquidityLbpSudo(
           bnToBn(maxSellPrice.toString())
         )
       ).signAndSend(
-        sudoPair as AddressOrPair,
+        // @ts-ignore
+        sudoPair?.address as AddressOrPair,
         ({ events = [], status }) => {
           if (status.isFinalized) {
             events.forEach(({ event: { data, method, section }, phase }) => {
