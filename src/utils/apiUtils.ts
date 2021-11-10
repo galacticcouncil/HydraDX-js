@@ -9,6 +9,7 @@ const basiliskQueryMethods = [
 
   'getPoolsInfoXyk',
   'getPoolInfoLbp',
+  'getPoolAccountLbp',
 
   'getSpotPrice',
   'getSpotPriceXyk',

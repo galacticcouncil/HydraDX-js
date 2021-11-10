@@ -7,6 +7,7 @@ import {
 } from '../../types';
 import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
+import { getPoolAccountLbp } from './getPoolAccountLbp';
 import { getAssetPrices } from '../../utils';
 import wasmUtils from '../../utils/wasmUtils';
 
@@ -171,10 +172,12 @@ export async function getPoolInfoLbp({
   poolAccount,
   asset0Id,
   asset1Id,
+  blockHash,
 }: {
   poolAccount?: string | null;
   asset0Id?: string;
   asset1Id?: string;
+  blockHash?: string | Uint8Array;
 }): Promise<LbpPoolData | null> {
   // We should terminate execution if required params are not provided
   if (!poolAccount && asset0Id === undefined && asset1Id === undefined)
@@ -187,15 +190,12 @@ export async function getPoolInfoLbp({
   let poolAddress: string | Codec | AnyJson = poolAccount || '';
 
   if (!poolAccount && asset0Id !== undefined && asset1Id !== undefined) {
-    // lbp.getPoolAccount is a custom RPC call, which is defined during API
-    // initialization but not visible for TypeScript
-    // @ts-ignore
-    poolAddress = await api.rpc.lbp.getPoolAccount(asset0Id, asset1Id);
-    // @ts-ignore
-    poolAddress = poolAddress.toHuman();
+    poolAddress = await getPoolAccountLbp(asset0Id, asset1Id);
   }
 
-  const poolData = await api.query.lbp.poolData(poolAddress);
+  const poolData = blockHash
+    ? await api.query.lbp.poolData.at(blockHash, poolAddress)
+    : await api.query.lbp.poolData(poolAddress);
 
   if (!poolData) return null;
 

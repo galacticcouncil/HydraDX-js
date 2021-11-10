@@ -21,7 +21,7 @@ test('Test getMarketcap structure', async () => {
 
     const { account } = await createPool(api, alice, asset2.toString(), (asset2 + 1).toString(), new BigNumber(1).multipliedBy('1e12'), new BigNumber(1).multipliedBy('1e18'));
 
-    let poolInfo = await api.hydraDx.query.getPoolInfo();
+    let poolInfo = await api.hydraDx.query.getPoolsInfoXyk();
 
     const pools = Object.keys(poolInfo.poolInfo);
     let newPool: any = [];

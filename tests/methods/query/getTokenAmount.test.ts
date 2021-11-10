@@ -21,7 +21,7 @@ test('Test getTokenAmount structure', async () => {
   await createPool(api, alice, asset1, asset2, new BigNumber('1').multipliedBy('1e12'), new BigNumber('1').multipliedBy('1e18'));
   assetList = await api.hydraDx.query.getAssetList(alice.address);
 
-  let poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
+  let poolInfo = await api.hydraDx.query.getPoolsInfoXyk(alice.address);
   let assetId = poolInfo.shareTokenIds[0];
   
   price = await api.hydraDx.query.getTokenAmount(alice.address, assetList[assetId].assetId.toString(), 'free');

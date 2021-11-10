@@ -15,7 +15,9 @@ import {
   getPoolsInfoXyk as _getPoolsInfoXyk,
   getPoolInfoLbp,
 } from './getPoolInfo';
-// import { getSpotPrice } from './getSpotPrice';
+
+import { getPoolAccountLbp } from './getPoolAccountLbp';
+
 import { getTokenAmount } from './getTokenAmount';
 import {
   getPoolAssetsAmounts, // TODO add toExternalBN conversion
@@ -236,6 +238,7 @@ export default {
   getAssetList,
   getPoolsInfoXyk,
   getPoolInfoLbp,
+  getPoolAccountLbp,
   getSpotPrice,
   getSpotPriceXyk,
   getSpotPriceLbp,

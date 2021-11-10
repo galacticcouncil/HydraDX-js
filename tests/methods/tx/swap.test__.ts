@@ -4,7 +4,7 @@ import Api from '../../../src/api';
 import { HydraApiPromise } from '../../../src/types';
 import { addLiquidity } from '../../../src/methods/tx/addLiquidity';
 import { createPool } from '../../../src/methods/tx/createPool';
-import { getPoolInfo } from '../../../src/methods/query';
+// import { getPoolsInfoXyk } from '../../../src/methods/query';
 import { swap } from '../../../src/methods/tx/swap';
 import { getAliceAccount } from '../../utils/getAliceAccount';
 import { destroyAllPools } from '../../utils';
@@ -19,7 +19,7 @@ test('Test swap', async () => {
   const asset1 = assetList[0].assetId;
   const asset2 = assetList[1].assetId;
 
-  let poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
+  let poolInfo = await api.hydraDx.query.getPoolsInfoXyk(alice.address);
 
   await destroyAllPools(api, alice);
   if (!poolInfo.tokenTradeMap[asset1] || !poolInfo.tokenTradeMap[asset1].includes(parseInt(asset2))) {

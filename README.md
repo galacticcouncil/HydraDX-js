@@ -46,6 +46,8 @@ specific chain.
 | getBlockHeightRelayChain  | query |    -    |     +    |             |
 | getPoolAssetsWeightsLbp   | query |    -    |     +    |             |
 | getSpotPriceLbp           | query |    -    |     +    |             |
+| getPoolInfoLbp            | query |    -    |     +    |             |
+| getPoolAccountLbp         | query |    -    |     +    |             |
 | _getSpotPriceXyk_         | query |    +    |     -    |             |
 | _getTradePrice_           | query |    +    |     -    |             |
 | _getPoolsInfoXyk_         | query |    +    |     +    |             |
@@ -126,9 +128,9 @@ These chain dependent utils can be found in API instnace - `api.utils.<utilName>
 ## Input/Output data types:
 
 - SDK receives numbers from users only as `BigNumber` (bignumber.js) with decimal part (not BN - bn.js). *Each received
-  number converts for inner usage (35,4666382916 → 354666382916) (function - `toInternalBN`)*
+  **amount/balance** number converts for inner usage from format `1e1` to `1e12` (35,4666382916 → 354666382916) (function - `toInternalBN`)*
 - SDK makes inner manipulations with numbers as BigNumber in  1e+n format (n == 12 || 18).
-- SDN returns numbers to users as `BigNumber` with decimal part. Each result of inner calculations or API response
+- SDN returns numbers to users as `BigNumber` with decimal part. Each result of inner **amount/balance** calculations
   converts to BigNumber with decimal part *(354666382916 → 35,4666382916) (function - `toExternalBN`)*
 
 Reason for using bignumber.js instead of bn.js - bn.js doesn't support decimal part what is not comfortable in

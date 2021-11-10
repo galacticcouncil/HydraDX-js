@@ -14,7 +14,7 @@ test('Test getPoolInfo structure', async () => {
   const alice = getAliceAccount();
   await destroyAllPools(api, alice);
 
-  let poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
+  let poolInfo = await api.hydraDx.query.getPoolsInfoXyk(alice.address);
   let assetList = await api.hydraDx.query.getAssetList(alice.address);
   const asset1 = assetList[0].assetId.toString();
   const asset2 = assetList[1].assetId.toString();
@@ -40,7 +40,7 @@ test('Test getPoolInfo structure', async () => {
   expectedPoolInfo.tokenTradeMap[asset1].push(parseInt(asset2));
   expectedPoolInfo.tokenTradeMap[asset2].push(parseInt(asset1));
 
-  poolInfo = await api.hydraDx.query.getPoolInfo(alice.address);
+  poolInfo = await api.hydraDx.query.getPoolsInfoXyk(alice.address);
 
   poolInfo.shareTokenIds.sort((a: number, b: number) => a - b);
   expectedPoolInfo.shareTokenIds.sort((a: number, b: number) => a - b);

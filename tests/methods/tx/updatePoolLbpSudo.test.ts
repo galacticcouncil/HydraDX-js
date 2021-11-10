@@ -3,8 +3,6 @@ import Api from '../../../src/api';
 let api: HydraApiPromise;
 import BigNumber from 'bignumber.js';
 import { getAliceAccount } from '../../utils/getAliceAccount';
-import { getFormattedAddress, toExternalBN } from '../../../src/utils';
-import { getPoolInfoLbp } from '../../../src/methods/query/getPoolInfo';
 
 test('Test updatePoolDataLbp query', async () => {
   api = await Api.initializeBasilisk({}, process.env.WS_URL);

@@ -18,6 +18,12 @@ test('Test createPoolLbpSudo query', async () => {
     new BigNumber(1000),
     new BigNumber(0)
   );
+  await api.basilisk.tx.setBalanceSudo(
+    aliceAddress!,
+    '0',
+    new BigNumber(1000),
+    new BigNumber(0)
+  );
 
   await api.basilisk.tx.createPoolLbpSudo({
     poolOwner: aliceAddress!,
