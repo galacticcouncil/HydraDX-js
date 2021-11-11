@@ -16,7 +16,7 @@ export function setBalanceSudo(
   addressForUpdate: AddressOrPair,
   assetId: string,
   freeBalance: BigNumber,
-  reservedBalance: BigNumber,
+  reservedBalance: BigNumber
 ): Promise<void> {
   return new Promise<void>(async (resolve, reject) => {
     const api = Api.getApi();
@@ -36,22 +36,19 @@ export function setBalanceSudo(
           reservedBalance.toString()
         )
       )
-      .signAndSend(
-        sudoPair as AddressOrPair,
-        ({ events = [], status }) => {
-          events.forEach(({ event: { data, method, section }, phase }) => {
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-          });
+      .signAndSend(sudoPair as AddressOrPair, ({ events = [], status }) => {
+        // events.forEach(({ event: { data, method, section }, phase }) => {
+        //   console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        // });
 
-          if (status.isFinalized) {
-            events.forEach(({ event: { data, method, section }, phase }) => {
-              console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-            });
+        if (status.isFinalized) {
+          // events.forEach(({ event: { data, method, section }, phase }) => {
+          //   console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+          // });
 
-            unsub();
-            resolve();
-          }
+          unsub();
+          resolve();
         }
-      );
+      });
   });
 }

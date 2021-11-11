@@ -73,9 +73,9 @@ export function updatePoolDataLbp({
           currentSigner as AddressOrPair,
           ({ events = [], status }) => {
             if (status.isFinalized) {
-              events.forEach(({ event: { data, method, section }, phase }) => {
-                console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-              });
+              // events.forEach(({ event: { data, method, section }, phase }) => {
+              //   console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+              // });
 
               unsub();
               resolve();
