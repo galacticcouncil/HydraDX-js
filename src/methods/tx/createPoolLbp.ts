@@ -129,9 +129,9 @@ export function createPoolLbp({
                   let newPoolAccount: AddressOrPair | null = null;
                   events.forEach(
                     ({ event: { data, method, section }, phase }) => {
-                      console.log(
-                        `\t' ${phase}: ${section}.${method}:: ${data}`
-                      );
+                      // console.log(
+                      //   `\t' ${phase}: ${section}.${method}:: ${data}`
+                      // );
                       if (section === 'lbp' && method == 'PoolCreated') {
                         newPoolAccount = data[0].toString();
                       }
