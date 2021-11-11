@@ -122,22 +122,32 @@ const addLiquidity = (
   );
 };
 
-const addLiquidityLbp = (
+const addLiquidityLbp = ({
+  asset1Id,
+  asset2Id,
+  amount,
+  maxSellPrice,
+  account,
+  signer,
+  isSudo
+} : {
   asset1Id: string,
   asset2Id: string,
   amount: BigNumber,
   maxSellPrice: BigNumber,
   account: AddressOrPair,
-  signer?: Signer
-) => {
-  return _addLiquidityLbp(
+  signer?: Signer,
+  isSudo?: boolean,
+}) => {
+  return _addLiquidityLbp({
     asset1Id,
     asset2Id,
-    toInternalBN(amount),
-    toInternalBN(maxSellPrice),
+    amount: toInternalBN(amount),
+    maxSellPrice: toInternalBN(maxSellPrice),
     account,
-    signer
-  );
+    signer,
+    isSudo
+  });
 };
 
 const removeLiquidity = (

@@ -1,7 +1,8 @@
 import { HydraApiPromise } from '../../src/types';
 
-export const getAllPoolInfo = async (api: HydraApiPromise) => {
-  const poolsList = await api.query.xyk.poolAssets.entries();
+export const getAllPoolInfo = async (api: HydraApiPromise, moduleName = 'xyk') => {
+  const module = api.query[moduleName];
+  const poolsList = await module.poolAssets.entries();
   const parsedPoolsList = poolsList.map(item => {
     return [item[0].toHuman(), item[1].toHuman()];
   });
@@ -23,8 +24,8 @@ export const getAllPoolInfo = async (api: HydraApiPromise) => {
           accountAddress: poolId,
           asset1Id,
           asset2Id,
-          asset1Amount: asset1Amount.toString(),
-          asset2Amount: asset2Amount.toString(),
+          asset1Amount: asset1Amount ? asset1Amount.toString() : '0',
+          asset2Amount: asset2Amount ? asset2Amount.toString() : '0',
         })
       }
     }

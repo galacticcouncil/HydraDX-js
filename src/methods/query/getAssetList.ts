@@ -6,7 +6,7 @@ import Api from '../../api';
 //  It can be fetched from the chain (api.registry.getChainProperties())
 
 export async function getAssetList(blockHash?: string | undefined) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<any[]>(async (resolve, reject) => {
     try {
       const api = Api.getApi();
       if (!api) return resolve([]);

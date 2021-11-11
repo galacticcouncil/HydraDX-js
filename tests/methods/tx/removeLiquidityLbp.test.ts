@@ -2,8 +2,8 @@ import BigNumber from 'bignumber.js';
 
 import Api from '../../../src/api';
 import { HydraApiPromise } from '../../../src/types';
-import { createPool } from '../../../src/methods/tx/createPool';
-import { removeLiquidity } from '../../../src/methods/tx/removeLiquidity';
+import { createPoolLbp } from '../../../src/methods/tx/createPoolLbp';
+import { removeLiquidityLbp } from '../../../src/methods/tx/removeLiquidityLbp';
 import { getAliceAccount } from '../../utils/getAliceAccount';
 import { destroyAllPools } from '../../utils';
 import { getFormattedAddress } from '../../../src/utils';
@@ -15,26 +15,42 @@ test('Test removeLiquidity', async () => {
 
   const alice = getAliceAccount();
   const aliceAddress = await getFormattedAddress(alice.address);
+  const assetList = await api.hydraDx.query.getAssetList(alice.address);
+  const asset1 = assetList[0].assetId;
+  const asset2 = assetList[assetList.length - 1].assetId;
+
+  await destroyAllPools(api, alice, 'lbp');
 
   try {
-    await api.basilisk.tx.setBalanceSudo(
-      aliceAddress!,
-      '1',
-      new BigNumber(1000),
-      new BigNumber(0)
-    );
+    await createPoolLbp({
+      poolOwner: aliceAddress!,
+      assetA: '0',
+      assetAAmount: new BigNumber(100),
+      assetB: '1',
+      assetBAmount: new BigNumber(100),
+      initialWeight: new BigNumber(10000000),
+      finalWeight: new BigNumber(90000000),
+      weightCurve: 'Linear',
+      fee: {
+        numerator: new BigNumber(2),
+        denominator: new BigNumber(10),
+      },
+      feeCollector: aliceAddress!,
+      isSudo: true,
+    });
   } catch(e) {
-    console.log(e);
+    // NO-OP
   }
 
-  await api.basilisk.tx.setBalanceSudo(
-    aliceAddress!,
-    '0',
-    new BigNumber(1000),
-    new BigNumber(0)
-  );
+  let targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
+  expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('0.001');
 
-  const newPool = await api.basilisk.tx.createPoolLbp({
+  await removeLiquidityLbp(asset1.toString(), asset2.toString(), new BigNumber('500000000'), alice);
+  targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
+  expect(targetBalance[targetBalance.length - 1].balance.toString()).toBe('0.0005');
+
+
+  /*const newPool = await api.basilisk.tx.createPoolLbp({
     poolOwner: aliceAddress!,
     assetA: '0',
     assetAAmount: new BigNumber(100),
@@ -51,5 +67,5 @@ test('Test removeLiquidity', async () => {
     isSudo: true,
   });
 
-  await removeLiquidity('0', '1', new BigNumber('100'), alice);
+  await removeLiquidity('0', '1', new BigNumber('100'), alice);*/
 });

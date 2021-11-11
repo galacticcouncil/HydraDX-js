@@ -2,11 +2,12 @@ import BigNumber from 'bignumber.js';
 import { HydraApiPromise } from '../../src/types';
 import { KeyringPair } from '@polkadot/keyring/types';
 
-export const removeLiquidity = (api: HydraApiPromise, keyring: KeyringPair, assetId1: string, assetId2: string, amount: BigNumber) => {
+export const removeLiquidity = (api: HydraApiPromise, keyring: KeyringPair, assetId1: string, assetId2: string, amount: BigNumber, moduleName: string = 'xyk') => {
   let account = '';
+  const module = api.tx[moduleName];
 
   return new Promise<string>(async (resolve, reject) => {
-    const unsub = await api.tx.xyk.removeLiquidity(assetId1, assetId2, amount.toString())
+    const unsub = await module.removeLiquidity(assetId1, assetId2, amount.toString())
       .signAndSend(keyring, ({ events = [], status }) => {
         if (status.isFinalized) {
           unsub();

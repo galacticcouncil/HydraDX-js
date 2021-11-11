@@ -140,7 +140,7 @@ const getMinReceivedTradeAmount = (
 };
 
 const getAccountBalances = (account: any) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<any[]>((resolve, reject) => {
     _getAccountBalances(account)
       .then((balances: AssetBalance[]) => {
         resolve(
