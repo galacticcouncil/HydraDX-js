@@ -38,7 +38,7 @@ export function setBalanceSudo(
       )
       .signAndSend(sudoPair as AddressOrPair, ({ events = [], status }) => {
         // events.forEach(({ event: { data, method, section }, phase }) => {
-        //   console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        //   console.log(` status - ${status} || ${phase}: ${section}.${method}:: ${data}`);
         // });
 
         if (status.isFinalized) {

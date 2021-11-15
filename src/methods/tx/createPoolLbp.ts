@@ -3,6 +3,8 @@ import { bnToBn } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { getAccountKeyring } from '../../utils';
+import { RegistryError } from '@polkadot/types/types/registry';
+import { ApiCallError, ApiInstanceError } from '../../utils/errorHandling';
 
 /**
  *
@@ -56,11 +58,7 @@ export function createPoolLbp({
     try {
       const api = Api.getApi();
 
-      if (!api)
-        reject({
-          section: 'lbp.createPoolLbpSudo',
-          data: ['API is not available'],
-        });
+      if (!api) throw new ApiInstanceError('createPoolLbp');
 
       let defaultSigner = await getAccountKeyring('//Alice');
 
@@ -86,6 +84,24 @@ export function createPoolLbp({
             .signAndSend(
               currentSigner as AddressOrPair,
               ({ events = [], status }) => {
+                events.forEach(
+                  ({ event: { data, method, section }, phase }) => {
+                    console.log(
+                      ` status - ${status} || ${phase}: ${section}.${method}:: ${data}`
+                    );
+
+                    if (method === 'ExtrinsicFailed') {
+                      const [dispatchError, dispatchInfo] = data;
+
+                      unsub();
+                      throw new ApiCallError(
+                        'createPoolLbp',
+                        dispatchError,
+                        api
+                      );
+                    }
+                  }
+                );
                 if (status.isFinalized) {
                   let newPoolAccount: AddressOrPair | null = null;
                   events.forEach(
@@ -125,29 +141,44 @@ export function createPoolLbp({
             .signAndSend(
               currentSigner as AddressOrPair,
               ({ events = [], status }) => {
+                if (status.isInBlock || status.isFinalized) {
+                  events
+                    // We know this tx should result in `Sudid` event.
+                    .filter(({ event }) => api.events.sudo.Sudid.is(event))
+                    .forEach(
+                      ({
+                        event: {
+                          data: [result],
+                        },
+                      }) => {
+                        // Now we look to see if the extrinsic was actually successful or not...
+                        // @ts-ignore
+                        if (result.isError) {
+                          // @ts-ignore
+                          let error = result.asError;
+                          unsub();
+                          throw new ApiCallError('createPoolLbp', error, api);
+                        }
+                      }
+                    );
+                }
                 if (status.isFinalized) {
                   let newPoolAccount: AddressOrPair | null = null;
-                  events.forEach(
-                    ({ event: { data, method, section }, phase }) => {
-                      // console.log(
-                      //   `\t' ${phase}: ${section}.${method}:: ${data}`
-                      // );
+                  events
+                    .filter(({ event }) => api.events.sudo.Sudid.is(event))
+                    .forEach(({ event: { data, method, section }, phase }) => {
                       if (section === 'lbp' && method == 'PoolCreated') {
                         newPoolAccount = data[0].toString();
                       }
-                    }
-                  );
+                    });
 
                   unsub();
                   resolve(newPoolAccount);
                 }
               }
             );
-    } catch (e: any) {
-      reject({
-        section: 'lbp.createPoolLbpSudo',
-        data: [e.message],
-      });
+    } catch (e: any | typeof ApiCallError | typeof ApiInstanceError) {
+      reject(e);
     }
   });
 }
