@@ -12,24 +12,24 @@ test('Test createPoolLbp query', async () => {
 
   const aliceAddress = await getFormattedAddress(alice.address);
 
-  // await api.basilisk.tx.setBalanceSudo(
-  //   aliceAddress!,
-  //   '1',
-  //   new BigNumber(1000),
-  //   new BigNumber(0)
-  // );
-  // await api.basilisk.tx.setBalanceSudo(
-  //   aliceAddress!,
-  //   '0',
-  //   new BigNumber(1000),
-  //   new BigNumber(0)
-  // );
+  await api.basilisk.tx.setBalanceSudo(
+    aliceAddress!,
+    '1',
+    new BigNumber(1000),
+    new BigNumber(0)
+  );
+  await api.basilisk.tx.setBalanceSudo(
+    aliceAddress!,
+    '0',
+    new BigNumber(1000),
+    new BigNumber(0)
+  );
 
   const newPool = await api.basilisk.tx.createPoolLbp({
     poolOwner: aliceAddress!,
-    assetA: '100',
+    assetA: '0',
     assetAAmount: new BigNumber(100),
-    assetB: '101',
+    assetB: '1',
     assetBAmount: new BigNumber(100),
     initialWeight: new BigNumber(10000000),
     finalWeight: new BigNumber(90000000),
@@ -39,7 +39,7 @@ test('Test createPoolLbp query', async () => {
       denominator: new BigNumber(10),
     },
     feeCollector: aliceAddress!,
-    isSudo: false,
+    isSudo: true,
   });
 
   console.log('>>>>> newPool - ', newPool);

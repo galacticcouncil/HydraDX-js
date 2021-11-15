@@ -45,13 +45,15 @@ const setBalanceSudo = (
   addressForUpdate: AddressOrPair,
   assetId: string,
   freeBalance: BigNumber,
-  reservedBalance: BigNumber
+  reservedBalance: BigNumber,
+  signer?: Signer
 ) => {
   return _setBalanceSudo(
     addressForUpdate,
     assetId,
     toInternalBN(freeBalance),
-    toInternalBN(reservedBalance)
+    toInternalBN(reservedBalance),
+    signer
   );
 };
 
@@ -129,15 +131,15 @@ const addLiquidityLbp = ({
   maxSellPrice,
   account,
   signer,
-  isSudo
-} : {
-  asset1Id: string,
-  asset2Id: string,
-  amount: BigNumber,
-  maxSellPrice: BigNumber,
-  account: AddressOrPair,
-  signer?: Signer,
-  isSudo?: boolean,
+  isSudo,
+}: {
+  asset1Id: string;
+  asset2Id: string;
+  amount: BigNumber;
+  maxSellPrice: BigNumber;
+  account: AddressOrPair;
+  signer?: Signer;
+  isSudo?: boolean;
 }) => {
   return _addLiquidityLbp({
     asset1Id,
@@ -146,7 +148,7 @@ const addLiquidityLbp = ({
     maxSellPrice: toInternalBN(maxSellPrice),
     account,
     signer,
-    isSudo
+    isSudo,
   });
 };
 

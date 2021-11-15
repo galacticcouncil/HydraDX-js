@@ -3,6 +3,7 @@ import { bnToBn } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { getAccountKeyring } from '../../utils';
+import { ApiInstanceError, ApiCallError } from '../../utils/errorHandling';
 
 /**
  * Set balance for passed account. It's a SUDO action. Sudo signer account is Alice.
@@ -11,44 +12,70 @@ import { getAccountKeyring } from '../../utils';
  * @param assetId
  * @param freeBalance
  * @param reservedBalance
+ * @param signer
  */
 export function setBalanceSudo(
   addressForUpdate: AddressOrPair,
   assetId: string,
   freeBalance: BigNumber,
-  reservedBalance: BigNumber
+  reservedBalance: BigNumber,
+  signer?: Signer
 ): Promise<void> {
   return new Promise<void>(async (resolve, reject) => {
-    const api = Api.getApi();
+    try {
+      const api = Api.getApi();
 
-    if (!api) reject('API is not available');
+      if (!api) throw new ApiInstanceError('setBalanceSudo');
 
-    const sudoPair = await getAccountKeyring('//Alice');
+      let defaultSigner = await getAccountKeyring('//Alice');
+      const currentSigner = signer ? signer : defaultSigner;
 
-    console.log('Sudo Balance');
-
-    const unsub = await api.tx.sudo
-      .sudo(
-        api.tx.tokens.setBalance(
-          addressForUpdate,
-          assetId,
-          freeBalance.toString(),
-          reservedBalance.toString()
+      const unsub = await api.tx.sudo
+        .sudo(
+          api.tx.tokens.setBalance(
+            addressForUpdate,
+            assetId,
+            freeBalance.toString(),
+            reservedBalance.toString()
+          )
         )
-      )
-      .signAndSend(sudoPair as AddressOrPair, ({ events = [], status }) => {
-        // events.forEach(({ event: { data, method, section }, phase }) => {
-        //   console.log(` status - ${status} || ${phase}: ${section}.${method}:: ${data}`);
-        // });
+        .signAndSend(
+          currentSigner as AddressOrPair,
+          ({ events = [], status }) => {
+            // events.forEach(({ event: { data, method, section }, phase }) => {
+            //   console.log(` status - ${status} || ${phase}: ${section}.${method}:: ${data}`);
+            // });
 
-        if (status.isFinalized) {
-          // events.forEach(({ event: { data, method, section }, phase }) => {
-          //   console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-          // });
+            if (status.isInBlock || status.isFinalized) {
+              events
+                // We know this tx should result in `Sudid` event.
+                .filter(({ event }) => api.events.sudo.Sudid.is(event))
+                .forEach(
+                  ({
+                    event: {
+                      data: [result],
+                    },
+                  }) => {
+                    // Now we look to see if the extrinsic was actually successful or not...
+                    // @ts-ignore
+                    if (result.isError) {
+                      // @ts-ignore
+                      let error = result.asError;
+                      unsub();
+                      throw new ApiCallError('setBalanceSudo', error, api);
+                    }
+                  }
+                );
+            }
 
-          unsub();
-          resolve();
-        }
-      });
+            if (status.isFinalized) {
+              unsub();
+              resolve();
+            }
+          }
+        );
+    } catch (e: any | typeof ApiCallError | typeof ApiInstanceError) {
+      reject(e);
+    }
   });
 }

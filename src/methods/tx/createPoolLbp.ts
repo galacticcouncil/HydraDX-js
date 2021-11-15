@@ -164,13 +164,13 @@ export function createPoolLbp({
                 }
                 if (status.isFinalized) {
                   let newPoolAccount: AddressOrPair | null = null;
-                  events
-                    .filter(({ event }) => api.events.sudo.Sudid.is(event))
-                    .forEach(({ event: { data, method, section }, phase }) => {
+                  events.forEach(
+                    ({ event: { data, method, section }, phase }) => {
                       if (section === 'lbp' && method == 'PoolCreated') {
                         newPoolAccount = data[0].toString();
                       }
-                    });
+                    }
+                  );
 
                   unsub();
                   resolve(newPoolAccount);
