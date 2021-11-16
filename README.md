@@ -2,6 +2,8 @@
 
 JS SDK for interacting with HydraDX and Basilisk nodes
 
+## *Package still is under development!*
+
 ## How to use?
 
 1. Import SDK library.

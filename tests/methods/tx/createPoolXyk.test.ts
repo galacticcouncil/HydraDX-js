@@ -3,7 +3,11 @@ import Api from '../../../src/api';
 let api: HydraApiPromise;
 import BigNumber from 'bignumber.js';
 import { getAliceAccount } from '../../utils/getAliceAccount';
-import { getFormattedAddress, toExternalBN, getAccountKeyring } from '../../../src/utils';
+import {
+  getFormattedAddress,
+  toExternalBN,
+  getAccountKeyring,
+} from '../../../src/utils';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
 
 test('Test createPoolLbp query', async () => {
@@ -32,23 +36,8 @@ test('Test createPoolLbp query', async () => {
     '1',
     new BigNumber('10000'),
     new BigNumber('123456'),
-    alice!,
+    alice!
   );
-
-//   ```
-// import { getAccountKeyring } from 'hydradx-js';
-//
-// const alice = getAccountKeyring('//Alice');
-//
-// await api.basilisk.tx.createPool(
-//     '0',
-//     '1',
-//     new BigNumber('10000'),
-//     new BigNumber('123456'),
-//     alice!,
-//   );
-// ```
-//   You can try this
 
   console.log('>>>>> newPool - ', newPool);
 
