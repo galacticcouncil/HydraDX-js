@@ -5,6 +5,7 @@ export const ErrorName = {
   BaseError: 'BaseError',
   ApiInstanceError: 'ApiInstanceError',
   ApiCallError: 'ApiCallError',
+  ApiBaseError: 'ApiBaseError',
 } as const;
 
 type ErrorName = typeof ErrorName[keyof typeof ErrorName];
@@ -34,6 +35,17 @@ export class ApiInstanceError extends BaseError {
     call: string,
     description = 'API instance is not available',
     name = ErrorName.ApiInstanceError,
+    isOperational = true
+  ) {
+    super(call, description, name, isOperational);
+  }
+}
+
+export class ApiBaseError extends BaseError {
+  constructor(
+    call: string,
+    description = 'API instance is not available',
+    name = ErrorName.ApiBaseError,
     isOperational = true
   ) {
     super(call, description, name, isOperational);
