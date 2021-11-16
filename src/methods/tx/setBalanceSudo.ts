@@ -27,7 +27,7 @@ export function setBalanceSudo(
 
       if (!api) throw new ApiInstanceError('setBalanceSudo');
 
-      let defaultSigner = await getAccountKeyring('//Alice');
+      let defaultSigner = getAccountKeyring('//Alice');
       const currentSigner = signer ? signer : defaultSigner;
 
       const unsub = await api.tx.sudo

@@ -245,18 +245,13 @@ export const getSudoPair = async (
  * Provides sudo pair for sudo transactions. By default pair is generated for
  * default sudo account Alice.
  *
- * @param sudoAccount
+ * @param account
  */
-export const getAccountKeyring = async (
-  sudoAccount: string = '//Alice'
-): Promise<KeyringPair | null | string> => {
-  const api = Api.getApi();
-  if (!api) {
-    return null;
-  }
+export const getAccountKeyring = (
+  account: string = '//Alice'
+): KeyringPair => {
   const keyring = new Keyring({ type: 'sr25519' });
-  return keyring.addFromUri(sudoAccount);
+  return keyring.addFromUri(account);
 };
-
 
 export { decToBn, bnToDec, getStableCoinID };

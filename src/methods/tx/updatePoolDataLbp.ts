@@ -3,6 +3,7 @@ import { bnToBn } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { getAccountKeyring } from '../../utils';
+import { ApiCallError, ApiInstanceError } from '../../utils/errorHandling';
 
 /**
  *
@@ -43,13 +44,9 @@ export function updatePoolDataLbp({
     try {
       const api = Api.getApi();
 
-      if (!api)
-        reject({
-          section: 'lbp.updatePoolDataLbp',
-          data: ['API is not available'],
-        });
+      if (!api) throw new ApiInstanceError('updatePoolDataLbp');
 
-      let defaultSigner = await getAccountKeyring('//Alice');
+      let defaultSigner = getAccountKeyring('//Alice');
 
       const currentSigner = signer ? signer : defaultSigner;
 
@@ -72,21 +69,23 @@ export function updatePoolDataLbp({
         .signAndSend(
           currentSigner as AddressOrPair,
           ({ events = [], status }) => {
-            if (status.isFinalized) {
-              // events.forEach(({ event: { data, method, section }, phase }) => {
-              //   console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-              // });
+            events.forEach(({ event: { data, method, section }, phase }) => {
+              if (method === 'ExtrinsicFailed') {
+                const [dispatchError, dispatchInfo] = data;
 
+                unsub();
+                throw new ApiCallError('updatePoolDataLbp', dispatchError, api);
+              }
+            });
+
+            if (status.isFinalized) {
               unsub();
               resolve();
             }
           }
         );
-    } catch (e: any) {
-      reject({
-        section: 'lbp.updatePoolDataLbp',
-        data: [e.message],
-      });
+    } catch (e: any | typeof ApiCallError | typeof ApiInstanceError) {
+      reject(e);
     }
   });
 }

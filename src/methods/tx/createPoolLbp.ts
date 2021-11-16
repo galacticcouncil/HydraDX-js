@@ -60,84 +60,62 @@ export function createPoolLbp({
 
       if (!api) throw new ApiInstanceError('createPoolLbp');
 
-      let defaultSigner = await getAccountKeyring('//Alice');
+      let defaultSigner = getAccountKeyring('//Alice');
 
       const currentSigner = signer ? signer : defaultSigner;
 
+      const tx = api.tx.lbp.createPool(
+        poolOwner,
+        assetA,
+        assetAAmount.toString(),
+        assetB,
+        assetBAmount.toString(),
+        initialWeight.toString(),
+        finalWeight.toString(),
+        weightCurve,
+        {
+          numerator: fee.numerator.toString(),
+          denominator: fee.denominator.toString(),
+        },
+        feeCollector
+      );
+
       const unsub = !isSudo
-        ? await api.tx.lbp
-            .createPool(
-              poolOwner,
-              assetA,
-              assetAAmount.toString(),
-              assetB,
-              assetBAmount.toString(),
-              initialWeight.toString(),
-              finalWeight.toString(),
-              weightCurve,
-              {
-                numerator: fee.numerator.toString(),
-                denominator: fee.denominator.toString(),
-              },
-              feeCollector
-            )
-            .signAndSend(
-              currentSigner as AddressOrPair,
-              ({ events = [], status }) => {
+        ? await tx.signAndSend(
+            currentSigner as AddressOrPair,
+            ({ events = [], status }) => {
+              events.forEach(({ event: { data, method, section }, phase }) => {
+                // console.log(
+                //   ` status - ${status} || ${phase}: ${section}.${method}:: ${data}`
+                // );
+
+                if (method === 'ExtrinsicFailed') {
+                  const [dispatchError, dispatchInfo] = data;
+
+                  unsub();
+                  throw new ApiCallError('createPoolLbp', dispatchError, api);
+                }
+              });
+              if (status.isFinalized) {
+                let newPoolAccount: AddressOrPair | null = null;
                 events.forEach(
                   ({ event: { data, method, section }, phase }) => {
-                    console.log(
-                      ` status - ${status} || ${phase}: ${section}.${method}:: ${data}`
-                    );
-
-                    if (method === 'ExtrinsicFailed') {
-                      const [dispatchError, dispatchInfo] = data;
-
-                      unsub();
-                      throw new ApiCallError(
-                        'createPoolLbp',
-                        dispatchError,
-                        api
-                      );
+                    // console.log(
+                    //   `\t' ${phase}: ${section}.${method}:: ${data}`
+                    // );
+                    if (section === 'lbp' && method == 'PoolCreated') {
+                      newPoolAccount = data[0].toString();
                     }
                   }
                 );
-                if (status.isFinalized) {
-                  let newPoolAccount: AddressOrPair | null = null;
-                  events.forEach(
-                    ({ event: { data, method, section }, phase }) => {
-                      // console.log(
-                      //   `\t' ${phase}: ${section}.${method}:: ${data}`
-                      // );
-                      if (section === 'lbp' && method == 'PoolCreated') {
-                        newPoolAccount = data[0].toString();
-                      }
-                    }
-                  );
 
-                  unsub();
-                  resolve(newPoolAccount);
-                }
+                unsub();
+                resolve(newPoolAccount);
               }
-            )
+            }
+          )
         : await api.tx.sudo
-            .sudo(
-              api.tx.lbp.createPool(
-                poolOwner,
-                assetA,
-                assetAAmount.toString(),
-                assetB,
-                assetBAmount.toString(),
-                initialWeight.toString(),
-                finalWeight.toString(),
-                weightCurve,
-                {
-                  numerator: fee.numerator.toString(),
-                  denominator: fee.denominator.toString(),
-                },
-                feeCollector
-              )
-            )
+            .sudo(tx)
             .signAndSend(
               currentSigner as AddressOrPair,
               ({ events = [], status }) => {

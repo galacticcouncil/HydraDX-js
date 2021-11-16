@@ -25,7 +25,7 @@ export function addLiquidityLbp({
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
-      const defaultSigner = await getAccountKeyring('//Alice');
+      const defaultSigner = getAccountKeyring('//Alice');
       const currentSigner = signer || defaultSigner;
       let tx = api.tx.lbp.addLiquidity(
         asset1Id,
