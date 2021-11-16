@@ -1,7 +1,11 @@
 {
   "name": "hydradx-js",
   "version": "0.1.0",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/galacticcouncil/HydraDX-js"
+  },
+  "homepage": "https://github.com/galacticcouncil/HydraDX-js",
   "scripts": {
     "build": "tsc && cp ./src/utils/import_wasm.js ./lib/utils/import_wasm.js",
     "postinstall": "npm run build",
@@ -9,7 +13,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@polkadot/api": "^6.2.1",
+    "@polkadot/api": "^6.8.1",
     "bignumber.js": "^9.0.1",
     "bn.js": "^5.1.3",
     "hydra-dx-wasm": "git+https://github.com/galacticcouncil/HydraDX-wasm"
