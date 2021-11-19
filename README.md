@@ -2,7 +2,7 @@
 
 JS SDK for interacting with HydraDX and Basilisk nodes
 
-## *Package still is under development!*
+## _Package still is under development!_
 
 ## How to use?
 
@@ -45,51 +45,56 @@ JS SDK for interacting with HydraDX and Basilisk nodes
 
 ## SDK methods
 
-Scope of available methods depends on initialized chain. Some methods are available only for the  
-specific chain.
-
-| Method                    | Type  | hydraDx | basilisk | description |
-| ------------------------- | ----- | :-----: | :------: | ----------- |
-| getBlockHeightRelayChain  | query |    -    |    +     |             |
-| getPoolAssetsWeightsLbp   | query |    -    |    +     |             |
-| getSpotPriceLbp           | query |    -    |    +     |             |
-| getPoolInfoLbp            | query |    -    |    +     |             |
-| getPoolAccountLbp         | query |    -    |    +     |             |
-| _getSpotPriceXyk_         | query |    +    |    -     |             |
-| _getTradePrice_           | query |    +    |    -     |             |
-| _getPoolsInfoXyk_         | query |    +    |    +     |             |
-| _getAssetList_            | query |    +    |    +     |             |
-| _getPoolInfo_             | query |    +    |          |             |
-| _getAccountBalances_      | query |    +    |    +     |             |
-| getTokenAmount            | query |    +    |    +     |             |
-| _getPoolAssetsAmounts_    | query |    +    |    +     |             |
-| getPoolAssetsAmountsLbp   | query |    -    |    +     |             |
-| getMaxReceivedTradeAmount | query |    +    |    +     |             |
-| getMinReceivedTradeAmount | query |    +    |    +     |             |
-| getFreeTokenAmount        | query |    +    |    +     |             |
-| getReservedTokenAmount    | query |    +    |    +     |             |
-| getFrozenFeeTokenAmount   | query |    +    |    +     |             |
-| getMiscFrozenTokenAmount  | query |    +    |    +     |             |
-| _createPool_              | tx    |    +    |    +     |             |
-| _addLiquidity_            | tx    |    +    |    +     |             |
-| _removeLiquidity_         | tx    |    +    |    +     |             |
-| _mintAsset_               | tx    |    +    |    +     |             |
-| _swap_                    | tx    |    +    |    +     |             |
-
-_\*These methods must be reviewed and refactored_
-
----
-
 ### Query
 
-#### getBlockHeightRelayChain(blockHash?: string | null): `BigNumber | null`
+#### getBlockHeightRelayChain(`blockHash?: string`): `Promise<BigNumber>`
 
 - **interface**: `api.<hydraDx|basilisk>.query.getBlockHeightRelayChain`
-- **summary**: Retrieve block height for latest of specific block of relay chain.
+- **summary**: Retrieve block height for latest of specific block of relay chain. You can specify block hash
+  of parachain as parameter.
 
-#### getPoolInfoLbp({ poolAccount?: string | null; asset0Id?: string; asset1Id?: string; blockHash?: string | Uint8Array; }): Promise<\_result | null>
+#### getPoolAccountLbp(`assetA: string, assetB: string`): `Promise<BigNumber>`
 
-- **result**:
+- **interface**: `api.basilisk.query.getPoolAccountLbp`
+- **summary**: Provides LBP pool account address by assets IDs.
+
+#### getPoolAssetsWeightsLbp(`_params`): `Promise<{ assetAWeight: BigNumber; assetBWeight: BigNumber; }>`
+
+- **\_params**:
+
+```
+  saleStart: BigNumber,
+  saleEnd: BigNumber,
+  poolInitialWeight: BigNumber,
+  poolFinalWeight: BigNumber,
+  relayChainBlockHeight: BigNumber
+```
+
+- **interface**: `api.basilisk.query.getPoolAssetsWeightsLbp`
+- **summary**: provides weights for assetA and assetB in specific trading period.
+
+#### getSpotPriceLbp(`assetAId: string, assetBId: string, poolAccount?: string, blockHash?: string`): `Promise<BigNumber>`
+
+- **interface**: `api.basilisk.query.getSpotPriceLbp`
+- **summary**: provides price for one unit (1000000000000) of asset0 in LBP section.
+
+#### getTokenAmount(`_params`): Promise<BigNumber>
+
+- **\_params**:
+
+```
+  accountId: string;
+  assetId: string;
+  type: string; // free | reserved | feeFrozen | miscFrozen
+  blockHash?: string;
+```
+
+- **interface**: `api.<hydraDx|basilisk>.query.getTokenAmount`
+- **summary**: Provides specific token's balance for specific account.
+
+#### getPoolInfoLbp(`{ poolAccount?: string; assetAId?: string; assetBId?: string; blockHash?: string | Uint8Array; }`): `Promise<_result>`
+
+- **\_result**:
 
 ```
 {
@@ -99,8 +104,8 @@ saleEnd: BigNumber;
 owner: string;
 initialWeight: BigNumber;
 finalWeight: BigNumber;
-asset0Id: string;
-asset1Id: string;
+assetAId: string;
+assetBId: string;
 weightCurve: string;
 feeNumerator: string;
 feeDenominator: string;
@@ -111,9 +116,41 @@ feeCollector: string;
 - **interface**: `api.basilisk.query.getPoolInfoLbp`
 - **summary**: Retrieve pool details by asset IDs or pool address. Block hash can be provided.
 
+#### getPoolAssetsAmountsLbp(`assetAId: string, assetBId: string, poolAccount: string, blockHash?: string`): `Promise<{assetA: BigNumber; assetB: BigNumber; }>`
+
+- **interface**: `api.basilisk.query.getPoolAssetsAmountsLbp`
+- **summary**: Retrieve amounts of specified assets in the pool.
+
+#### getMaxReceivedTradeAmount(`tradeAmount: BigNumber, slippage: BigNumber`): `BigNumber`
+
+- **interface**: `api.<hydraDx|basilisk>.query.getMaxReceivedTradeAmount`
+- **summary**: Get maximum received trade amount regarding provided slippage value. `slippage` is a percentage value.
+
+#### getMinReceivedTradeAmount(`tradeAmount: BigNumber, slippage: BigNumber`): `BigNumber`
+
+- **interface**: `api.<hydraDx|basilisk>.query.getMinReceivedTradeAmount`
+- **summary**: Get minimum received trade amount regarding provided slippage value. `slippage` is a percentage value.
+
 ### TX
 
-#### createPoolLbp(\_params): `Promise<AddressOrPair | null>`
+#### setBalanceSudo(`_params`): `Promise<void>`
+
+- **\_params**:
+
+```
+{
+  addressForUpdate: AddressOrPair;
+  assetId: string;
+  freeBalance: BigNumber;
+  reservedBalance: BigNumber;
+  signer?: Signer;
+}
+```
+
+- **interface**: `api.<hydraDx|basilisk>.tx.setBalanceSudo`
+- **summary**: Set provided balance for the address with Sudo.
+
+#### createPoolLbp(`_params`): `Promise<AddressOrPair | null>`
 
 - **\_params**:
 
@@ -138,9 +175,10 @@ feeCollector: string;
 ```
 
 - **interface**: `api.basilisk.tx.createPoolLbp`
-- **summary**: Create LBP pool with provided parameters. Can be created from sudo as well (`isSudo: true`). Returns address of newly created pool.
+- **summary**: Create new LBP pool with provided parameters. Can be created from sudo as well (`isSudo: true`).
+  Returns address of newly created pool or `null` if address is not available in event's response.
 
-#### updatePoolDataLbp(\_params): `Promise<void>`
+#### updatePoolDataLbp(`_params`): `Promise<void>`
 
 - **\_params**:
 
@@ -185,6 +223,17 @@ via `api.registry.findMetaError`
 
 - **summary**: Occurs when something is wrong with required API instance during API call.
 
+#### ApiBaseError
+
+- **interface**:
+
+  - `isOperational: boolean` - is error operational;
+  - `call: string` - name of called SDK functions;
+  - `name: string` - name of Error;
+  - `description: string` - custom Error message;
+
+- **summary**: Occurs when something is wrong with required API instance during API call.
+
 #### ApiCallError
 
 - **interface**:
@@ -209,7 +258,7 @@ via `api.registry.findMetaError`
 
 API instance contains a bunch of wasm functions for `xyk` and `lbp` modules.
 They are available under `api.wasmUtils.<module>.<functionName>`
-(e.g. `api.wasmUtils.lbp.calculateLinearWeights(...params)`). Each util functions is wrapper for
+(e.g. `api.wasmUtils.lbp.calculateLinearWeights(...params)`). Each util functions is a wrapper for
 original function from [hydra-dx-wasm](https://github.com/galacticcouncil/HydraDX-wasm) library
 and returns raw result of wasm function calculation.
 
@@ -235,11 +284,18 @@ SDK provide a bunch of utils. Some of them you can import directly from SDK pack
 Other can be used only with initialized API instance as they need api connection to the chain.
 These chain dependent utils can be found in API instnace - `api.utils.<utilName>`.
 
-- `getFormattedAddress(address: string, format?: number): Promise<string | null>` - Returns formatted address regarding provided ss58Format value. If ss58Format
-  is not provided, value will be fetched from initiated in current api instance
-  chain (api.registry.getChainProperties())
+#### getFormattedAddress(`address: string, format?: number`): `Promise<string>`
 
-- `setBlocksDelay(delayBlocksNumber: number | BigNumber): Promise<BigNumber | null>` - Set delay for specified number of blocks. As successful result returns
+- **interface**: `api.utils.getFormattedAddress`
+- **summary**: Returns formatted address regarding provided ss58Format value. If `format` value is provided as parameter,
+  so this util function can be imported from SDK library directly and used without initialized API instance.
+  If ss58Format is not provided, value will be fetched from initiated in current api instance
+  chain (api.registry.getChainProperties()).
+
+#### setBlocksDelay(`delayBlocksNumber: number | BigNumber`): `Promise<BigNumber>`
+
+- **interface**: `api.utils.setBlocksDelay`
+- **summary**: Set delay for specified number of blocks. As successful result returns
   blockHeight of latest finalized block, which has been omitted. With this method you can make chains
   of actions with delays:
 

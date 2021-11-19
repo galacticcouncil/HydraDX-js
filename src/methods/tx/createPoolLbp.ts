@@ -97,7 +97,7 @@ export function createPoolLbp({
                 }
               });
               if (status.isFinalized) {
-                let newPoolAccount: AddressOrPair | null = null;
+                let newPoolAccount: AddressOrPair | null = null; // TODO update response in case pool address is not available in event response
                 events.forEach(
                   ({ event: { data, method, section }, phase }) => {
                     // console.log(

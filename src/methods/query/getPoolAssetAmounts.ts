@@ -1,7 +1,8 @@
 import Api from '../../api';
 import { getTokenAmount } from './getTokenAmount';
-import { getPoolInfoLbp } from './getPoolInfo';
+import { getPoolAccountLbp } from './getPoolAccountLbp';
 import BigNumber from 'bignumber.js';
+import { ApiInstanceError } from '../../utils/errorHandling';
 
 /**
  * getAssetsAmounts fetches amounts for pair of assets within pool.
@@ -184,56 +185,54 @@ export const getPoolAssetsAmountsXyk = async (
 
 /**
  * getPoolAssetsAmountsLbp fetches amounts for pair of assets within pool.
- * @param asset0Id
- * @param asset1Id: string | null
- * @param poolAccount: string | null | undefined - if pool account is specified, it will
+ * @param assetAId
+ * @param assetBId
+ * @param poolAccount: string | undefined - if pool account is specified, it will
  *        reduce number of requests to the chain (we do not need fetch poolInfo by asset IDs)
  * @param blockHash?: string | undefined
  */
 export const getPoolAssetsAmountsLbp = async (
-  asset0Id: string,
-  asset1Id: string,
-  poolAccount: string | null | undefined,
-  blockHash?: string | undefined
+  assetAId: string,
+  assetBId: string,
+  poolAccount?: string,
+  blockHash?: string
 ): Promise<{
-  asset0: BigNumber;
-  asset1: BigNumber;
-} | null> => {
-  if (!asset0Id || !asset1Id) return null;
+  assetA: BigNumber;
+  assetB: BigNumber;
+}> => {
+  return new Promise<{
+    assetA: BigNumber;
+    assetB: BigNumber;
+  }>(async (resolve, reject) => {
+    try {
+      const api = Api.getApi();
+      if (!api) throw new ApiInstanceError('getPoolAssetsAmountsLbp');
 
-  const api = Api.getApi();
-  if (!api) return null;
+      let currentPoolAccount = poolAccount;
 
-  let currentPoolAccount = poolAccount;
+      if (!currentPoolAccount) {
+        currentPoolAccount = await getPoolAccountLbp(assetAId, assetBId);
+      }
 
-  if (!currentPoolAccount) {
-    const currentPool = await getPoolInfoLbp({
-      asset0Id,
-      asset1Id,
-    });
+      const asset0Amount = await getTokenAmount(
+        currentPoolAccount,
+        assetAId,
+        'free',
+        blockHash
+      );
+      const asset1Amount = await getTokenAmount(
+        currentPoolAccount,
+        assetBId,
+        'free',
+        blockHash
+      );
 
-    if (currentPool === null) return null;
-
-    currentPoolAccount = currentPool.poolId;
-  }
-
-  const asset0Amount = await getTokenAmount(
-    currentPoolAccount,
-    asset0Id,
-    'free',
-    blockHash
-  );
-  const asset1Amount = await getTokenAmount(
-    currentPoolAccount,
-    asset1Id,
-    'free',
-    blockHash
-  );
-
-  if (asset0Amount === null || asset1Amount === null) return null;
-
-  return {
-    asset0: asset0Amount,
-    asset1: asset1Amount,
-  };
+      resolve({
+        assetA: asset0Amount,
+        assetB: asset1Amount,
+      });
+    } catch (e: any) {
+      reject(e);
+    }
+  });
 };

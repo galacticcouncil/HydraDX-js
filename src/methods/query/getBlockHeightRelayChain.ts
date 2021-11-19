@@ -7,7 +7,7 @@ import { ApiInstanceError, ApiBaseError } from '../../utils/errorHandling';
  * getBlockHeightRelayChain - provides blockHeight of relay chain
  */
 export const getBlockHeightRelayChain = async (
-  blockHash?: string | null
+  blockHash?: string
 ): Promise<BigNumber> => {
   return new Promise<BigNumber>(async (resolve, reject) => {
     try {

@@ -7,12 +7,14 @@ import type { StorageKey } from '@polkadot/types';
 import type { AnyTuple, Codec, AnyJson } from '@polkadot/types/types';
 import {
   ExchangeTxEventData,
+  LbpPoolData,
   MergedPairedEvents,
   TokenTradeMap,
 } from '../types';
 
 import Api from '../api';
 import { Keyring } from '@polkadot/api';
+import { ApiInstanceError, ApiBaseError } from './errorHandling';
 
 /**
  * Convert BigNumber value to BN
@@ -42,9 +44,9 @@ export const toInternalBN = (number: BigNumber, multiply: number = 12) =>
  * @param divide
  */
 export const toExternalBN = (
-  number: BigNumber | null,
+  number: BigNumber,
   divide: number = 12
-): BigNumber | null =>
+): BigNumber =>
   number ? number.integerValue().dividedBy(`1e+${divide}`) : number;
 
 export const decorateExchangeTxDataToExternalBN = (
@@ -171,20 +173,29 @@ export const getAssetPrices = (
 export const getFormattedAddress = async (
   address: string,
   format?: number
-): Promise<string | null> => {
-  let chainFormat = format;
+): Promise<string> => {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      let chainFormat = format;
 
-  if (format === undefined) {
-    const api = Api.getApi();
+      if (format === undefined) {
+        const api = Api.getApi();
+        if (!api) throw new ApiInstanceError('getFormattedAddress');
 
-    if (!api) return null;
+        const chainInfo = await api.registry.getChainProperties();
+        if (!chainInfo)
+          throw new ApiBaseError(
+            'getFormattedAddress',
+            'Chain info is not available.'
+          );
+        chainFormat = +chainInfo.ss58Format.toString();
+      }
 
-    const chainInfo = await api.registry.getChainProperties();
-    if (!chainInfo) return null;
-    chainFormat = +chainInfo.ss58Format.toString();
-  }
-
-  return encodeAddress(address, chainFormat);
+      resolve(encodeAddress(address, chainFormat));
+    } catch (e: any) {
+      reject(e);
+    }
+  });
 };
 
 /**
@@ -195,26 +206,27 @@ export const getFormattedAddress = async (
  */
 export const setBlocksDelay = (
   delayBlocksNumber: number | BigNumber
-): Promise<BigNumber | null> => {
-  return new Promise(async resolve => {
-    const api = Api.getApi();
-    if (!api) {
-      resolve(null);
-      return;
+): Promise<BigNumber> => {
+  return new Promise<BigNumber>(async (resolve, reject) => {
+    try {
+      const api = Api.getApi();
+      if (!api) throw new ApiInstanceError('setBlocksDelay');
+
+      let blockIndex = !BigNumber.isBigNumber(delayBlocksNumber)
+        ? new BigNumber(delayBlocksNumber)
+        : delayBlocksNumber;
+
+      const unsubscribe = await api.rpc.chain.subscribeNewHeads(header => {
+        blockIndex = blockIndex.minus(1);
+        if (blockIndex.isZero()) {
+          unsubscribe();
+          resolve(new BigNumber(header.number.toString().replace(/,/g, '')));
+          return;
+        }
+      });
+    } catch (e: any) {
+      reject(e);
     }
-
-    let blockIndex = !BigNumber.isBigNumber(delayBlocksNumber)
-      ? new BigNumber(delayBlocksNumber)
-      : delayBlocksNumber;
-
-    const unsubscribe = await api.rpc.chain.subscribeNewHeads(header => {
-      blockIndex = blockIndex.minus(1);
-      if (blockIndex.isZero()) {
-        unsubscribe();
-        resolve(new BigNumber(header.number.toString().replace(/,/g, '')));
-        return;
-      }
-    });
   });
 };
 
@@ -247,9 +259,7 @@ export const getSudoPair = async (
  *
  * @param account
  */
-export const getAccountKeyring = (
-  account: string = '//Alice'
-): KeyringPair => {
+export const getAccountKeyring = (account: string = '//Alice'): KeyringPair => {
   const keyring = new Keyring({ type: 'sr25519' });
   return keyring.addFromUri(account);
 };

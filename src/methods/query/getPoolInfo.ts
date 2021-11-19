@@ -12,6 +12,7 @@ import { getAssetPrices } from '../../utils';
 import wasmUtils from '../../utils/wasmUtils';
 
 import type { AnyJson, Codec } from '@polkadot/types/types';
+import { ApiBaseError, ApiInstanceError } from '../../utils/errorHandling';
 // import Any = jasmine.Any;
 
 // TODO Detailed description is necessary
@@ -170,39 +171,44 @@ export async function getPoolsInfoXyk(blockHash?: string | undefined) {
 
 export async function getPoolInfoLbp({
   poolAccount,
-  asset0Id,
-  asset1Id,
+  assetAId,
+  assetBId,
   blockHash,
 }: {
-  poolAccount?: string | null;
-  asset0Id?: string;
-  asset1Id?: string;
+  poolAccount?: string;
+  assetAId?: string;
+  assetBId?: string;
   blockHash?: string | Uint8Array;
-}): Promise<LbpPoolData | null> {
-  // We should terminate execution if required params are not provided
-  if (!poolAccount && asset0Id === undefined && asset1Id === undefined)
-    return null;
+}): Promise<LbpPoolData> {
+  return new Promise<LbpPoolData>(async (resolve, reject) => {
+    try {
+      // We should terminate execution if required params are not provided
+      if (!poolAccount && (assetAId === undefined || assetBId === undefined))
+        throw new ApiBaseError(
+          'getPoolInfoLbp',
+          'Required parameters are missed.'
+        );
 
-  const api = Api.getApi();
+      const api = Api.getApi();
+      if (!api) throw new ApiInstanceError('getPoolInfoLbp');
 
-  if (!api) return null;
+      let poolAddress: string | Codec | AnyJson = poolAccount || '';
 
-  let poolAddress: string | Codec | AnyJson = poolAccount || '';
+      if (!poolAccount && assetAId !== undefined && assetBId !== undefined) {
+        poolAddress = await getPoolAccountLbp(assetAId, assetBId);
+      }
 
-  if (!poolAccount && asset0Id !== undefined && asset1Id !== undefined) {
-    poolAddress = await getPoolAccountLbp(asset0Id, asset1Id);
-  }
+      const poolData = blockHash
+        ? await api.query.lbp.poolData.at(blockHash, poolAddress)
+        : await api.query.lbp.poolData(poolAddress);
 
-  const poolData = blockHash
-    ? await api.query.lbp.poolData.at(blockHash, poolAddress)
-    : await api.query.lbp.poolData(poolAddress);
+      if (!poolData)
+        throw new ApiBaseError('getPoolInfoLbp', 'Pool data is not available.');
 
-  if (!poolData) return null;
-
-  /**
-   * poolData contains next data:
-   *
-     {
+      /**
+       * poolData contains next data:
+       *
+       {
         owner: bXmPf7DcVmF...,
         start: 0,
         end: 0,
@@ -213,35 +219,39 @@ export async function getPoolInfoLbp({
         fee: { numerator: 2, denominator: 100 },
         fee_collector: bXmPf7DcVmFuHEm...,
      },
-   *
-   */
+       *
+       */
 
-  const poolDataHuman = poolData.toHuman() as LbpPoolDataHuman;
+      const poolDataHuman = poolData.toHuman() as LbpPoolDataHuman;
 
-  const {
-    owner,
-    start,
-    end,
-    assets,
-    initialWeight,
-    finalWeight,
-    weightCurve,
-    fee: { numerator, denominator },
-    feeCollector,
-  } = poolDataHuman;
+      const {
+        owner,
+        start,
+        end,
+        assets,
+        initialWeight,
+        finalWeight,
+        weightCurve,
+        fee: { numerator, denominator },
+        feeCollector,
+      } = poolDataHuman;
 
-  return {
-    poolId: poolAddress as string,
-    saleStart: new BigNumber(start.replace(/,/g, '')),
-    saleEnd: new BigNumber(end.replace(/,/g, '')),
-    owner: owner,
-    initialWeight: new BigNumber(initialWeight.replace(/,/g, '')),
-    finalWeight: new BigNumber(finalWeight.replace(/,/g, '')),
-    asset0Id: assets[0],
-    asset1Id: assets[1],
-    weightCurve: weightCurve,
-    feeNumerator: numerator,
-    feeDenominator: denominator,
-    feeCollector: feeCollector,
-  };
+      resolve({
+        poolId: poolAddress as string,
+        saleStart: new BigNumber(start.replace(/,/g, '')),
+        saleEnd: new BigNumber(end.replace(/,/g, '')),
+        owner: owner,
+        initialWeight: new BigNumber(initialWeight.replace(/,/g, '')),
+        finalWeight: new BigNumber(finalWeight.replace(/,/g, '')),
+        assetAId: assets[0],
+        assetBId: assets[1],
+        weightCurve: weightCurve,
+        feeNumerator: numerator,
+        feeDenominator: denominator,
+        feeCollector: feeCollector,
+      });
+    } catch (e: any) {
+      reject(e);
+    }
+  });
 }

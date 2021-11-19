@@ -19,16 +19,16 @@ export const getPoolAssetsWeightsLbp = async (
   poolFinalWeight: BigNumber,
   relayChainBlockHeight: BigNumber
 ): Promise<{
-  asset0Weight: BigNumber;
-  asset1Weight: BigNumber;
+  assetAWeight: BigNumber;
+  assetBWeight: BigNumber;
 }> => {
 
-  let asset0Weight = poolInitialWeight;
+  let assetAWeight = poolInitialWeight;
   // "100000000" is a maximum weight value
-  let asset1Weight = new BigNumber('100000000').minus(poolInitialWeight);
+  let assetBWeight = new BigNumber('100000000').minus(poolInitialWeight);
 
   if (!saleStart.isZero() && !saleEnd.isZero()) {
-    asset0Weight = new BigNumber(
+    assetAWeight = new BigNumber(
       wasmUtils.lbp.calculateLinearWeights(
         saleStart.toString(),
         saleEnd.toString(),
@@ -38,11 +38,11 @@ export const getPoolAssetsWeightsLbp = async (
       )
     );
 
-    asset1Weight = new BigNumber('100000000').minus(asset0Weight);
+    assetBWeight = new BigNumber('100000000').minus(assetAWeight);
   }
 
   return {
-    asset0Weight,
-    asset1Weight,
+    assetAWeight,
+    assetBWeight,
   };
 };

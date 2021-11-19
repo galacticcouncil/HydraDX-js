@@ -83,7 +83,7 @@ const getTradePrice = async (
 const getSpotPrice = async (
   asset1Id: string,
   asset2Id: string,
-  blockHash?: string | undefined
+  blockHash?: string
 ) => {
   return Promise.resolve(
     toExternalBN(await _getSpotPrice(asset1Id, asset2Id, blockHash))
@@ -103,14 +103,14 @@ const getSpotPriceXyk = async (
   );
 };
 const getSpotPriceLbp = async (
-  asset0Id: string,
-  asset1Id: string,
-  blockHash?: string | null | undefined,
-  poolAccount?: string | null | undefined
+  assetAId: string,
+  assetBId: string,
+  blockHash?: string,
+  poolAccount?: string
 ) => {
   return Promise.resolve(
     toExternalBN(
-      await _getSpotPriceLbp(asset0Id, asset1Id, blockHash, poolAccount)
+      await _getSpotPriceLbp(assetAId, assetBId, poolAccount, blockHash)
     )
   );
 };
@@ -174,33 +174,25 @@ const getAccountBalances = (account: any) => {
 };
 
 const getPoolAssetsAmountsLbp = (
-  asset0Id: string,
-  asset1Id: string,
-  poolAccount: string | null | undefined,
-  blockHash?: string | undefined
+  assetAId: string,
+  assetBId: string,
+  poolAccount: string,
+  blockHash?: string
 ): Promise<{
-  asset0: BigNumber;
-  asset1: BigNumber;
-} | null> => {
-  return new Promise((resolve, reject) => {
-    _getPoolAssetsAmountsLbp(asset0Id, asset1Id, poolAccount, blockHash)
-      .then(
-        (
-          amounts: {
-            asset0: BigNumber;
-            asset1: BigNumber;
-          } | null
-        ) => {
-          if (amounts === null) {
-            resolve(null);
-            return;
-          }
-          resolve({
-            asset0: toExternalBN(amounts.asset0)!,
-            asset1: toExternalBN(amounts.asset1)!,
-          });
-        }
-      )
+  assetA: BigNumber;
+  assetB: BigNumber;
+}> => {
+  return new Promise<{
+    assetA: BigNumber;
+    assetB: BigNumber;
+  }>((resolve, reject) => {
+    _getPoolAssetsAmountsLbp(assetAId, assetBId, poolAccount, blockHash)
+      .then((amounts: { assetA: BigNumber; assetB: BigNumber }) => {
+        resolve({
+          assetA: toExternalBN(amounts.assetA),
+          assetB: toExternalBN(amounts.assetB),
+        });
+      })
       .catch(e => reject(null));
   });
 };
