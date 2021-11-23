@@ -11,6 +11,7 @@ import { getPoolAssetsWeightsLbp } from './getPoolAssetsWeights';
 import { getBlockHeightRelayChain } from './getBlockHeightRelayChain';
 
 import wasmUtils from '../../utils/wasmUtils';
+import { ApiBaseError, ApiInstanceError } from '../../utils/errorHandling';
 
 export async function getSpotPrice(
   asset1Id: string,
@@ -93,68 +94,64 @@ export async function getSpotPriceXyk(
 
 /**
  * Provides price for one unit (1000000000000) of asset0 in LBP section.
- * @param asset0Id
- * @param asset1Id
+ * @param assetAId
+ * @param assetBId
  * @param poolAccount: string | null | undefined - if pool account is specified, it will
  *        reduce number of requests to the chain
  * @param blockHash
  */
 export async function getSpotPriceLbp(
-  asset0Id: string,
-  asset1Id: string,
-  blockHash?: string | null | undefined,
-  poolAccount?: string | null | undefined
-): Promise<BigNumber | null> {
-  const api = Api.getApi();
-  if (!api) return null;
+  assetAId: string,
+  assetBId: string,
+  poolAccount?: string,
+  blockHash?: string
+): Promise<BigNumber> {
+  return new Promise<BigNumber>(async (resolve, reject) => {
+    try {
+      const api = Api.getApi();
+      if (!api) throw new ApiInstanceError('getSpotPriceLbp');
 
-  try {
-    const poolInfo = await getPoolInfoLbp({
-      asset0Id,
-      asset1Id,
-      poolAccount,
-    });
+      const poolInfo = await getPoolInfoLbp({
+        assetAId: assetAId,
+        assetBId: assetBId,
+        poolAccount,
+      });
 
-    if (!poolInfo) return null;
+      const relayChainBlockHeight = await getBlockHeightRelayChain(blockHash);
 
-    const relayChainBlockHeight = await getBlockHeightRelayChain(blockHash);
+      const assetsWeights = await getPoolAssetsWeightsLbp(
+        poolInfo.saleStart,
+        poolInfo.saleEnd,
+        poolInfo.initialWeight,
+        poolInfo.finalWeight,
+        relayChainBlockHeight
+      );
 
-    if (!relayChainBlockHeight) return null;
+      const asset0Amount = await getTokenAmount(
+        poolInfo.poolId,
+        assetAId,
+        'free',
+        blockHash
+      );
+      const asset1Amount = await getTokenAmount(
+        poolInfo.poolId,
+        assetBId,
+        'free',
+        blockHash
+      );
 
-    const assetsWeights = await getPoolAssetsWeightsLbp(
-      poolInfo.saleStart,
-      poolInfo.saleEnd,
-      poolInfo.initialWeight,
-      poolInfo.finalWeight,
-      relayChainBlockHeight
-    );
-
-    const asset0Amount = await getTokenAmount(
-      poolInfo.poolId,
-      asset0Id,
-      'free',
-      blockHash
-    );
-    const asset1Amount = await getTokenAmount(
-      poolInfo.poolId,
-      asset1Id,
-      'free',
-      blockHash
-    );
-
-
-    if (asset0Amount === null || asset1Amount === null) return null;
-
-    return new BigNumber(
-      wasmUtils.lbp.getSpotPrice(
-        asset0Amount.toString(),
-        asset1Amount.toString(),
-        assetsWeights.asset0Weight.toString(),
-        assetsWeights.asset1Weight.toString()
-      )
-    );
-  } catch (e: any) {
-    console.log(e);
-    return null;
-  }
+      resolve(
+        new BigNumber(
+          wasmUtils.lbp.getSpotPrice(
+            asset0Amount.toString(),
+            asset1Amount.toString(),
+            assetsWeights.assetAWeight.toString(),
+            assetsWeights.assetBWeight.toString()
+          )
+        )
+      );
+    } catch (e: any) {
+      reject(e);
+    }
+  });
 }

@@ -13,7 +13,7 @@ export function removeLiquidityLbp({
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
-      const sudoPair = await getAccountKeyring('//Alice');
+      const sudoPair = getAccountKeyring('//Alice');
       // const sudoPair = await getSudoPair();
       const unsub = await api.tx.sudo
         .sudo(

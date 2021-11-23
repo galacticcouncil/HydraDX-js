@@ -188,8 +188,8 @@ export type LbpPoolData = {
   owner: string;
   initialWeight: BigNumber;
   finalWeight: BigNumber;
-  asset0Id: string;
-  asset1Id: string;
+  assetAId: string;
+  assetBId: string;
   weightCurve: string;
   feeNumerator: string;
   feeDenominator: string;

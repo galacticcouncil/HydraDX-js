@@ -1,5 +1,6 @@
 import Api from '../../api';
 import { AnyJson, Codec } from '@polkadot/types/types';
+import { ApiInstanceError, ApiBaseError } from '../../utils/errorHandling';
 
 /**
  * Provides LBP pool account address by assets IDs.
@@ -9,29 +10,27 @@ import { AnyJson, Codec } from '@polkadot/types/types';
 export async function getPoolAccountLbp(
   assetA: string,
   assetB: string
-): Promise<string | null> {
-  // We should terminate execution if required params are not provided
-  if (!assetA && !assetB) return null;
-  try {
-    const api = Api.getApi();
-    if (!api) return null;
+): Promise<string> {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      const api = Api.getApi();
+      if (!api) throw new ApiInstanceError('getPoolAccountLbp');
 
-    let poolAddress: string | Codec | AnyJson =
-      // lbp.getPoolAccount is a custom RPC call, which is defined during API
-      // initialization but not visible for TypeScript
-      // TODO should be fixed
-      // @ts-ignore
-      await api.rpc.lbp.getPoolAccount(assetA, assetB);
+      let poolAddress: string | Codec | AnyJson =
+        // lbp.getPoolAccount is a custom RPC call, which is defined during API
+        // initialization but not visible for TypeScript
+        // TODO Fix typing of api.rpc.lbp
+        // @ts-ignore
+        await api.rpc.lbp.getPoolAccount(assetA, assetB);
 
-    // @ts-ignore
-    poolAddress = poolAddress.toString();
+      if (!poolAddress) throw new ApiBaseError('getPoolAccountLbp');
 
-    return poolAddress;
-  } catch (e: any) {
-    console.log({
-      section: 'lbp.getPoolAccountLbp',
-      data: [e],
-    });
-    return null;
-  }
+      poolAddress = poolAddress.toString();
+
+      resolve(poolAddress);
+    } catch (e: any) {
+      console.log(e);
+      reject(e);
+    }
+  });
 }

@@ -1,7 +1,12 @@
 {
   "name": "hydradx-js",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.5",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/galacticcouncil/HydraDX-js"
+  },
+  "homepage": "https://github.com/galacticcouncil/HydraDX-js",
   "scripts": {
     "build": "tsc && cp ./src/utils/import_wasm.js ./lib/utils/import_wasm.js",
     "postinstall": "npm run build",

@@ -3,6 +3,8 @@ import { bnToBn } from '@polkadot/util';
 import BigNumber from 'bignumber.js';
 import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { getAccountKeyring } from '../../utils';
+import { RegistryError } from '@polkadot/types/types/registry';
+import { ApiCallError, ApiInstanceError } from '../../utils/errorHandling';
 
 /**
  *
@@ -56,96 +58,92 @@ export function createPoolLbp({
     try {
       const api = Api.getApi();
 
-      if (!api)
-        reject({
-          section: 'lbp.createPoolLbpSudo',
-          data: ['API is not available'],
-        });
+      if (!api) throw new ApiInstanceError('createPoolLbp');
 
-      let defaultSigner = await getAccountKeyring('//Alice');
+      let defaultSigner = getAccountKeyring('//Alice');
 
       const currentSigner = signer ? signer : defaultSigner;
 
+      const tx = api.tx.lbp.createPool(
+        poolOwner,
+        assetA,
+        assetAAmount.toString(),
+        assetB,
+        assetBAmount.toString(),
+        initialWeight.toString(),
+        finalWeight.toString(),
+        weightCurve,
+        {
+          numerator: fee.numerator.toString(),
+          denominator: fee.denominator.toString(),
+        },
+        feeCollector
+      );
+
       const unsub = !isSudo
-        ? await api.tx.lbp
-            .createPool(
-              poolOwner,
-              assetA,
-              assetAAmount.toString(),
-              assetB,
-              assetBAmount.toString(),
-              initialWeight.toString(),
-              finalWeight.toString(),
-              weightCurve,
-              {
-                numerator: fee.numerator.toString(),
-                denominator: fee.denominator.toString(),
-              },
-              feeCollector
-            )
-            .signAndSend(
-              currentSigner as AddressOrPair,
-              ({ events = [], status }) => {
-                events.forEach(
-                  ({ event: { data, method, section }, phase }) => {
-                    console.log(
-                      `\t' ${phase}: ${section}.${method}:: ${data}`
-                    );
-                  }
-                );
-                if (status.isFinalized) {
-                  let newPoolAccount: AddressOrPair | null = null;
-                  events.forEach(
-                    ({ event: { data, method, section }, phase }) => {
-                      // console.log(
-                      //   `\t' ${phase}: ${section}.${method}:: ${data}`
-                      // );
-                      if (section === 'lbp' && method == 'PoolCreated') {
-                        newPoolAccount = data[0].toString();
-                      }
-                    }
-                  );
+        ? await tx.signAndSend(
+            currentSigner as AddressOrPair,
+            ({ events = [], status }) => {
+              events.forEach(({ event: { data, method, section }, phase }) => {
+                // console.log(
+                //   ` status - ${status} || ${phase}: ${section}.${method}:: ${data}`
+                // );
+
+                if (method === 'ExtrinsicFailed') {
+                  const [dispatchError, dispatchInfo] = data;
 
                   unsub();
-                  resolve(newPoolAccount);
+                  throw new ApiCallError('createPoolLbp', dispatchError, api);
                 }
+              });
+              if (status.isFinalized) {
+                let newPoolAccount: AddressOrPair | null = null; // TODO update response in case pool address is not available in event response
+                events.forEach(
+                  ({ event: { data, method, section }, phase }) => {
+                    // console.log(
+                    //   `\t' ${phase}: ${section}.${method}:: ${data}`
+                    // );
+                    if (section === 'lbp' && method == 'PoolCreated') {
+                      newPoolAccount = data[0].toString();
+                    }
+                  }
+                );
+
+                unsub();
+                resolve(newPoolAccount);
               }
-            )
+            }
+          )
         : await api.tx.sudo
-            .sudo(
-              api.tx.lbp.createPool(
-                poolOwner,
-                assetA,
-                assetAAmount.toString(),
-                assetB,
-                assetBAmount.toString(),
-                initialWeight.toString(),
-                finalWeight.toString(),
-                weightCurve,
-                {
-                  numerator: fee.numerator.toString(),
-                  denominator: fee.denominator.toString(),
-                },
-                feeCollector
-              )
-            )
+            .sudo(tx)
             .signAndSend(
               currentSigner as AddressOrPair,
               ({ events = [], status }) => {
-                events.forEach(
-                  ({ event: { data, method, section }, phase }) => {
-                    console.log(
-                      `\t' ${phase}: ${section}.${method}:: ${data}`
+                if (status.isInBlock || status.isFinalized) {
+                  events
+                    // We know this tx should result in `Sudid` event.
+                    .filter(({ event }) => api.events.sudo.Sudid.is(event))
+                    .forEach(
+                      ({
+                        event: {
+                          data: [result],
+                        },
+                      }) => {
+                        // Now we look to see if the extrinsic was actually successful or not...
+                        // @ts-ignore
+                        if (result.isError) {
+                          // @ts-ignore
+                          let error = result.asError;
+                          unsub();
+                          throw new ApiCallError('createPoolLbp', error, api);
+                        }
+                      }
                     );
-                  }
-                );
+                }
                 if (status.isFinalized) {
                   let newPoolAccount: AddressOrPair | null = null;
                   events.forEach(
                     ({ event: { data, method, section }, phase }) => {
-                      // console.log(
-                      //   `\t' ${phase}: ${section}.${method}:: ${data}`
-                      // );
                       if (section === 'lbp' && method == 'PoolCreated') {
                         newPoolAccount = data[0].toString();
                       }
@@ -157,11 +155,8 @@ export function createPoolLbp({
                 }
               }
             );
-    } catch (e: any) {
-      reject({
-        section: 'lbp.createPoolLbpSudo',
-        data: [e.message],
-      });
+    } catch (e: any | typeof ApiCallError | typeof ApiInstanceError) {
+      reject(e);
     }
   });
 }
