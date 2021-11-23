@@ -1,3 +1,6 @@
 export function import_wasm() {
-  return import('hydra-dx-wasm/build/xyk/bundler');
+  return {
+    xyk: import('hydra-dx-wasm/build/xyk/bundler'),
+    lbp: import('hydra-dx-wasm/build/lbp/bundler'),
+  };
 }

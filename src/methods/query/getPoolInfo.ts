@@ -1,19 +1,35 @@
 import BigNumber from 'bignumber.js';
-import { PoolInfo, TokenTradeMap } from '../../types';
+import {
+  PoolInfo,
+  TokenTradeMap,
+  LbpPoolDataHuman,
+  LbpPoolData,
+} from '../../types';
 import Api from '../../api';
 import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
+import { getPoolAccountLbp } from './getPoolAccountLbp';
 import { getAssetPrices } from '../../utils';
-import { wasm } from './index';
+import wasmUtils from '../../utils/wasmUtils';
 
-import { toExternalBN } from '../../utils';
+import type { AnyJson, Codec } from '@polkadot/types/types';
+import { ApiBaseError, ApiInstanceError } from '../../utils/errorHandling';
+// import Any = jasmine.Any;
 
-export async function getPoolInfo() {
+// TODO Detailed description is necessary
+/**
+ * Provides list of all available pools with bunch of pool's details
+ */
+export async function getPoolInfo(blockHash?: string | undefined) {
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
       if (!api) return reject();
-      const allPools = await api.query.xyk.poolAssets.entries();
-      const allTokens = await api.query.xyk.shareToken.entries();
+      const allPools = blockHash
+        ? await api.query.xyk.poolAssets.entriesAt(blockHash)
+        : await api.query.xyk.poolAssets.entries();
+      const allTokens = blockHash
+        ? await api.query.xyk.shareToken.entriesAt(blockHash)
+        : await api.query.xyk.shareToken.entries();
       const poolInfo: PoolInfo = {};
 
       const shareTokenIds: number[] = [];
@@ -79,10 +95,9 @@ export async function getPoolInfo() {
 
         let promises2 = poolAssetAmounts.map(assetAmounts => {
           if (assetAmounts) {
-            return wasm.get_spot_price(
+            return wasmUtils.xyk.getSpotPrice(
               assetAmounts.asset1,
-              assetAmounts.asset2,
-              '1000000000000'
+              assetAmounts.asset2
             );
           }
           return null;
@@ -93,12 +108,13 @@ export async function getPoolInfo() {
         let spotPrices = await Promise.all(promises2);
 
         for (let i = 0; i < spotPrices.length; i++) {
-          poolAssetAmounts[i].spotPrice = new BigNumber(spotPrices[i]);
+          poolAssetAmounts[i].spotPrice = new BigNumber(spotPrices[i]!); // TODO types should be improved
         }
 
         const poolAssetsAmount = await getPoolAssetsAmounts(
           poolAssets[0].toString(),
-          poolAssets[1].toString()
+          poolAssets[1].toString(),
+          blockHash
         );
         const assetPrices = getAssetPrices(
           tokenTradeMap,
@@ -142,6 +158,97 @@ export async function getPoolInfo() {
         tokenTradeMap,
         shareTokenIds,
         poolInfo,
+      });
+    } catch (e: any) {
+      reject(e);
+    }
+  });
+}
+
+export async function getPoolsInfoXyk(blockHash?: string | undefined) {
+  return getPoolInfo(blockHash);
+}
+
+export async function getPoolInfoLbp({
+  poolAccount,
+  assetAId,
+  assetBId,
+  blockHash,
+}: {
+  poolAccount?: string;
+  assetAId?: string;
+  assetBId?: string;
+  blockHash?: string | Uint8Array;
+}): Promise<LbpPoolData> {
+  return new Promise<LbpPoolData>(async (resolve, reject) => {
+    try {
+      // We should terminate execution if required params are not provided
+      if (!poolAccount && (assetAId === undefined || assetBId === undefined))
+        throw new ApiBaseError(
+          'getPoolInfoLbp',
+          'Required parameters are missed.'
+        );
+
+      const api = Api.getApi();
+      if (!api) throw new ApiInstanceError('getPoolInfoLbp');
+
+      let poolAddress: string | Codec | AnyJson = poolAccount || '';
+
+      if (!poolAccount && assetAId !== undefined && assetBId !== undefined) {
+        poolAddress = await getPoolAccountLbp(assetAId, assetBId);
+      }
+
+      const poolData = blockHash
+        ? await api.query.lbp.poolData.at(blockHash, poolAddress)
+        : await api.query.lbp.poolData(poolAddress);
+
+      if (!poolData)
+        throw new ApiBaseError('getPoolInfoLbp', 'Pool data is not available.');
+
+      /**
+       * poolData contains next data:
+       *
+       {
+        owner: bXmPf7DcVmF...,
+        start: 0,
+        end: 0,
+        assets: { asset_in: 0, asset_out: 1 },
+        initial_weight: 10000000,
+        final_weight: 90000000,
+        weight_curve: Linear,
+        fee: { numerator: 2, denominator: 100 },
+        fee_collector: bXmPf7DcVmFuHEm...,
+     },
+       *
+       */
+
+      const poolDataHuman = poolData.toHuman() as LbpPoolDataHuman;
+
+      const {
+        owner,
+        start,
+        end,
+        assets,
+        initialWeight,
+        finalWeight,
+        weightCurve,
+        fee: { numerator, denominator },
+        feeCollector,
+      } = poolDataHuman;
+
+      resolve({
+        poolId: poolAddress as string,
+        saleStart: new BigNumber(start.replace(/,/g, '')),
+        saleEnd: new BigNumber(end.replace(/,/g, '')),
+        owner: owner,
+        initialWeight: new BigNumber(initialWeight.replace(/,/g, '')),
+        finalWeight: new BigNumber(finalWeight.replace(/,/g, '')),
+        assetAId: assets[0],
+        assetBId: assets[1],
+        weightCurve: weightCurve,
+        feeNumerator: numerator,
+        feeDenominator: denominator,
+        feeCollector: feeCollector,
       });
     } catch (e: any) {
       reject(e);

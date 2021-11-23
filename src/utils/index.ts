@@ -1,25 +1,53 @@
 import { bnToBn } from '@polkadot/util';
+import { encodeAddress } from '@polkadot/util-crypto';
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
+import { KeyringPair } from '@polkadot/keyring/types';
 import type { StorageKey } from '@polkadot/types';
 import type { AnyTuple, Codec, AnyJson } from '@polkadot/types/types';
 import {
   ExchangeTxEventData,
+  LbpPoolData,
   MergedPairedEvents,
   TokenTradeMap,
 } from '../types';
 
+import Api from '../api';
+import { Keyring } from '@polkadot/api';
+import { ApiInstanceError, ApiBaseError } from './errorHandling';
+
+/**
+ * Convert BigNumber value to BN
+ * @param bignumber
+ */
 const decToBn = (bignumber: BigNumber): BN => bnToBn(bignumber.toString());
 
+/**
+ * Convert BN value to BigNumber
+ * @param bn
+ */
 const bnToDec = (bn: BN): BigNumber => new BigNumber(bn.toString());
 
 const getStableCoinID = () => 1;
 
+/**
+ * Convert BigNumber value from value with decimal part to 1e+n format.
+ * @param number
+ * @param multiply
+ */
 export const toInternalBN = (number: BigNumber, multiply: number = 12) =>
   number.multipliedBy(`1e+${multiply}`).integerValue();
 
-export const toExternalBN = (number: BigNumber, divide: number = 12) =>
-  number.integerValue().dividedBy(`1e+${divide}`);
+/**
+ * Convert BigNumber value from 1e+n format to value with decimal part.
+ * @param number
+ * @param divide
+ */
+export const toExternalBN = (
+  number: BigNumber,
+  divide: number = 12
+): BigNumber =>
+  number ? number.integerValue().dividedBy(`1e+${divide}`) : number;
 
 export const decorateExchangeTxDataToExternalBN = (
   txDataFull: ExchangeTxEventData
@@ -130,6 +158,110 @@ export const getAssetPrices = (
   }
 
   return assetPrices;
+};
+
+/**
+ * Returns formatted address regarding provided ss58Format value. If ss58Format
+ * is not provided, value will be fetched from initiated in current api instance
+ * chain (api.registry.getChainProperties())
+ *
+ * @param address
+ * @param format
+ * @return string | null - function returns null in case api call has been
+ * required but has got failed.
+ */
+export const getFormattedAddress = async (
+  address: string,
+  format?: number
+): Promise<string> => {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      let chainFormat = format;
+
+      if (format === undefined) {
+        const api = Api.getApi();
+        if (!api) throw new ApiInstanceError('getFormattedAddress');
+
+        const chainInfo = await api.registry.getChainProperties();
+        if (!chainInfo)
+          throw new ApiBaseError(
+            'getFormattedAddress',
+            'Chain info is not available.'
+          );
+        chainFormat = +chainInfo.ss58Format.toString();
+      }
+
+      resolve(encodeAddress(address, chainFormat));
+    } catch (e: any) {
+      reject(e);
+    }
+  });
+};
+
+/**
+ * Set delay for specified number of blocks. As successful result returns
+ * blockHeight of latest finalized block, which has been omitted.
+ *
+ * @param delayBlocksNumber
+ */
+export const setBlocksDelay = (
+  delayBlocksNumber: number | BigNumber
+): Promise<BigNumber> => {
+  return new Promise<BigNumber>(async (resolve, reject) => {
+    try {
+      const api = Api.getApi();
+      if (!api) throw new ApiInstanceError('setBlocksDelay');
+
+      let blockIndex = !BigNumber.isBigNumber(delayBlocksNumber)
+        ? new BigNumber(delayBlocksNumber)
+        : delayBlocksNumber;
+
+      const unsubscribe = await api.rpc.chain.subscribeNewHeads(header => {
+        blockIndex = blockIndex.minus(1);
+        if (blockIndex.isZero()) {
+          unsubscribe();
+          resolve(new BigNumber(header.number.toString().replace(/,/g, '')));
+          return;
+        }
+      });
+    } catch (e: any) {
+      reject(e);
+    }
+  });
+};
+
+/**
+ * Provides sudo pair for sudo transactions. By default pair is generated for
+ * default sudo account Alice.
+ * TODO add opportunity specify account and FIX "Unable to retrieve keypair" error
+ *
+ * @param blockHash
+ */
+export const getSudoPair = async (
+  blockHash?: string | Uint8Array
+): Promise<KeyringPair | null | string> => {
+  const api = Api.getApi();
+  if (!api) {
+    return null;
+  }
+  const keyring = new Keyring({ type: 'sr25519' });
+
+  const sudoKey = blockHash
+    ? await api.query.sudo.key.at(blockHash)
+    : await api.query.sudo.key();
+
+  return keyring.getPair(sudoKey);
+};
+
+/**
+ * Provides sudo pair for sudo transactions. By default pair is generated for
+ * default sudo account Alice.
+ *
+ * @param account
+ */
+export const getAccountKeyring = (account: string = '//Alice'): KeyringPair => {
+  const keyring = new Keyring({ type: 'sr25519' });
+  return keyring.addFromUri(account);
 };
 
 export { decToBn, bnToDec, getStableCoinID };

@@ -9,30 +9,22 @@ export interface AccountAmount extends Codec {
   free?: Balance;
 }
 
-export let wasm: any;
-
-async function initialize() {
-  if (typeof window !== 'undefined') {
-    if (typeof process.env.NODE_ENV === 'undefined') {
-      wasm = await import('hydra-dx-wasm/build/xyk/web');
-      wasm.default();
-    } else {
-      const { import_wasm } = await import('../../utils/import_wasm');
-      wasm = await import_wasm();
-    }
-  } else {
-    wasm = await import('hydra-dx-wasm/build/xyk/nodejs');
-  }
-}
-
-initialize();
-
 // import { getAccountBalances } from './getAccountBalances';
 import { getAssetList } from './getAssetList';
-import { getPoolInfo as _getPoolInfo } from './getPoolInfo';
-// import { getSpotPrice } from './getSpotPrice';
+import {
+  getPoolsInfoXyk as _getPoolsInfoXyk,
+  getPoolInfoLbp,
+} from './getPoolInfo';
+
+import { getPoolAccountLbp } from './getPoolAccountLbp';
+
 import { getTokenAmount } from './getTokenAmount';
-import { getPoolAssetsAmounts } from './getPoolAssetAmounts';
+import {
+  getPoolAssetsAmounts, // TODO add toExternalBN conversion
+  // getPoolAssetsAmountsXyk as _getPoolAssetsAmountsXyk,  // TODO add toExternalBN conversion
+  getPoolAssetsAmountsLbp as _getPoolAssetsAmountsLbp,
+} from './getPoolAssetAmounts';
+
 import { calculateSpotAmount as _calculateSpotAmount } from './calculateSpotAmount';
 import { getTradePrice as _getTradePrice } from './getTradePrice';
 import { getFreeTokenAmount } from './getFreeTokenAmount';
@@ -43,9 +35,19 @@ import { getMarketcap } from './getMarketcap';
 import { getMaxReceivedTradeAmount as _getMaxReceivedTradeAmount } from './getMaxReceivedTradeAmount';
 import { getMinReceivedTradeAmount as _getMinReceivedTradeAmount } from './getMinReceivedTradeAmount';
 
-import { getAccountBalances as _getAccountBalances } from './getAccountBalances';
-import { getSpotPrice as _getSpotPrice } from './getSpotPrice';
+import { getBlockHeightRelayChain } from './getBlockHeightRelayChain';
+import { getPoolAssetsWeightsLbp } from './getPoolAssetsWeights';
 
+import { getAccountBalances as _getAccountBalances } from './getAccountBalances';
+import {
+  getSpotPrice as _getSpotPrice,
+  getSpotPriceXyk as _getSpotPriceXyk,
+  getSpotPriceLbp as _getSpotPriceLbp,
+} from './getSpotPrice';
+
+/**
+ * @deprecated
+ */
 const calculateSpotAmount = async (
   asset1Id: string,
   asset2Id: string,
@@ -62,7 +64,8 @@ const getTradePrice = async (
   asset1Id: string,
   asset2Id: string,
   tradeAmount: BigNumber,
-  actionType: string
+  actionType: string,
+  blockHash?: string | undefined
 ) => {
   return Promise.resolve(
     toExternalBN(
@@ -70,14 +73,46 @@ const getTradePrice = async (
         asset1Id,
         asset2Id,
         toInternalBN(tradeAmount),
-        actionType
+        actionType,
+        blockHash
       )
     )
   );
 };
 
-const getSpotPrice = async (asset1Id: string, asset2Id: string) => {
-  return Promise.resolve(toExternalBN(await _getSpotPrice(asset1Id, asset2Id)));
+const getSpotPrice = async (
+  asset1Id: string,
+  asset2Id: string,
+  blockHash?: string
+) => {
+  return Promise.resolve(
+    toExternalBN(await _getSpotPrice(asset1Id, asset2Id, blockHash))
+  );
+};
+
+const getSpotPriceXyk = async (
+  asset1Id: string,
+  asset2Id: string,
+  poolAccount?: string | null | undefined,
+  blockHash?: string | undefined
+) => {
+  return Promise.resolve(
+    toExternalBN(
+      await _getSpotPriceXyk(asset1Id, asset2Id, poolAccount, blockHash)
+    )
+  );
+};
+const getSpotPriceLbp = async (
+  assetAId: string,
+  assetBId: string,
+  blockHash?: string,
+  poolAccount?: string
+) => {
+  return Promise.resolve(
+    toExternalBN(
+      await _getSpotPriceLbp(assetAId, assetBId, poolAccount, blockHash)
+    )
+  );
 };
 
 const getMaxReceivedTradeAmount = (
@@ -105,37 +140,79 @@ const getMinReceivedTradeAmount = (
 };
 
 const getAccountBalances = (account: any) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<any[]>((resolve, reject) => {
     _getAccountBalances(account)
       .then((balances: AssetBalance[]) => {
         resolve(
-          balances.map(({ assetId, balance, totalBalance, freeBalance, feeFrozenBalance, miscFrozenBalance, reservedBalance }) => {
-            return {
+          balances.map(
+            ({
               assetId,
-              balance: toExternalBN(balance),
-              totalBalance: toExternalBN(new BigNumber(totalBalance)),
-              freeBalance: toExternalBN(new BigNumber(freeBalance)),
-              feeFrozenBalance: toExternalBN(new BigNumber(feeFrozenBalance)),
-              miscFrozenBalance: toExternalBN(new BigNumber(miscFrozenBalance)),
-              reservedBalance: toExternalBN(new BigNumber(reservedBalance)),
-            };
-          })
+              balance,
+              totalBalance,
+              freeBalance,
+              feeFrozenBalance,
+              miscFrozenBalance,
+              reservedBalance,
+            }) => {
+              return {
+                assetId,
+                balance: toExternalBN(balance),
+                totalBalance: toExternalBN(new BigNumber(totalBalance)),
+                freeBalance: toExternalBN(new BigNumber(freeBalance)),
+                feeFrozenBalance: toExternalBN(new BigNumber(feeFrozenBalance)),
+                miscFrozenBalance: toExternalBN(
+                  new BigNumber(miscFrozenBalance)
+                ),
+                reservedBalance: toExternalBN(new BigNumber(reservedBalance)),
+              };
+            }
+          )
         );
       })
       .catch(e => reject(e));
   });
 };
 
-const getPoolInfo = () => {
+const getPoolAssetsAmountsLbp = (
+  assetAId: string,
+  assetBId: string,
+  poolAccount: string,
+  blockHash?: string
+): Promise<{
+  assetA: BigNumber;
+  assetB: BigNumber;
+}> => {
+  return new Promise<{
+    assetA: BigNumber;
+    assetB: BigNumber;
+  }>((resolve, reject) => {
+    _getPoolAssetsAmountsLbp(assetAId, assetBId, poolAccount, blockHash)
+      .then((amounts: { assetA: BigNumber; assetB: BigNumber }) => {
+        resolve({
+          assetA: toExternalBN(amounts.assetA),
+          assetB: toExternalBN(amounts.assetB),
+        });
+      })
+      .catch(e => reject(null));
+  });
+};
+
+const getPoolsInfoXyk = (blockHash?: string | undefined) => {
   return new Promise((resolve, reject) => {
-    _getPoolInfo()
+    _getPoolsInfoXyk(blockHash)
       .then((res: any) => {
-        Object.keys(res.poolInfo).forEach((key) => {
+        Object.keys(res.poolInfo).forEach(key => {
           if (res.poolInfo[key].poolAssetsAmount) {
-            res.poolInfo[key].poolAssetsAmount.asset1 = toExternalBN(res.poolInfo[key].poolAssetsAmount.asset1);
-            res.poolInfo[key].poolAssetsAmount.asset2 = toExternalBN(res.poolInfo[key].poolAssetsAmount.asset2);
+            res.poolInfo[key].poolAssetsAmount.asset1 = toExternalBN(
+              res.poolInfo[key].poolAssetsAmount.asset1
+            );
+            res.poolInfo[key].poolAssetsAmount.asset2 = toExternalBN(
+              res.poolInfo[key].poolAssetsAmount.asset2
+            );
           }
-          res.poolInfo[key].marketCap = toExternalBN(res.poolInfo[key].marketCap);
+          res.poolInfo[key].marketCap = toExternalBN(
+            res.poolInfo[key].marketCap
+          );
         });
         resolve(res);
       })
@@ -143,13 +220,23 @@ const getPoolInfo = () => {
   });
 };
 
-export {
+/**
+ * If we export new method, it must be added to methods expose
+ * list in "./src/utils/apiUtils.ts"
+ */
+
+export default {
   getAccountBalances,
   getAssetList,
-  getPoolInfo,
+  getPoolsInfoXyk,
+  getPoolInfoLbp,
+  getPoolAccountLbp,
   getSpotPrice,
+  getSpotPriceXyk,
+  getSpotPriceLbp,
   getTokenAmount,
   getPoolAssetsAmounts,
+  getPoolAssetsAmountsLbp,
   calculateSpotAmount,
   getTradePrice,
   getFreeTokenAmount,
@@ -159,4 +246,6 @@ export {
   getMarketcap,
   getMaxReceivedTradeAmount,
   getMinReceivedTradeAmount,
+  getBlockHeightRelayChain,
+  getPoolAssetsWeightsLbp,
 };

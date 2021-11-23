@@ -18,8 +18,8 @@ export function swap({
   asset1Id: string;
   asset2Id: string;
   amount: BigNumber;
-  expectedOut: string;
   actionType: string;
+  expectedOut: string;
   slippage: BigNumber;
   account: AddressOrPair;
   signer?: Signer;
@@ -41,7 +41,7 @@ export function swap({
   };
 
   if (actionType === 'buy') {
-    tx = api.tx.exchange
+    tx = api.tx.xyk
       //TODO: CALCULATE LIMITS FROM SPOT PRICE
       .buy(
         asset1Id,
@@ -51,7 +51,7 @@ export function swap({
         false
       );
   } else {
-    tx = api.tx.exchange
+    tx = api.tx.xyk
       //TODO: CALCULATE LIMITS FROM SPOT PRICE
       .sell(
         asset1Id,

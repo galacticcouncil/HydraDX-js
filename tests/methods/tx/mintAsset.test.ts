@@ -15,7 +15,7 @@ test('Test mintAsset', async () => {
 
   let targetBalance = await api.hydraDx.query.getAccountBalances(alice.address);
 
-  expect(targetBalance[0].balanceFormatted).toBe(originalBalance[0].balance.plus('1000000000000000').toString());
-  expect(targetBalance[1].balanceFormatted).toBe(originalBalance[1].balance.plus('1000000000000000').toString());
-  expect(targetBalance[2].balanceFormatted).toBe(originalBalance[2].balance.plus('1000000000000000').toString());
+  expect(targetBalance[0].balance.toString()).toBe(originalBalance[0].balance.plus('1000').toString());
+  expect(targetBalance[1].balance.toString()).toBe(originalBalance[1].balance.plus('1000').toString());
+  expect(targetBalance[2].balance.toString()).toBe(originalBalance[2].balance.plus('1000').toString());
 });

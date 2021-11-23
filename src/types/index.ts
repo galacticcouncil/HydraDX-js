@@ -1,9 +1,56 @@
 import BigNumber from 'bignumber.js';
 import { ApiPromise } from '@polkadot/api';
 import { AddressOrPair } from '@polkadot/api/types';
+import type { Codec, AnyJson } from '@polkadot/types/types';
+
+import queryMethods from '../methods/query';
+import txMethods from '../methods/tx';
+import * as sdkUtils from '../utils';
+
+import {
+  getSpotPriceXyk,
+  calculateInGivenOutXyk,
+  calculateOutGivenInXyk,
+  getSpotPriceLbp,
+  calculateInGivenOutLbp,
+  calculateOutGivenInLbp,
+  calculateLinearWeightsLbp,
+} from '../utils/wasmUtils';
+
+export const ChainName = {
+  hydraDx: 'hydraDx',
+  basilisk: 'basilisk',
+} as const;
+
+type SdkMethods<Type> = {
+  [Property in keyof Type]: Type[Property];
+};
+
+export type SdkMethodsScope = {
+  query: SdkMethods<typeof queryMethods>;
+  tx: SdkMethods<typeof txMethods>;
+};
 
 export interface HydraApiPromise extends ApiPromise {
-  hydraDx?: any;
+  hydraDx: SdkMethodsScope;
+  basilisk: SdkMethodsScope;
+  wasmUtils: {
+    xyk: {
+      getSpotPrice: typeof getSpotPriceXyk;
+      calculateOutGivenIn: typeof calculateOutGivenInXyk;
+      calculateInGivenOut: typeof calculateInGivenOutXyk;
+    };
+    lbp: {
+      getSpotPrice: typeof getSpotPriceLbp;
+      calculateOutGivenIn: typeof calculateOutGivenInLbp;
+      calculateInGivenOut: typeof calculateInGivenOutLbp;
+      calculateLinearWeights: typeof calculateLinearWeightsLbp;
+    };
+  };
+  utils: {
+    getFormattedAddress: typeof sdkUtils.getFormattedAddress;
+    setBlocksDelay: typeof sdkUtils.setBlocksDelay;
+  };
 }
 
 export type ApiListeners = {
@@ -24,10 +71,10 @@ export type AssetBalance = {
   assetId: number;
   balance: BigNumber;
   totalBalance: BigNumber;
-  freeBalance: BigNumber,
-  feeFrozenBalance: BigNumber,
-  miscFrozenBalance: BigNumber,
-  reservedBalance: BigNumber,
+  freeBalance: BigNumber;
+  feeFrozenBalance: BigNumber;
+  miscFrozenBalance: BigNumber;
+  reservedBalance: BigNumber;
   name?: string;
   shareToken?: boolean;
 };
@@ -45,7 +92,9 @@ export type PoolInfo = {
     shareToken: number;
     poolAssetsAmount?: {
       asset1: BigNumber | null;
+      asset1Weight?: BigNumber | null; // actual for Basilisk chain
       asset2: BigNumber | null;
+      asset2Weight?: BigNumber | null; // actual for Basilisk chain
     } | null;
     marketCap?: BigNumber;
   };
@@ -72,7 +121,7 @@ export type DirectTradeFee = {
   account2: string;
   asset: string;
   amount: BigNumber;
-}
+};
 
 export type ExchangeTransactionDetails = {
   id: string | null;
@@ -92,7 +141,8 @@ export type ExchangeTransactionDetails = {
   amountSoldBought?: BigNumber;
   totalAmountFinal?: BigNumber;
   errorDetails?:
-    string | { section: string; name: string; documentation: string };
+    | string
+    | { section: string; name: string; documentation: string };
   assetsPair?: string;
   directTrades?: {
     amountSent: BigNumber;
@@ -117,3 +167,39 @@ export type ExchangeTxEventData = {
 };
 
 export type MergedPairedEvents = { [key: string]: ExchangeTxEventData };
+
+export type LbpPoolDataHuman = {
+  owner: string;
+  start: string;
+  end: string;
+  assets: string[];
+  initialWeight: string;
+  finalWeight: string;
+  weightCurve: string;
+  fee: { numerator: string; denominator: string };
+  feeCollector: string;
+  [index: string]: AnyJson;
+};
+
+export type LbpPoolData = {
+  poolId: string;
+  saleStart: BigNumber;
+  saleEnd: BigNumber;
+  owner: string;
+  initialWeight: BigNumber;
+  finalWeight: BigNumber;
+  assetAId: string;
+  assetBId: string;
+  weightCurve: string;
+  feeNumerator: string;
+  feeDenominator: string;
+  feeCollector: string;
+};
+
+export type RelayChainValidationDataHuman = {
+  parentHead: string;
+  relayParentNumber: string;
+  relayParentStorageRoot: string;
+  maxPovSize: string;
+  [index: string]: AnyJson;
+};

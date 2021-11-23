@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import Api from '../../../src/api';
 import { HydraApiPromise } from '../../../src/types';
 
@@ -14,10 +15,10 @@ test('Test getAccountBalances structure', async () => {
   const target = getRandomAccount();
   let targetBalance = await api.hydraDx.query.getAccountBalances(target.address);
 
-  expect(targetBalance[0].balanceFormatted).toBe('0');
+  expect(targetBalance[0].balance.toString()).toBe('0');
 
-  await transfer(api, target.address, alice, '1000000000000');
+  await transfer(api, target.address, alice, new BigNumber('1').multipliedBy('1e12'));
   targetBalance = await api.hydraDx.query.getAccountBalances(target.address);
 
-  expect(targetBalance[0].balanceFormatted).toBe('1000000000000');
+  expect(targetBalance[0].balance.toString()).toBe('1');
 });
