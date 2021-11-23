@@ -5,13 +5,11 @@ import { AddressOrPair, Signer } from '@polkadot/api/types';
 import { txCallback, txCatch } from './_callback';
 import { getAccountKeyring, getSudoPair } from '../../utils';
 
-export function removeLiquidityLbp(
-  asset1Id: string,
-  asset2Id: string,
-  liquidityToRemove: BigNumber,
-  account: AddressOrPair,
-  signer?: Signer
-): Promise<void> {
+export function removeLiquidityLbp({
+  poolId,
+}: {
+  poolId: string,
+}): Promise<void> {
   return new Promise(async (resolve, reject) => {
     try {
       const api = Api.getApi();
@@ -20,9 +18,7 @@ export function removeLiquidityLbp(
       const unsub = await api.tx.sudo
         .sudo(
           api.tx.lbp.removeLiquidity(
-            asset1Id,
-            asset2Id,
-            bnToBn(liquidityToRemove.toString())
+            poolId,
           )
         )
         .signAndSend(

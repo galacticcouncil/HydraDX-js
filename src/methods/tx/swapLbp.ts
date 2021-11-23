@@ -49,7 +49,6 @@ export function swapLbp({
         asset2Id,
         bnToBn(amount.toString()),
         bnToBn(slippage.toString()),
-        false
       );
   } else {
     tx = api.tx.lbp
@@ -59,7 +58,6 @@ export function swapLbp({
         asset2Id,
         bnToBn(amount.toString()),
         bnToBn(slippage.toString()),
-        false
       );
   }
 

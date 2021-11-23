@@ -86,6 +86,13 @@ export function createPoolLbp({
             .signAndSend(
               currentSigner as AddressOrPair,
               ({ events = [], status }) => {
+                events.forEach(
+                  ({ event: { data, method, section }, phase }) => {
+                    console.log(
+                      `\t' ${phase}: ${section}.${method}:: ${data}`
+                    );
+                  }
+                );
                 if (status.isFinalized) {
                   let newPoolAccount: AddressOrPair | null = null;
                   events.forEach(
@@ -125,6 +132,13 @@ export function createPoolLbp({
             .signAndSend(
               currentSigner as AddressOrPair,
               ({ events = [], status }) => {
+                events.forEach(
+                  ({ event: { data, method, section }, phase }) => {
+                    console.log(
+                      `\t' ${phase}: ${section}.${method}:: ${data}`
+                    );
+                  }
+                );
                 if (status.isFinalized) {
                   let newPoolAccount: AddressOrPair | null = null;
                   events.forEach(

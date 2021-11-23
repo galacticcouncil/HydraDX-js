@@ -2,10 +2,18 @@ import { HydraApiPromise } from '../../src/types';
 
 export const getAllPoolInfo = async (api: HydraApiPromise, moduleName = 'xyk') => {
   const module = api.query[moduleName];
-  const poolsList = await module.poolAssets.entries();
+  let poolsList = [];
+  
+  if (moduleName === 'xyk') {
+    poolsList = await module.poolAssets.entries();
+  } else {
+    poolsList = await module.poolData.entries();
+  }
+
   const parsedPoolsList = poolsList.map(item => {
     return [item[0].toHuman(), item[1].toHuman()];
   });
+
   const pools = [];
 
   if (parsedPoolsList) {

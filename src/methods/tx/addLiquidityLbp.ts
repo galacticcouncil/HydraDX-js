@@ -8,16 +8,16 @@ import { getAccountKeyring, getSudoPair } from '../../utils';
 export function addLiquidityLbp({
   asset1Id,
   asset2Id,
-  amount,
-  maxSellPrice,
+  amountA,
+  amountB,
   account,
   signer,
-  isSudo
+  isSudo = false
 } : {
   asset1Id: string,
   asset2Id: string,
-  amount: BigNumber,
-  maxSellPrice: BigNumber,
+  amountA: BigNumber,
+  amountB: BigNumber,
   account: AddressOrPair,
   signer?: Signer,
   isSudo?: boolean,
@@ -28,10 +28,8 @@ export function addLiquidityLbp({
       const defaultSigner = await getAccountKeyring('//Alice');
       const currentSigner = signer || defaultSigner;
       let tx = api.tx.lbp.addLiquidity(
-        asset1Id,
-        asset2Id,
-        bnToBn(amount.toString()),
-        bnToBn(maxSellPrice.toString())
+        [asset1Id, bnToBn(amountA.toString())],
+        [asset2Id, bnToBn(amountB.toString())]
       );
       let result: any;
 
@@ -51,6 +49,7 @@ export function addLiquidityLbp({
 
       result.catch(txCatch(reject));
     } catch (e: any) {
+      console.log(e.message);
       reject({
         section: 'lbp.addLiquidity',
         data: [e.message],

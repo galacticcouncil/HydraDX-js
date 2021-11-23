@@ -125,16 +125,16 @@ const addLiquidity = (
 const addLiquidityLbp = ({
   asset1Id,
   asset2Id,
-  amount,
-  maxSellPrice,
+  amountA,
+  amountB,
   account,
   signer,
   isSudo
 } : {
   asset1Id: string,
   asset2Id: string,
-  amount: BigNumber,
-  maxSellPrice: BigNumber,
+  amountA: BigNumber,
+  amountB: BigNumber,
   account: AddressOrPair,
   signer?: Signer,
   isSudo?: boolean,
@@ -142,8 +142,8 @@ const addLiquidityLbp = ({
   return _addLiquidityLbp({
     asset1Id,
     asset2Id,
-    amount: toInternalBN(amount),
-    maxSellPrice: toInternalBN(maxSellPrice),
+    amountA,
+    amountB,
     account,
     signer,
     isSudo

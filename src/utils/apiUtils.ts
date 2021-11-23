@@ -90,10 +90,11 @@ export const exposeApiMethods = (
 
   const filterMethods = (methods: any, pattern: string[]) => {
     const methodsArr = Object.entries(methods);
-    const filteredArr = methodsArr.filter(function ([key]) {
-      return pattern.includes(key);
-    });
-    return filteredArr.reduce(objectFromEntries);
+    return methods;
+    // const filteredArr = methodsArr.filter(function ([key]) {
+    //   return pattern.includes(key);
+    // });
+    // return filteredArr.reduce(objectFromEntries);
   };
 
   switch (chainName) {

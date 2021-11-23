@@ -11,8 +11,7 @@ import { destroyAllPools } from '../../utils';
 
 let api: HydraApiPromise;
 
-test('Test swap', async () => {
-  console.log(process.env.WS_URL);
+test('Test swapLbp', async () => {
   api = await Api.initialize({}, process.env.WS_URL);
 
   const alice = getAliceAccount();
@@ -22,7 +21,7 @@ test('Test swap', async () => {
   // @ts-ignore
   const asset2 = assetList[1].assetId;
 
-  let poolInfo = await api.hydraDx.query.getPoolsInfoXyk(alice.address);
+  let poolInfo = await api.hydraDx.query.getPoolsInfoXyk();
 
   await destroyAllPools(api, alice);
   // @ts-ignore
@@ -44,6 +43,7 @@ test('Test swap', async () => {
     account: alice
   });
 
+  expect(result.method[0]).not.toBeNull();
   // expect(result.method[0]).toBe('IntentionRegistered');
   // expect(result.data.amount.toString()).toBe('100000000');
   // expect(result.data.amountXykTrade.toString()).toBe('100000000');
